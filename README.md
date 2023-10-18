@@ -72,15 +72,19 @@ $ npm run
 
 ## API endpoints
 
-| Endpoint                       | Description  |
-| :----------------------------- | :----------- |
-| `GET: /health`                 | Health       |
-| `GET: /v1/entities`            | Entities     |
-| `GET: /v1/entities/<entityId>` | Entity by ID |
+| Endpoint                                              | Description                  |
+| :---------------------------------------------------- | :--------------------------- |
+| `POST: /_admin/trigger-ecr-push/<repo-name>/<version>` | triggers an ECR push message |
 
 ## Calling API endpoints
 
-### Postman
+### Curl
+
+Triggering an ECR message
+
+```bash
+curl -X POST localhost:3939/_admin/trigger-ecr-push/cdp-portal-frontend/0.1.0
+```
 
 A [Postman](https://www.postman.com/) collection and environment are available for making calls to the Teams and
 Repositories API. Simply import the collection and environment into Postman.
@@ -88,13 +92,6 @@ Repositories API. Simply import the collection and environment into Postman.
 - [CDP Node Backend Template Postman Collection](postman/cdp-portal-stubs.postman_collection.json)
 - [CDP Node Backend Template Postman Environment](postman/cdp-portal-stubs.postman_environment.json)
 
-## Versioning
-
-### Auto minor versioning
-
-The [Publish GitHub Actions workflow](./.github/workflows/publish.yml) auto versions a Pull Requests code with a `minor`
-version once it has been merged into the `main` branch.
-All you have to do is commit your code and raise a Pull Request and the pipeline will auto version your code for you.
 
 ### Major or Patch versioning
 

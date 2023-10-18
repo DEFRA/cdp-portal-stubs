@@ -6,7 +6,7 @@ const adminStub = {
     register: async (server) => {
       server.route([
         {
-          method: 'GET',
+          method: 'POST',
           path: '/_admin/trigger-ecr-push/{repo}/{tag}',
           ...triggerEcrPush
         }

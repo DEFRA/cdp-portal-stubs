@@ -1,11 +1,11 @@
 import { protectedServices, publicServices } from '~/src/config/services'
 
 const getTfSvcFile = (path) => {
-  if (path.endsWith('protected.json')) {
+  if (path.endsWith('protected_services.json')) {
     return protectedServices.map((s) => generateService(s))
   }
 
-  if (path.endsWith('public.json')) {
+  if (path.endsWith('public_services.json')) {
     return publicServices.map((s) => generateService(s))
   }
   return null
