@@ -1,4 +1,5 @@
 import { getTfSvcFile } from '~/src/api/github/content/tfsvc'
+import { getTfSvcInfraFile } from '~/src/api/github/content/tfsvcinfra'
 
 const getContentController = {
   handler: async (request, h) => {
@@ -16,8 +17,10 @@ const getContentController = {
 
 const lookupContent = (repo, path) => {
   switch (repo) {
-    case 'tf-svc':
+    case 'cdp-tf-svc':
       return getTfSvcFile(path)
+    case 'cdp-tf-svc-infra':
+      return getTfSvcInfraFile(path)
     default:
       return null
   }

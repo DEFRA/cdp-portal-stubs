@@ -515,4 +515,4 @@ const generateRepoData = (org, repo) => {
   }
 }
 
-export {generateRepoData}
+export { generateRepoData }

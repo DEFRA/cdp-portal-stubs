@@ -4,4 +4,4 @@ const gitTreeController = {
   }
 }
 
-export {gitTreeController}
+export { gitTreeController }

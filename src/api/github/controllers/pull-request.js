@@ -1,42 +1,59 @@
 import * as crypto from 'crypto'
+import { triggerDeployWorkflow } from '~/src/api/github/events/trigger-deployment-workflow'
+import { triggerMergeResponse } from '~/src/api/github/events/trigger-merge-response'
+import { environmentMappings } from '~/src/config/environments'
+import { extractTagFromTitle } from '~/src/api/github/helpers/extract-tag-from-title'
+import { triggerWorkflowComplete } from '~/src/api/github/events/trigger-workflow-complete'
 
 const createPullRequest = {
   handler: async (request, h) => {
+    const org = request.params.org
     const repo = request.params.repo
-    const payload = request.payload
-
-    // Payload looks something like this
-    // "{\"head\":\"defra-cdp-sandpit:deploy-cdp-portal-frontend-0.1.0-1697630060408\",\"base\":\"master\",\"title\":\"Deploy cdp-portal-frontend:0.1.0 to public cluster\",\"body\":\"Auto generated Pull Request to set cdp-portal-frontend to use version 0.1.0 in 'environments/infra-dev/services/public_services.json'\",\"draft\":false}",
 
     const commitId = crypto.randomBytes(16).toString('hex')
     const nodeId = crypto.randomBytes(16).toString('hex')
 
+    request.logger.info(request.payload)
+
     if (repo === 'tf-svc') {
-      await triggerMergeResponse(repo, commitId, 1)
-      triggerDeployWorkflow(repo, commitId)
+      const { service, version, environment } = extractTagFromTitle(
+        request.payload.title
+      )
+
+      const accountId = environmentMappings[environment]
+
+      request.logger.info(
+        `Triggering deployment workflow ${service}:${version}`
+      )
+
+      const res = await triggerDeployWorkflow(
+        request.sqs,
+        accountId,
+        org,
+        service,
+        version
+      )
+
+      request.logger.info(res)
     }
 
-    if (repo === 'tf-svc-infra') {
-      await triggerMergeResponse(repo, commitId, 1)
-      triggerCreateRepoWorkflow(repo, commitId)
-    }
+    const number = Math.floor(Math.random() * 9999999)
 
-    if (repo === 'cdp-app-config') {
-      triggerMergeResponse(repo, commitId, 1)
-    }
+    await triggerMergeResponse(request.sqs, repo, number, nodeId, commitId)
+    await triggerWorkflowComplete(request.sqs, repo, commitId)
 
     return h
       .response({
-        nodeId
+        head: {
+          sha: commitId,
+          ref: 'branch' + number
+        },
+        number,
+        html_url: `http://localhost/org/repo/pull_request/${number}`,
+        node_id: nodeId
       })
       .code(200)
   }
 }
-
-const triggerDeployWorkflow = async (repo, commitId) => {}
-
-const triggerCreateRepoWorkflow = async (repo, commitId) => {}
-
-const triggerMergeResponse = async (repo, commitId, delay) => {}
 
 export { createPullRequest }

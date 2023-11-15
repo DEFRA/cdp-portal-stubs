@@ -29,7 +29,7 @@ const fileBlobs = {
 
 const configBlobs = () => {
   const configBlobs = {}
-  allServices.forEach((s) => {
+  allServices().forEach((s) => {
     // note: this isn't actually what docker is hashing, we're just generating it this way since its
     // derministic and reasonably representative of the real thing.
     const org = config.get('githubOrg')

@@ -103,6 +103,12 @@ const config = convict({
     format: String,
     default: 'http://127.0.0.1:4566/000000000000/ecr-push-events',
     env: 'SQS_ECR_QUEUE'
+  },
+  sqsEcsQueue: {
+    doc: 'URL of sqs queue providing ECS deployment events',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/ecs-deployments',
+    env: 'SQS_ECS_QUEUE'
   }
 })
 

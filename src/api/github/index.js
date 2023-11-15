@@ -7,8 +7,9 @@ import {
   postCommitsController,
   repoCommitsController
 } from '~/src/api/github/controllers/commits'
-import {graphqlController} from "~/src/api/github/controllers/graphql";
-import {createPullRequest} from "~/src/api/github/controllers/pull-request";
+import { graphqlController } from '~/src/api/github/controllers/graphql'
+import { createPullRequest } from '~/src/api/github/controllers/pull-request'
+import { triggerWorkflow } from '~/src/api/github/controllers/trigger-workflow'
 
 const githubStub = {
   plugin: {
@@ -59,6 +60,11 @@ const githubStub = {
           method: 'POST',
           path: '/repos/{org}/{repo}/pulls',
           ...createPullRequest
+        },
+        {
+          method: 'POST',
+          path: '/repos/{org}/{repo}/actions/workflows/{workflow}/dispatches',
+          ...triggerWorkflow
         }
       ])
     }
