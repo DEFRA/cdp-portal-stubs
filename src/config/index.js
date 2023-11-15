@@ -13,7 +13,7 @@ const config = convict({
   port: {
     doc: 'The port to bind.',
     format: 'port',
-    default: 3001,
+    default: 3939,
     env: 'PORT'
   },
   version: {
@@ -73,6 +73,42 @@ const config = convict({
     doc: 'path for mongodb TLS truststore',
     format: '*',
     env: 'MONGO_CERT_PATH'
+  },
+  githubOrg: {
+    doc: 'github org to mock',
+    format: 'String',
+    default: 'defra-cdp-sandpit',
+    env: 'GITHUB_ORG'
+  },
+  sqsRegion: {
+    doc: 'AWS region of sqs queue',
+    format: String,
+    default: 'us-east-1',
+    env: 'SQS_REGION'
+  },
+  sqsEndpoint: {
+    doc: 'SQS endpoint',
+    format: String,
+    default: 'http://127.0.0.1:4566',
+    env: 'SQS_ENDPOINT'
+  },
+  sqsGithubQueue: {
+    doc: 'URL of sqs queue providing github events',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/github-events',
+    env: 'SQS_GITHUB_QUEUE'
+  },
+  sqsEcrQueue: {
+    doc: 'URL of sqs queue providing github events',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/ecr-push-events',
+    env: 'SQS_ECR_QUEUE'
+  },
+  sqsEcsQueue: {
+    doc: 'URL of sqs queue providing ECS deployment events',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/ecs-deployments',
+    env: 'SQS_ECS_QUEUE'
   }
 })
 
