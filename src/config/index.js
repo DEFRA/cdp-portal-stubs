@@ -80,17 +80,17 @@ const config = convict({
     default: 'defra-cdp-sandpit',
     env: 'GITHUB_ORG'
   },
-  sqsRegion: {
-    doc: 'AWS region of sqs queue',
+  awsRegion: {
+    doc: 'AWS region',
     format: String,
-    default: 'us-east-1',
-    env: 'SQS_REGION'
+    default: 'eu-west-2',
+    env: 'AWS_REGION'
   },
-  sqsEndpoint: {
-    doc: 'SQS endpoint',
+  awsEndpoint: {
+    doc: 'AWS endpoint',
     format: String,
     default: 'http://127.0.0.1:4566',
-    env: 'SQS_ENDPOINT'
+    env: 'AWS_ENDPOINT'
   },
   sqsGithubQueue: {
     doc: 'URL of sqs queue providing github events',

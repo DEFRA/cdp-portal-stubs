@@ -6,8 +6,8 @@ const sqsPlugin = {
   version: '1.0.0',
   register: async function (server) {
     const sqsClient = new SQSClient({
-      region: config.get('sqsRegion'),
-      endpoint: config.get('sqsEndpoint')
+      region: config.get('awsRegion'),
+      endpoint: config.get('awsEndpoint')
     })
 
     server.decorate('server', 'sqs', sqsClient)
