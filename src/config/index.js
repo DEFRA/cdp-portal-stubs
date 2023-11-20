@@ -86,11 +86,11 @@ const config = convict({
     default: 'eu-west-2',
     env: 'AWS_REGION'
   },
-  awsEndpoint: {
-    doc: 'AWS endpoint',
+  sqsEndpoint: {
+    doc: 'AWS SQS endpoint',
     format: String,
     default: 'http://127.0.0.1:4566',
-    env: 'AWS_ENDPOINT'
+    env: 'SQS_ENDPOINT'
   },
   sqsGithubQueue: {
     doc: 'URL of sqs queue providing github events',
