@@ -10,6 +10,7 @@ import {
 import { graphqlController } from '~/src/api/github/controllers/graphql'
 import { createPullRequest } from '~/src/api/github/controllers/pull-request'
 import { triggerWorkflow } from '~/src/api/github/controllers/trigger-workflow'
+import { accessTokenController } from '~/src/api/github/controllers/access-token'
 
 const githubStub = {
   plugin: {
@@ -65,6 +66,11 @@ const githubStub = {
           method: 'POST',
           path: '/repos/{org}/{repo}/actions/workflows/{workflow}/dispatches',
           ...triggerWorkflow
+        },
+        {
+          method: 'POST',
+          path: '/app/installations/{appInstallationId}/access_tokens',
+          ...accessTokenController
         }
       ])
     }
