@@ -56,7 +56,7 @@ const triggerDeployWorkflow = async (sqs, accountId, org, repo, version) => {
   const doneMessage = {
     QueueUrl: config.get('sqsEcsQueue'),
     MessageBody: JSON.stringify(payload),
-    DelaySeconds: 2,
+    DelaySeconds: 1,
     MessageAttributes: {},
     MessageSystemAttributes: {}
   }

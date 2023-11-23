@@ -18,7 +18,7 @@ const triggerCreateRepoWorkflow = async (sqs, repoName) => {
   const pendingMessage = {
     QueueUrl: config.get('sqsGithubQueue'),
     MessageBody: JSON.stringify(payload),
-    DelaySeconds: 2,
+    DelaySeconds: 1,
     MessageAttributes: {},
     MessageSystemAttributes: {}
   }
