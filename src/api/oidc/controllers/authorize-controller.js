@@ -1,9 +1,32 @@
-import { oidcConfig } from '~/src/api/oidc/oidc'
+import { oidcBasePath, oidcConfig } from '~/src/api/oidc/oidc-config'
 import { validateScope } from '~/src/api/oidc/helpers/validate-scope'
 import { newSession } from '~/src/api/oidc/helpers/session-store'
+import { allUsers } from '~/src/api/oidc/helpers/users'
 
 const authorizeController = {
   handler: (request, h) => {
+    // a bit of a hack, but basically if the user propery hasn't been set
+    // show a 'login' page where they can select which fake user they want
+    if (request.query.user === undefined) {
+      const fullUrl = new URL(request.url)
+      const page = `
+        <h1>Login</h1>
+        ${Object.keys(allUsers).map(
+          (u) =>
+            '<a href="' +
+            oidcBasePath +
+            '/authorize' +
+            fullUrl.search +
+            '&user=' +
+            u +
+            '">' +
+            u +
+            '</a>'
+        )}
+        `
+      return h.response(page).header('content-type', 'text/html').code(200)
+    }
+
     // TODO check these are all set, use joi or something
     const clientId = request.query.client_id
     const responseType = request.query.response_type
@@ -37,12 +60,13 @@ const authorizeController = {
         .code(400)
     }
 
-    // create session
-    // TODO we should load the users from some sort of config
-    const user = {
-      id: '62bb35d2-d4f2-4cf6-abd3-262d99727677', // TODO: what should this be, refer to example configs
-      username: 'Test User'
+    const user = allUsers[request.query.user]
+    if (user === undefined) {
+      request.logger.error(`Invalid user selected ${request.query.user}`)
+      return h.response(`Invalid user selection!`).code(400)
     }
+
+    // create session
     const session = newSession(
       scope,
       request.query.nonce,

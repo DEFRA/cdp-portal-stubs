@@ -1,4 +1,4 @@
-import { oidcConfig } from '~/src/api/oidc/oidc'
+import { oidcConfig } from '~/src/api/oidc/oidc-config'
 
 const generateConfig = () => {
   return {

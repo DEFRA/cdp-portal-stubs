@@ -1,8 +1,22 @@
 import * as crypto from 'crypto'
-import { standardClaims } from '~/src/api/oidc/helpers/user-defaults'
-import { keyId, oidcConfig } from '~/src/api/oidc/oidc'
+import { defaultClaims } from '~/src/api/oidc/helpers/default-claims'
+import { oidcConfig } from '~/src/api/oidc/oidc-config'
 import jsonwebtoken from 'jsonwebtoken'
 import { jwk2pem } from 'pem-jwk'
+
+function loadOIDCKeys() {
+  const jwk = generateRSAKeyPair()
+  const pem = {
+    publicKey: jwk2pem(jwk.publicKey),
+    privateKey: jwk2pem(jwk.privateKey)
+  }
+  const keyId = keyID(pem.publicKey)
+  return {
+    jwk,
+    keyId,
+    pem
+  }
+}
 
 function generateRSAKeyPair() {
   // TODO: load these from file so they remain the same between restarts
@@ -19,52 +33,43 @@ function generateRSAKeyPair() {
   })
 }
 
-function rsaKeyToJwk(key) {
-  return {
+function JWKS(keys) {
+  const jwks = {
     kty: 'RSA',
-    n: Buffer.from(key.n, 'base64').toString('base64url'),
-    e: Buffer.from(key.e, 'base64').toString('base64url'),
+    n: Buffer.from(keys.jwk.publicKey.n, 'base64').toString('base64url'),
+    e: Buffer.from(keys.jwk.publicKey.e, 'base64').toString('base64url'),
     alg: 'RS256',
     use: 'sig',
-    kid: keyId
+    kid: keys.keyId
   }
-}
 
-function JWKS(publicKey) {
   return {
-    keys: [rsaKeyToJwk(publicKey)]
+    keys: [jwks]
   }
 }
 
-function generateToken(keyPair, session) {
-  const privateKey = jwk2pem(keyPair.privateKey)
-  const claim = standardClaims(session, oidcConfig.ttl)
-
-  return jsonwebtoken.sign(claim, privateKey, {
+function generateToken(keys, session) {
+  const claim = defaultClaims(session, oidcConfig.ttl)
+  return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
-    keyid: keyId
+    keyid: keys.keyId
   })
 }
 
-function generateIDToken(keyPair, session) {
-  const privateKey = jwk2pem(keyPair.privateKey)
-  const claims = standardClaims(session, oidcConfig.ttl)
-  claims.nonce = session.nonce
-
-  // TODO: add claims for user here
-  return jsonwebtoken.sign(claims, privateKey, {
+function generateIDToken(keys, session) {
+  const claim = defaultClaims(session, oidcConfig.ttl)
+  claim.nonce = session.nonce
+  return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
-    keyid: keyId
+    keyid: keys.keyId
   })
 }
 
-function generateRefreshToken(keyPair, session) {
-  const privateKey = jwk2pem(keyPair.privateKey)
-
-  const claim = standardClaims(session, oidcConfig.refreshTtl)
-  return jsonwebtoken.sign(claim, privateKey, {
+function generateRefreshToken(keys, session) {
+  const claim = defaultClaims(session, oidcConfig.refreshTtl)
+  return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
-    keyid: keyId
+    keyid: keys.keyId
   })
 }
 
@@ -80,8 +85,7 @@ function generateCodeChallenge(method, codeVerifier) {
 }
 
 // If not manually set, computes the JWT headers' `kid`
-function keyID(keypair) {
-  const pem = jwk2pem(keypair.publicKey)
+function keyID(pem) {
   const publicKey = crypto.createPublicKey({
     key: pem,
     format: 'pem',
@@ -102,12 +106,11 @@ function sha256(input) {
 }
 
 export {
-  generateRSAKeyPair,
-  rsaKeyToJwk,
+  loadOIDCKeys,
   JWKS,
   generateToken,
   generateIDToken,
   generateRefreshToken,
   generateCodeChallenge,
-  keyID
+  sha256
 }

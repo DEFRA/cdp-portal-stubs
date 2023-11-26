@@ -1,14 +1,14 @@
-import { keyPair, oidcConfig } from '~/src/api/oidc/oidc'
+import { oidcConfig } from '~/src/api/oidc/oidc-config'
 import {
   getSessionByToken,
   sessions
 } from '~/src/api/oidc/helpers/session-store'
 import {
-  generateCodeChallenge,
   generateIDToken,
   generateRefreshToken,
   generateToken
 } from '~/src/api/oidc/helpers/oidc-crypto'
+import { validateCodeChallenge } from '~/src/api/oidc/helpers/validate-code-challenge'
 
 const tokenController = {
   handler: (request, h) => {
@@ -39,7 +39,6 @@ const tokenController = {
     if (grantType === 'authorization_code') {
       logger.info('handling authorization code')
       result = getSessionForAuthorizationCode(code)
-      // TODO: validate code challenge
       const { valid, err } = validateCodeChallenge(result.session, codeVerifier)
       if (!valid) {
         logger.error(err)
@@ -69,21 +68,22 @@ const tokenController = {
     }
 
     // copy over the refresh token if its not there
+    // unsure if we still need the !== string 'null' check anymore
     if (refreshToken && refreshToken !== 'null') {
       logger.info(`refresh token ${refreshToken}`)
       tokenResponse.refresh_token = refreshToken
     }
 
-    tokenResponse.access_token = generateToken(keyPair, session, grantType)
+    tokenResponse.access_token = generateToken(request.keys, session)
 
     // the example only checked the first item in the scope, unsure if this is correct or an oversight?
     if (session.scopes[0] === 'openid') {
-      tokenResponse.id_token = generateIDToken(keyPair, session)
+      tokenResponse.id_token = generateIDToken(request.keys, session)
     }
 
     if (grantType !== 'refresh_token') {
       logger.info('generating a refresh token')
-      tokenResponse.refresh_token = generateRefreshToken(keyPair, session)
+      tokenResponse.refresh_token = generateRefreshToken(request.keys, session)
     }
 
     logger.info(tokenResponse)
@@ -112,50 +112,6 @@ function getSessionForRefreshToken(refreshToken) {
   return {
     session,
     valid: session !== undefined
-  }
-}
-
-function validateCodeChallenge(session, codeVerifier) {
-  if (
-    session.codeChallenge === undefined ||
-    session.codeChallenge === '' ||
-    session.codeChallengeMethod === undefined ||
-    session.codeChallengeMethod === ''
-  ) {
-    return {
-      valid: true,
-      err: ''
-    }
-  }
-
-  if (codeVerifier === '') {
-    return {
-      valid: false,
-      err: 'Invalid code verifier. Expected code but client sent none.'
-    }
-  }
-
-  const challenge = generateCodeChallenge(
-    session.codeChallengeMethod,
-    codeVerifier
-  )
-  if (challenge === null) {
-    return {
-      valid: false,
-      err: `failed to generate code challenge for ${session.codeChallengeMethod} ${codeVerifier}`
-    }
-  }
-
-  if (challenge !== session.codeChallenge) {
-    return {
-      valid: false,
-      err: 'Invalid code verifier. Code challenge did not match hashed code verifier.'
-    }
-  }
-
-  return {
-    valid: true,
-    err: ''
   }
 }
 

@@ -1,5 +1,3 @@
-import { generateRSAKeyPair, keyID } from '~/src/api/oidc/helpers/oidc-crypto'
-
 const serverHost = 'http://localhost:3939'
 const oidcBasePath = '/oidc'
 
@@ -62,7 +60,4 @@ const oidcConfig = {
   refreshTtl: 3600
 }
 
-const keyPair = generateRSAKeyPair()
-const keyId = keyID(keyPair)
-
-export { oidcConfig, oidcBasePath, keyPair, keyId }
+export { oidcConfig, oidcBasePath }
