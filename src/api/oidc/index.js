@@ -4,7 +4,7 @@ import { jwksController } from '~/src/api/oidc/controllers/well-known-jwks'
 import { authorizeController } from '~/src/api/oidc/controllers/authorize-controller'
 import { tokenController } from '~/src/api/oidc/controllers/token-controller'
 import { loadOIDCKeys } from '~/src/api/oidc/helpers/oidc-crypto'
-import { loginController } from '~/src/api/oidc/controllers/login-controller'
+import { userInfoController } from '~/src/api/oidc/controllers/user-info-controller'
 
 const oidc = {
   plugin: {
@@ -32,14 +32,14 @@ const oidc = {
           ...authorizeController
         },
         {
-          method: 'GET',
-          path: `${oidcBasePath}/login`,
-          ...loginController
-        },
-        {
           method: 'POST',
           path: `${oidcBasePath}/token`,
           ...tokenController
+        },
+        {
+          method: 'GET',
+          path: `${oidcBasePath}/user-info`,
+          ...userInfoController
         }
       ])
     }

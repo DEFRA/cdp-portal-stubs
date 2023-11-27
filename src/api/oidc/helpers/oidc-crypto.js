@@ -84,7 +84,6 @@ function generateCodeChallenge(method, codeVerifier) {
   }
 }
 
-// If not manually set, computes the JWT headers' `kid`
 function keyID(pem) {
   const publicKey = crypto.createPublicKey({
     key: pem,
@@ -92,7 +91,6 @@ function keyID(pem) {
     type: 'spki'
   })
   const publicKeyDER = publicKey.export({ type: 'spki', format: 'der' })
-
   return sha256(publicKeyDER)
 }
 
