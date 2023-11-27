@@ -1,6 +1,6 @@
 import { config } from '~/src/config'
 
-const serverHost = 'http://localhost:3939'
+const serverHost = `${config.get('oidcServerHost')}:${config.get('port')}`
 const oidcBasePath = config.get('oidcBasePath')
 
 const oidcConfig = {

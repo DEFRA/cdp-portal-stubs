@@ -127,6 +127,12 @@ const config = convict({
     format: String,
     default: 'test_value',
     env: 'OIDC_CLIENT_SECRET'
+  },
+  oidcServerHost: {
+    doc: 'hostname of the stub server, used in wellknown urls endpoint',
+    format: String,
+    default: 'http://localhost',
+    env: 'OIDC_SERVER_HOST'
   }
 })
 
