@@ -1,9 +1,11 @@
+import { config } from '~/src/config'
+
 const serverHost = 'http://localhost:3939'
-const oidcBasePath = '/oidc'
+const oidcBasePath = config.get('oidcBasePath')
 
 const oidcConfig = {
-  clientId: '63983fc2-cfff-45bb-8ec2-959e21062b9a',
-  clientSecret: 'test_value',
+  clientId: config.get('oidcClientId'),
+  clientSecret: config.get('oidcClientSecret'),
   issuerBase: `${serverHost}${oidcBasePath}`,
   authorizationEndpoint: `${serverHost}${oidcBasePath}/authorize`,
   tokenEndpoint: `${serverHost}${oidcBasePath}/token`,
@@ -11,12 +13,6 @@ const oidcConfig = {
   jwksEndpoint: `${serverHost}${oidcBasePath}/.well-known/jwks.json`,
   discoveryEndpoint: `${serverHost}${oidcBasePath}/.well-known/openid-configuration`,
 
-  invalidRequest: 'invalid_request',
-  invalidClient: 'invalid_client',
-  invalidGrant: 'invalid_grant',
-  unsupportedGrantType: 'unsupported_grant_type',
-  invalidScope: 'invalid_scope',
-  internalServerError: 'internal_server_error',
   openidScope: 'openid',
 
   grantTypesSupported: [
@@ -56,7 +52,7 @@ const oidcConfig = {
     'aud'
   ],
   codeChallengeMethodsSupported: ['plain', 'S256'],
-  ttl: 3600, // TODO: what unit are these? ms/sec?
+  ttl: 3600, // seconds
   refreshTtl: 3600
 }
 
