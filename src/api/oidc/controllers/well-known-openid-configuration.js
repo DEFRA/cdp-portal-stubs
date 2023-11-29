@@ -1,14 +1,16 @@
 import { oidcConfig } from '~/src/api/oidc/oidc-config'
 
-const generateConfig = () => {
+const generateConfig = (host) => {
   return {
-    issuer: oidcConfig.issuerBase,
-    authorization_endpoint: oidcConfig.authorizationEndpoint,
-    pushed_authorization_request_endpoint: `${oidcConfig.issuerBase}/par`,
-    token_endpoint: oidcConfig.tokenEndpoint,
-    jwks_uri: oidcConfig.jwksEndpoint,
-    userinfo_endpoint: oidcConfig.userinfoEndpoint,
-    introspection_endpoint: `${oidcConfig.issuerBase}/introspect`,
+    issuer: host + oidcConfig.issuerBase,
+    authorization_endpoint: host + oidcConfig.authorizationEndpoint,
+    pushed_authorization_request_endpoint: `${host}${oidcConfig.issuerBase}/par`,
+    token_endpoint: host + oidcConfig.tokenEndpoint,
+    jwks_uri: host + oidcConfig.jwksEndpoint,
+    userinfo_endpoint: host + oidcConfig.userinfoEndpoint,
+    introspection_endpoint: `${host}${oidcConfig.issuerBase}/introspect`,
+    end_session_endpoint: `${host}${oidcConfig.issuerBase}/logout`,
+
     grant_types_supported: oidcConfig.grantTypesSupported,
     response_types_supported: oidcConfig.responseTypesSupported,
     subject_types_supported: oidcConfig.subjectTypesSupported,
@@ -24,7 +26,7 @@ const generateConfig = () => {
 
 const openIdConfigurationController = {
   handler: (request, h) => {
-    return h.response(generateConfig()).code(200)
+    return h.response(generateConfig('http://' + request.info.host)).code(200)
   }
 }
 

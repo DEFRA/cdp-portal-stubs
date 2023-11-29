@@ -76,16 +76,16 @@ function JWKS(keys) {
   }
 }
 
-function generateToken(keys, session) {
-  const claim = defaultClaims(session, oidcConfig.ttl)
+function generateToken(keys, session, host) {
+  const claim = defaultClaims(session, oidcConfig.ttl, host)
   return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
     keyid: keys.keyId
   })
 }
 
-function generateIDToken(keys, session) {
-  const claim = defaultClaims(session, oidcConfig.ttl)
+function generateIDToken(keys, session, host) {
+  const claim = defaultClaims(session, oidcConfig.ttl, host)
   claim.nonce = session.nonce
   return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
@@ -93,8 +93,8 @@ function generateIDToken(keys, session) {
   })
 }
 
-function generateRefreshToken(keys, session) {
-  const claim = defaultClaims(session, oidcConfig.refreshTtl)
+function generateRefreshToken(keys, session, host) {
+  const claim = defaultClaims(session, oidcConfig.refreshTtl, host)
   return jsonwebtoken.sign(claim, keys.pem.privateKey, {
     algorithm: 'RS256',
     keyid: keys.keyId

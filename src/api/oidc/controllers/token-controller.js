@@ -20,6 +20,7 @@ const tokenController = {
     const code = request.payload.code
     const refreshToken = request.payload.refresh_token
     const codeVerifier = request.payload.code_verifier
+    const host = `http://${request.info.host}`
 
     // validate client id
     if (clientId !== oidcConfig.clientId) {
@@ -74,15 +75,19 @@ const tokenController = {
       tokenResponse.refresh_token = refreshToken
     }
 
-    tokenResponse.access_token = generateToken(request.keys, session)
+    tokenResponse.access_token = generateToken(request.keys, session, host)
 
     if (session.scopes[0] === 'openid') {
-      tokenResponse.id_token = generateIDToken(request.keys, session)
+      tokenResponse.id_token = generateIDToken(request.keys, session, host)
     }
 
     if (session.scopes[0] === 'refresh') {
       logger.info('generating a refresh token')
-      tokenResponse.refresh_token = generateRefreshToken(request.keys, session)
+      tokenResponse.refresh_token = generateRefreshToken(
+        request.keys,
+        session,
+        host
+      )
     }
 
     logger.info(tokenResponse)

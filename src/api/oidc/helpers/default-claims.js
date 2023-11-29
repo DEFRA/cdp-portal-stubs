@@ -1,13 +1,13 @@
 import { oidcConfig } from '~/src/api/oidc/oidc-config'
 
-function defaultClaims(session, ttl) {
+function defaultClaims(session, ttl, host) {
   const now = Math.floor(Date.now() / 1000)
   return {
     aud: [oidcConfig.clientId], // Audience
     exp: now + ttl, // expires at
     jti: session.sessionId, // session id
     iat: now, // issued at
-    iss: oidcConfig.issuerBase, // issuer
+    iss: host + oidcConfig.issuerBase, // issuer
     nbf: now, // not before
     sub: session.user.id, // subject (i.e. user)
     amr: ['eid', 'urn:be:fedict:iam:fas:Level500'],
