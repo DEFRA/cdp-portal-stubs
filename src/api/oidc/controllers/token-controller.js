@@ -76,12 +76,11 @@ const tokenController = {
 
     tokenResponse.access_token = generateToken(request.keys, session)
 
-    // the example only checked the first item in the scope, unsure if this is correct or an oversight?
     if (session.scopes[0] === 'openid') {
       tokenResponse.id_token = generateIDToken(request.keys, session)
     }
 
-    if (grantType !== 'refresh_token') {
+    if (session.scopes[0] === 'refresh') {
       logger.info('generating a refresh token')
       tokenResponse.refresh_token = generateRefreshToken(request.keys, session)
     }

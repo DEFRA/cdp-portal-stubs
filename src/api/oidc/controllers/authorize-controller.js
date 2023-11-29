@@ -1,25 +1,15 @@
-import { oidcBasePath, oidcConfig } from '~/src/api/oidc/oidc-config'
+import { oidcConfig } from '~/src/api/oidc/oidc-config'
 import { validateScope } from '~/src/api/oidc/helpers/validate-scope'
 import { newSession } from '~/src/api/oidc/helpers/session-store'
 import { allUsers } from '~/src/api/oidc/helpers/users'
-
-const userToLink = (user, query) => {
-  return `<a id='${user}' href='${oidcBasePath}/authorize${query}&user=${user}'>${user}</a>`
-}
+import { renderLoginPage } from '~/src/api/oidc/helpers/render-login-page'
 
 const authorizeController = {
   handler: (request, h) => {
     // a bit of a hack, but basically if the user param hasn't been set
     // show a 'login' page where they can select which fake user they want
     if (request.query.user === undefined) {
-      const fullUrl = new URL(request.url)
-      const page = `
-        <h1>Login</h1>
-        ${Object.keys(allUsers)
-          .map((user) => userToLink(user, fullUrl.search))
-          .join('<br>')}
-        `
-      return h.response(page).header('content-type', 'text/html').code(200)
+      return renderLoginPage(request.url, h)
     }
 
     // TODO check these are all set, use joi or something

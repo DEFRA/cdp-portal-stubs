@@ -133,6 +133,18 @@ const config = convict({
     format: String,
     default: 'http://localhost',
     env: 'OIDC_SERVER_HOST'
+  },
+  oidcPublicKeyBase64: {
+    doc: 'base 64 encoded public pem',
+    format: String,
+    default: undefined,
+    env: 'OIDC_PUBLIC_KEY_B64'
+  },
+  oidcPrivateKeyBase64: {
+    doc: 'base 64 encoded private pem',
+    format: String,
+    default: undefined,
+    env: 'OIDC_PRIVATE_KEY_B64'
   }
 })
 

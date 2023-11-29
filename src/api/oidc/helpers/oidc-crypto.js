@@ -4,13 +4,31 @@ import { oidcConfig } from '~/src/api/oidc/oidc-config'
 import jsonwebtoken from 'jsonwebtoken'
 import { jwk2pem } from 'pem-jwk'
 
-function loadOIDCKeys() {
-  const jwk = generateRSAKeyPair()
+function loadKeyPair(pub, priv) {
+  const privatePem = crypto.createPrivateKey({
+    key: priv,
+    format: 'pem',
+    encoding: 'utf8'
+  })
+
+  const publicPem = crypto.createPublicKey({
+    key: pub,
+    format: 'pem',
+    encoding: 'utf8'
+  })
+
   const pem = {
-    publicKey: jwk2pem(jwk.publicKey),
-    privateKey: jwk2pem(jwk.privateKey)
+    publicKey: publicPem,
+    privateKey: privatePem
   }
-  const keyId = keyID(pem.publicKey)
+
+  const jwk = {
+    publicKey: pem.publicKey.export({ format: 'jwk' }),
+    privatePem: pem.privateKey.export({ format: 'jwk' })
+  }
+
+  const keyId = sha256(publicPem.export({ type: 'spki', format: 'der' }))
+
   return {
     jwk,
     keyId,
@@ -18,9 +36,8 @@ function loadOIDCKeys() {
   }
 }
 
-function generateRSAKeyPair() {
-  // TODO: load these from file so they remain the same between restarts
-  return crypto.generateKeyPairSync('rsa', {
+function generateRandomKeypair() {
+  const jwk = crypto.generateKeyPairSync('rsa', {
     modulusLength: 2048, // 2048 bits is recommended for RSA keys
     publicKeyEncoding: {
       type: 'spki',
@@ -31,6 +48,17 @@ function generateRSAKeyPair() {
       format: 'jwk'
     }
   })
+
+  const pem = {
+    publicKey: jwk2pem(jwk.publicKey),
+    privateKey: jwk2pem(jwk.privateKey)
+  }
+  const keyId = keyID(pem.publicKey)
+  return {
+    jwk,
+    keyId,
+    pem
+  }
 }
 
 function JWKS(keys) {
@@ -84,9 +112,9 @@ function generateCodeChallenge(method, codeVerifier) {
   }
 }
 
-function keyID(pem) {
+function keyID(pemPublicKey) {
   const publicKey = crypto.createPublicKey({
-    key: pem,
+    key: pemPublicKey,
     format: 'pem',
     type: 'spki'
   })
@@ -104,7 +132,8 @@ function sha256(input) {
 }
 
 export {
-  loadOIDCKeys,
+  loadKeyPair,
+  generateRandomKeypair,
   JWKS,
   generateToken,
   generateIDToken,
