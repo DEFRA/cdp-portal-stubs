@@ -47,6 +47,7 @@
     "mongodb": "6.0.0",
     "node-fetch": "2.7.0",
     "node-jose": "2.2.0",
+    "pem-jwk": "2.0.0",
     "pino": "8.15.0"
   },
   "devDependencies": {

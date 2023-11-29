@@ -109,6 +109,42 @@ const config = convict({
     format: String,
     default: 'http://127.0.0.1:4566/000000000000/ecs-deployments',
     env: 'SQS_ECS_QUEUE'
+  },
+  oidcBasePath: {
+    doc: 'the base path all oidc stubs will be served from',
+    format: String,
+    default: '/oidc',
+    env: 'OIDC_BASE_PATH'
+  },
+  oidcClientId: {
+    doc: 'client id to use in the oidc stub',
+    format: String,
+    default: '63983fc2-cfff-45bb-8ec2-959e21062b9a',
+    env: 'OIDC_CLIENT_ID'
+  },
+  oidcClientSecret: {
+    doc: 'the client secret key for the oidc stub',
+    format: String,
+    default: 'test_value',
+    env: 'OIDC_CLIENT_SECRET'
+  },
+  oidcServerHost: {
+    doc: 'hostname of the stub server, used in wellknown urls endpoint',
+    format: String,
+    default: 'http://localhost',
+    env: 'OIDC_SERVER_HOST'
+  },
+  oidcPublicKeyBase64: {
+    doc: 'base 64 encoded public pem',
+    format: String,
+    default: undefined,
+    env: 'OIDC_PUBLIC_KEY_B64'
+  },
+  oidcPrivateKeyBase64: {
+    doc: 'base 64 encoded private pem',
+    format: String,
+    default: undefined,
+    env: 'OIDC_PRIVATE_KEY_B64'
   }
 })
 
