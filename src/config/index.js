@@ -128,12 +128,6 @@ const config = convict({
     default: 'test_value',
     env: 'OIDC_CLIENT_SECRET'
   },
-  oidcServerHost: {
-    doc: 'hostname of the stub server, used in wellknown urls endpoint',
-    format: String,
-    default: 'http://localhost',
-    env: 'OIDC_SERVER_HOST'
-  },
   oidcPublicKeyBase64: {
     doc: 'base 64 encoded public pem',
     format: String,
@@ -145,6 +139,12 @@ const config = convict({
     format: String,
     default: undefined,
     env: 'OIDC_PRIVATE_KEY_B64'
+  },
+  oidcShowLogin: {
+    doc: 'if set, shows login page, else it auto logs in as admin',
+    format: Boolean,
+    default: true,
+    env: 'OIDC_SHOW_LOGIN'
   }
 })
 
