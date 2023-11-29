@@ -17,11 +17,11 @@ function defaultClaims(session, ttl) {
     name: session.user.username,
     preferred_username: session.user.email,
     oid: session.user.id, // should this be user id or a unique one
-    scope: 'openid read api',
     upn: session.user.email,
     uti: 'E_C59uEkm0ZORgAi0cAA', // Token identifier claim, unique, per-token identifier that is case-sensitive
     ver: '2.0',
-    wids: ['13bd1c72-6f4a-4dcf-985f-18d3b80f208a'] // ??
+    wids: ['13bd1c72-6f4a-4dcf-985f-18d3b80f208a'],
+    scp: 'cdp.user'
   }
 }
 
