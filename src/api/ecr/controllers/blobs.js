@@ -6,16 +6,24 @@ const blobController = {
   handler: async (request, h) => {
     const blobId = request.params.blobId
 
-    const blobs = configBlobs()
-    if (blobs[blobId]) {
-      return h.response(JSON.stringify(blobs[blobId])).code(200)
+    const accept = request.headers.accept
+
+    if (accept === 'application/vnd.docker.container.image.v1+json') {
+      const blobs = configBlobs()
+      if (blobs[blobId]) {
+        return h.response(JSON.stringify(blobs[blobId])).code(200)
+      }
     }
 
-    if (fileBlobs[blobId]) {
-      return h.file(fileBlobs[blobId])
+    if (accept === 'application/vnd.docker.image.rootfs.diff.tar.gzip') {
+      if (fileBlobs[blobId]) {
+        return h.file(fileBlobs[blobId])
+      }
+
+      return h.response().code(404)
     }
 
-    return h.response().code(404)
+    return h.response(`unsupported accept header ${accept}`).code(400)
   }
 }
 
@@ -30,13 +38,9 @@ const fileBlobs = {
 const configBlobs = () => {
   const configBlobs = {}
   allServices().forEach((s) => {
-    // note: this isn't actually what docker is hashing, we're just generating it this way since its
-    // derministic and reasonably representative of the real thing.
     const org = config.get('githubOrg')
-    const hash = crypto.createHash('sha256')
-    hash.update(s)
-    const sha256 = hash.digest('hex')
 
+    const sha256 = crypto.createHash('sha256').update(s).digest('hex')
     configBlobs[`sha256:${sha256}`] = generateConfig(org, s)
   })
   return configBlobs

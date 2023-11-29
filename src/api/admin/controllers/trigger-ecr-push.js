@@ -1,11 +1,31 @@
 // Simulates a new image being pushed to the ECR registry
 import { config } from '~/src/config'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
+import {
+  allServices,
+  protectedServices,
+  publicServices
+} from '~/src/config/services'
 
 const triggerEcrPush = {
   handler: async (request, h) => {
     const repo = request.params.repo
     const tag = request.params.tag
+    const zone = request.query.zone
+
+    if (!allServices().includes(repo)) {
+      if (zone === 'public') {
+        publicServices.push(repo)
+      } else if (zone === 'protected') {
+        protectedServices.push(repo)
+      } else {
+        return h.response(
+          `unknown service, use the zone=public/private param, or use a service from ${allServices().join(
+            ', '
+          )}`
+        )
+      }
+    }
 
     const payload = JSON.stringify(generateMessage(repo, tag))
     const msg = {

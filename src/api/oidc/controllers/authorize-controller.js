@@ -3,13 +3,19 @@ import { validateScope } from '~/src/api/oidc/helpers/validate-scope'
 import { newSession } from '~/src/api/oidc/helpers/session-store'
 import { allUsers } from '~/src/api/oidc/helpers/users'
 import { renderLoginPage } from '~/src/api/oidc/helpers/render-login-page'
+import { config } from '~/src/config'
 
 const authorizeController = {
   handler: (request, h) => {
     // a bit of a hack, but basically if the user param hasn't been set
     // show a 'login' page where they can select which fake user they want
-    if (request.query.user === undefined) {
-      return renderLoginPage(request.url, h)
+
+    let loginUser = 'admin'
+    if (config.get('oidcShowLogin')) {
+      if (request.query.user === undefined) {
+        return renderLoginPage(request.url, h)
+      }
+      loginUser = request.query.user
     }
 
     // TODO check these are all set, use joi or something
@@ -45,7 +51,7 @@ const authorizeController = {
         .code(400)
     }
 
-    const user = allUsers[request.query.user]
+    const user = allUsers[loginUser]
     if (user === undefined) {
       request.logger.error(`Invalid user selected ${request.query.user}`)
       return h.response(`Invalid user selection!`).code(400)
