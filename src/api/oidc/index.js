@@ -9,6 +9,7 @@ import {
 } from '~/src/api/oidc/helpers/oidc-crypto'
 import { userInfoController } from '~/src/api/oidc/controllers/user-info-controller'
 import { config } from '~/src/config'
+import { logoutController } from '~/src/api/oidc/controllers/logout-controller'
 
 const oidc = {
   plugin: {
@@ -56,6 +57,11 @@ const oidc = {
           method: 'GET',
           path: `${oidcBasePath}/user-info`,
           ...userInfoController
+        },
+        {
+          method: 'GET',
+          path: `${oidcBasePath}/logout`,
+          ...logoutController
         }
       ])
     }

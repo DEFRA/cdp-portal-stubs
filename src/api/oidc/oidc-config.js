@@ -1,17 +1,15 @@
 import { config } from '~/src/config'
-
-const serverHost = `${config.get('oidcServerHost')}:${config.get('port')}`
 const oidcBasePath = config.get('oidcBasePath')
 
 const oidcConfig = {
   clientId: config.get('oidcClientId'),
   clientSecret: config.get('oidcClientSecret'),
-  issuerBase: `${serverHost}${oidcBasePath}`,
-  authorizationEndpoint: `${serverHost}${oidcBasePath}/authorize`,
-  tokenEndpoint: `${serverHost}${oidcBasePath}/token`,
-  userinfoEndpoint: `${serverHost}${oidcBasePath}/userinfo`,
-  jwksEndpoint: `${serverHost}${oidcBasePath}/.well-known/jwks.json`,
-  discoveryEndpoint: `${serverHost}${oidcBasePath}/.well-known/openid-configuration`,
+  issuerBase: oidcBasePath,
+  authorizationEndpoint: `${oidcBasePath}/authorize`,
+  tokenEndpoint: `${oidcBasePath}/token`,
+  userinfoEndpoint: `${oidcBasePath}/userinfo`,
+  jwksEndpoint: `${oidcBasePath}/.well-known/jwks.json`,
+  discoveryEndpoint: `${oidcBasePath}/.well-known/openid-configuration`,
 
   openidScope: 'openid',
 
