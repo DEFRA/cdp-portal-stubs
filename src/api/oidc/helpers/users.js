@@ -9,7 +9,7 @@ const userNonAdmin = {
   username: 'Test User',
   email: 'test.user@oidc.mock',
   id: 'dfa791eb-76b2-434c-ad1f-bb9dc1dd8b48',
-  teams: ['aabe63e7-87ef-4beb-a596-c810631fc474'] // TODO: swap this for a non-admin team
+  teams: ['7b7c7a75-746a-4083-9072-6e68eb30c90c']
 }
 
 const allUsers = {

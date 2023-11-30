@@ -113,7 +113,7 @@ const config = convict({
   oidcBasePath: {
     doc: 'the base path all oidc stubs will be served from',
     format: String,
-    default: '/oidc',
+    default: '/63983fc2-cfff-45bb-8ec2-959e21062b9a/v2.0',
     env: 'OIDC_BASE_PATH'
   },
   oidcClientId: {
@@ -143,7 +143,7 @@ const config = convict({
   oidcShowLogin: {
     doc: 'if set, shows login page, else it auto logs in as admin',
     format: Boolean,
-    default: true,
+    default: false,
     env: 'OIDC_SHOW_LOGIN'
   }
 })
