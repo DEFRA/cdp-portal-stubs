@@ -1,5 +1,7 @@
 import { allServices } from '~/src/config/services'
 
+const teamName = 'cdp-platform'
+
 const teamsAndReposData = () => {
   return {
     data: {
@@ -19,7 +21,7 @@ const teamsAndReposData = () => {
 
 const node = (service) => {
   return {
-    slug: service,
+    slug: teamName,
     repositories: {
       nodes: [
         {
