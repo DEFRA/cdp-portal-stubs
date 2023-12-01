@@ -4,7 +4,7 @@ import { deploymentHandler } from '~/src/api/ecs/deployment-handler'
 const { config } = require('~/src/config')
 
 function deploymentEventListener(server) {
-  const queueUrl = config.get('sqsStubDeployments')
+  const queueUrl = config.get('sqsDeploymentsFromPortal')
 
   server.logger.info(`Listening for deployment events on ${queueUrl}`)
 
@@ -17,7 +17,7 @@ function deploymentEventListener(server) {
     visibilityTimeout: 400,
     handleMessage: async (message) => {
       const payload = JSON.parse(message.Body)
-      await deploymentHandler(server, payload)
+      await deploymentHandler(server.sqs, payload)
       return message
     },
     sqs

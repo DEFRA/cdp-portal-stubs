@@ -146,7 +146,7 @@ const config = convict({
     default: false,
     env: 'OIDC_SHOW_LOGIN'
   },
-  sqsStubDeployments: {
+  sqsDeploymentsFromPortal: {
     doc: 'The queue hooked up to the deployment topic',
     format: String,
     default: 'http://127.0.0.1:4566/000000000000/stub-deployments',
