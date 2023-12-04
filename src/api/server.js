@@ -7,7 +7,6 @@ import { router } from '~/src/api/router'
 import { requestLogger } from '~/src/helpers/logging/request-logger'
 import { mongoPlugin } from '~/src/helpers/mongodb'
 import { failAction } from '~/src/helpers/fail-action'
-import { populateDb } from '~/src/helpers/db/populate-db'
 import { sqsPlugin } from '~/src/helpers/sqs'
 
 async function createServer() {
@@ -38,8 +37,6 @@ async function createServer() {
   await server.register(router, {})
 
   await server.register(sqsPlugin)
-
-  await server.register(populateDb)
 
   return server
 }
