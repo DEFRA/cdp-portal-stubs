@@ -12,7 +12,7 @@ const triggerCreateRepoWorkflow = async (sqs, repoName) => {
       conclusion: 'success'
     },
     repository: {
-      name: 'cdp-boilerplate'
+      name: 'cdp-create-workflows'
     }
   }
   const pendingMessage = {
