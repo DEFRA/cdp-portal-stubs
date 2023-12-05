@@ -6,24 +6,28 @@ const triggerWorkflow = {
     const org = request.params.org
     const repo = request.params.repo
     const workflowFile = request.params.workflow
-
-    const repoToCreate = request.payload.inputs.repositoryName
-    const serviceType = request.payload.inputs.serviceType
-    const owningTeam = request.payload.inputs.owningTeam
+    const inputs = request.payload.inputs
+    const repositoryName = inputs.repositoryName
 
     request.logger.info(
-      `Stubbing triggering of workflow ${org}/${repo} ${workflowFile} to create repo ${repoToCreate} for ${owningTeam} of type ${serviceType}`
+      `Stubbing triggering of workflow ${org}/${repo} ${workflowFile} with inputs ${JSON.stringify(
+        inputs
+      )}`
     )
 
-    await triggerCreateRepoWorkflow(request.sqs, repoToCreate)
+    await triggerCreateRepoWorkflow(request.sqs, repositoryName)
 
-    // update the list of services
-    if (serviceType.includes('frontend')) {
-      request.logger.info(`Adding ${repoToCreate} to public services`)
-      publicServices.push(repoToCreate)
-    } else {
-      protectedServices.push(repoToCreate)
-      request.logger.info(`Adding ${repoToCreate} to protected services`)
+    if (workflowFile === 'create_microservice.yml') {
+      const serviceTypeTemplate = inputs.serviceTypeTemplate
+
+      // Update the list of services
+      if (serviceTypeTemplate?.includes('frontend')) {
+        request.logger.info(`Adding ${repositoryName} to public services`)
+        publicServices.push(repositoryName)
+      } else {
+        protectedServices.push(repositoryName)
+        request.logger.info(`Adding ${repositoryName} to protected services`)
+      }
     }
 
     return h.response({}).code(200)
