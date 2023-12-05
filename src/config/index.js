@@ -147,10 +147,10 @@ const config = convict({
     env: 'OIDC_SHOW_LOGIN'
   },
   sqsDeploymentsFromPortal: {
-    doc: 'The queue hooked up to the deployment topic',
+    doc: 'The queue hooked up to the deployment topic, would normally go to the lambda',
     format: String,
-    default: 'http://127.0.0.1:4566/000000000000/stub-deployments',
-    env: 'SQS_STUB_DEPLOYMENTS'
+    default: 'http://127.0.0.1:4566/000000000000/deployments-from-portal',
+    env: 'SQS_DEPLOYMENTS_FROM_PORTAL'
   }
 })
 

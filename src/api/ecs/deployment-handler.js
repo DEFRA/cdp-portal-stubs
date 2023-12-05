@@ -23,16 +23,7 @@ async function deploymentHandler(sqs, payload) {
   const deploymentId = crypto.randomUUID()
   const taskId = Math.floor(Math.random() * 1000000)
 
-  /*
-  const initalDeployment = lambdaDeploymentUpdate(
-    environment,
-    zone,
-    containerImage,
-    deploymentId,
-    taskId
-  )
-   */
-
+  // TODO: send multiple pending/success messages
   const firstUpdate = ecsDeploymentEvent(
     environment,
     zone,
@@ -44,7 +35,7 @@ async function deploymentHandler(sqs, payload) {
   const deployMessage = {
     QueueUrl: config.get('sqsEcsQueue'),
     MessageBody: JSON.stringify(firstUpdate),
-    DelaySeconds: 0,
+    DelaySeconds: 1,
     MessageAttributes: {},
     MessageSystemAttributes: {}
   }

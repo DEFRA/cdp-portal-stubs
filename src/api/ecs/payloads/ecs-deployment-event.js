@@ -4,7 +4,8 @@ function ecsDeploymentEvent(
   service,
   version,
   deploymentId,
-  taskId
+  taskId,
+  status
 ) {
   const now = new Date().toISOString()
   return {
@@ -35,7 +36,7 @@ function ecsDeploymentEvent(
           containerArn:
             'arn:aws:ecs:eu-west-2:332499610595:container/dev-ecs-public/f8bec92bed774ee4b27711702a862de5/2fe15c3c-1d90-47a3-a424-3cd6a1ead322',
           lastStatus: 'RUNNING',
-          name: 'cdp-demo-test-15_log_router',
+          name: `${service}-${taskId}_log_router`,
           image:
             '094954420758.dkr.ecr.eu-west-2.amazonaws.com/cdp-fluent-bit:latest',
           imageDigest:
@@ -62,7 +63,7 @@ function ecsDeploymentEvent(
           containerArn:
             'arn:aws:ecs:eu-west-2:332499610595:container/dev-ecs-public/f8bec92bed774ee4b27711702a862de5/499d6f34-a842-470a-9dcb-122c786e0619',
           lastStatus: 'RUNNING',
-          name: 'cdp-demo-test-15_ssl',
+          name: `${service}-${taskId}_ssl`,
           image:
             '094954420758.dkr.ecr.eu-west-2.amazonaws.com/cdp-ssl-sidecar:12',
           imageDigest:
@@ -88,8 +89,8 @@ function ecsDeploymentEvent(
         {
           containerArn:
             'arn:aws:ecs:eu-west-2:332499610595:container/dev-ecs-public/f8bec92bed774ee4b27711702a862de5/4ea14053-c77f-4eb8-ad19-9c7f9dafa4b0',
-          lastStatus: 'RUNNING',
-          name: 'cdp-demo-test-15',
+          lastStatus: status,
+          name: `${service}-${taskId}`,
           image: `094954420758.dkr.ecr.eu-west-2.amazonaws.com/${service}:${version}`,
           imageDigest:
             'sha256:ae81d8e895da216863393eb04294f4e2387656bb7416fc6db7ce3da15dbed7d0',
@@ -115,7 +116,7 @@ function ecsDeploymentEvent(
           containerArn:
             'arn:aws:ecs:eu-west-2:332499610595:container/dev-ecs-public/f8bec92bed774ee4b27711702a862de5/9409e11e-afc6-4aa4-9baf-a5f46f0277a3',
           lastStatus: 'RUNNING',
-          name: 'cdp-demo-test-15_cwagent',
+          name: `${service}-${taskId}_cwagent`,
           image:
             '094954420758.dkr.ecr.eu-west-2.amazonaws.com/cdp-cloudwatch-agent:latest',
           imageDigest:
@@ -148,23 +149,10 @@ function ecsDeploymentEvent(
       },
       group: `service:${service}-${taskId}`,
       launchType: 'FARGATE',
-      lastStatus: 'RUNNING',
+      lastStatus: status,
       memory: '2048',
       overrides: {
-        containerOverrides: [
-          {
-            name: 'cdp-demo-test-15_log_router'
-          },
-          {
-            name: 'cdp-demo-test-15_ssl'
-          },
-          {
-            name: 'cdp-demo-test-15'
-          },
-          {
-            name: 'cdp-demo-test-15_cwagent'
-          }
-        ]
+        containerOverrides: []
       },
       platformVersion: '1.4.0',
       pullStartedAt: now,
