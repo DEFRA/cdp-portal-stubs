@@ -69,6 +69,7 @@ awslocal sqs create-queue --queue-name ecr-push-deployments --region eu-west-2
 awslocal sqs create-queue --queue-name ecs-deployments --region eu-west-2
 awslocal sqs create-queue --queue-name ecr-push-events --region eu-west-2
 awslocal sqs create-queue --queue-name github-events --region eu-west-2
+awslocal sqs create-queue --queue-name deployments-from-portal --region eu-west-2
 ```
 
 ### Start cdp-portal-backend
