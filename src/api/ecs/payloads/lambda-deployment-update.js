@@ -4,7 +4,8 @@ function lambdaDeploymentUpdate(
   awsAccountId,
   zone,
   service,
-  deploymentId,
+  cdpDeploymentId,
+  lambdaId,
   taskId
 ) {
   return {
@@ -18,11 +19,12 @@ function lambdaDeploymentUpdate(
     ],
     detail: {
       eventType: 'INFO',
-      eventName: 'COMPLETED',
-      deploymentId: `ecs-svc/${deploymentId}`,
+      eventName: 'IN_PROGRESS',
+      deploymentId: `ecs-svc/${lambdaId}`,
       reason: `Deployment arn:aws:ecs:eu-west-2:${awsAccountId}:service/infra-dev-ecs-public/${service} successfully updated`
     },
-    deployed_by: 'Test, User'
+    deployed_by: 'Test, User',
+    cdp_deployment_id: cdpDeploymentId
   }
 }
 

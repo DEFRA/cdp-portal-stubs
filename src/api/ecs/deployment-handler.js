@@ -6,6 +6,7 @@ import { environmentMappings } from '~/src/config/environments'
 import { config } from '~/src/config'
 
 import { ecsDeploymentEvent } from '~/src/api/ecs/payloads/ecs-deployment-event'
+import { lambdaDeploymentUpdate } from '~/src/api/ecs/payloads/lambda-deployment-update'
 
 const logger = createLogger()
 
@@ -16,26 +17,56 @@ async function deploymentHandler(sqs, payload) {
 
   const containerImage = msg?.container_image
   const containerVersion = msg?.container_version
-  // const desiredCount = msg?.desired_count
   const zone = msg?.zone
-  const environment = environmentMappings[msg?.environment]
+  const awsAccount = environmentMappings[msg?.environment]
 
-  const deploymentId = crypto.randomUUID()
+  const deploymentId = msg?.deployed_by?.deployment_id
+  const lamdaId = crypto.randomUUID()
   const taskId = Math.floor(Math.random() * 1000000)
+
+  // Lamba update
+  const lambdaUpdated = lambdaDeploymentUpdate(
+    awsAccount,
+    zone,
+    containerImage,
+    deploymentId,
+    lamdaId,
+    taskId
+  )
+
+  await send(sqs, lambdaUpdated, 1)
 
   // TODO: send multiple pending/success messages
   const firstUpdate = ecsDeploymentEvent(
-    environment,
+    awsAccount,
     zone,
     containerImage,
     containerVersion,
     deploymentId,
-    taskId
+    lamdaId,
+    taskId,
+    'PENDING'
   )
+  await send(sqs, firstUpdate, 3)
+
+  const secondUpdate = ecsDeploymentEvent(
+    awsAccount,
+    zone,
+    containerImage,
+    containerVersion,
+    deploymentId,
+    lamdaId,
+    taskId,
+    'RUNNING'
+  )
+  await send(sqs, secondUpdate, 5)
+}
+
+async function send(sqs, payload, delay = 0) {
   const deployMessage = {
     QueueUrl: config.get('sqsEcsQueue'),
-    MessageBody: JSON.stringify(firstUpdate),
-    DelaySeconds: 1,
+    MessageBody: JSON.stringify(payload),
+    DelaySeconds: delay,
     MessageAttributes: {},
     MessageSystemAttributes: {}
   }

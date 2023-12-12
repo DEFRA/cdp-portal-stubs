@@ -6,6 +6,11 @@ const triggerWorkflowComplete = async (sqs, repoName, mergedSha, delay = 7) => {
     github_event: 'workflow_run',
     action: 'completed',
     workflow_run: {
+      name: 'Terraform Apply',
+      id: Math.floor(Math.random() * 9999999),
+      html_url: 'http://localhost:3939/#local-stub',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       head_sha: mergedSha,
       head_branch: 'main',
       conclusion: 'success'
@@ -14,6 +19,7 @@ const triggerWorkflowComplete = async (sqs, repoName, mergedSha, delay = 7) => {
       name: repoName
     }
   }
+
   const pendingMessage = {
     QueueUrl: config.get('sqsGithubQueue'),
     MessageBody: JSON.stringify(payload),
