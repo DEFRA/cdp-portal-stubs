@@ -77,7 +77,7 @@ const config = convict({
   githubOrg: {
     doc: 'github org to mock',
     format: 'String',
-    default: 'defra-cdp-sandpit',
+    default: 'defra',
     env: 'GITHUB_ORG'
   },
   awsRegion: {
@@ -145,6 +145,12 @@ const config = convict({
     format: Boolean,
     default: false,
     env: 'OIDC_SHOW_LOGIN'
+  },
+  sqsDeploymentsFromPortal: {
+    doc: 'The queue hooked up to the deployment topic, would normally go to the lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/deployments-from-portal',
+    env: 'SQS_DEPLOYMENTS_FROM_PORTAL'
   }
 })
 
