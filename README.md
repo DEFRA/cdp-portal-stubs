@@ -75,31 +75,11 @@ awslocal sqs create-queue --queue-name github-events --region eu-west-2
 
 [DEFRA/cdp-portal-backend](https://github.com/DEFRA/cdp-portal-backend)
 
-You can add the following to `launchSettings.json` in your checkout of the `cdp-portal-backend`
+Run in stubbed mode
 
-> Note please obtain the test `Github__AppKey` from another dev
-
-```json5
-{
-  // other launch settings
-  Stubbed: {
-    commandName: 'Project',
-    dotnetRunMessages: true,
-    launchBrowser: false,
-    applicationUrl: 'http://localhost:5094',
-    environmentVariables: {
-      ASPNETCORE_ENVIRONMENT: 'Development',
-      Mongo__DatabaseUri: 'mongodb://127.0.0.1:27017',
-      AzureAd__Instance: 'http://localhost:3939/',
-      AzureAd__RequireHttpsMetadata: 'false',
-      Github__AppKey: '<OBTAIN_FROM_ANOTHER_DEV>',
-      Github__ApiUrl: 'http://localhost:3939'
-    }
-  }
-}
-```
-
-Run
+> Note you need to generate a random key for local testing using
+> `ssh-keygen -t rsa -b 4096 -m PEM -f /tmp/mock.key -q -P '' && cat /tmp/mock.key | base64 -w0`
+> See [launchSettings.json](https://github.com/DEFRA/cdp-portal-backend/blob/b9dc08a84ec557966d3e8900896cf676f427f286/Defra.Cdp.Backend.Api/Properties/launchSettings.json#L27)
 
 ```bash
 dotnet run --project Defra.Cdp.Backend.Api --launch-profile Stubbed
