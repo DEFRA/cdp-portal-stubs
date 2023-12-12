@@ -14,6 +14,7 @@ const tokenController = {
   handler: (request, h) => {
     const logger = request.logger
 
+    logger.info(JSON.stringify(request.payload))
     const clientId = request.payload.client_id
     const clientSecret = request.payload.client_secret
     const grantType = request.payload.grant_type
@@ -77,11 +78,10 @@ const tokenController = {
 
     tokenResponse.access_token = generateToken(request.keys, session, host)
 
-    if (session.scopes[0] === 'openid') {
+    if (session.scopes.includes('openid')) {
       tokenResponse.id_token = generateIDToken(request.keys, session, host)
     }
-
-    if (session.scopes[0] === 'refresh') {
+    if (session.scopes.includes('offline_access')) {
       logger.info('generating a refresh token')
       tokenResponse.refresh_token = generateRefreshToken(
         request.keys,
