@@ -1,4 +1,4 @@
-name: IT Tests
+name: Jouney Tests
 
 on:
   workflow_dispatch:
