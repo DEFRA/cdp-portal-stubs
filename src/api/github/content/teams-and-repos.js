@@ -1,6 +1,39 @@
 import { allServices } from '~/src/config/services'
 
-const teamName = 'cdp-platform'
+const teams = [
+  {
+    github: 'cdp-platform',
+    name: 'CDP Platform Team'
+  },
+  {
+    github: 'cdp-test-1',
+    name: 'CDP Test 1 Team'
+  },
+  {
+    github: 'cdp-test-2',
+    name: 'CDP Test 2 Team'
+  },
+  {
+    github: 'cdp-test-3',
+    name: 'CDP Test 3 Team'
+  }
+]
+
+const teamsData = () => {
+  return {
+    data: {
+      organization: {
+        teams: {
+          nodes: teams
+        },
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: 'Y3Vyc29yOnYyOpMCs0FEUC1QbGF0Zm9ybS1BZG1pbnPOAIFBcA=='
+        }
+      }
+    }
+  }
+}
 
 const teamsAndReposData = () => {
   return {
@@ -21,7 +54,7 @@ const teamsAndReposData = () => {
 
 const node = (service) => {
   return {
-    slug: teamName,
+    slug: teams[0].github,
     repositories: {
       nodes: [
         {
@@ -41,4 +74,4 @@ const node = (service) => {
   }
 }
 
-export { teamsAndReposData }
+export { teamsData, teamsAndReposData, teams }
