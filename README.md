@@ -3,18 +3,21 @@
 A set of stubs for mocking calls to Github, Aws and Microsoft OIDC for the cdp-portal suite of applications.
 
 - [CDP Portal Stubs](#cdp-portal-stubs)
+
   - [What it currently provides](#what-it-currently-provides)
   - [Setup](#setup)
+
     - [MongoDB](#mongodb)
       - [Start MongoDB](#start-mongodb)
     - [Redis](#redis)
     - [Localstack](#localstack)
       - [Create queues](#create-queues)
+    - [Start cdp-portal-stubs](#start-cdp-portal-stubs)
     - [start cdp-portal-backend](#start-cdp-portal-backend)
     - [start cdp-self-service-ops](#start-cdp-self-service-ops)
     - [Start cdp-user-services](#start-cdp-user-service-backend)
     - [Start cdp-portal-frontend](#start-cdp-portal-frontend)
-    - [Start cdp-portal-stubs](#start-cdp-portal-stubs)
+
   - [Test Data](#test-data)
 
 ## What it currently provides
@@ -70,6 +73,22 @@ awslocal sqs create-queue --queue-name ecs-deployments --region eu-west-2
 awslocal sqs create-queue --queue-name ecr-push-events --region eu-west-2
 awslocal sqs create-queue --queue-name github-events --region eu-west-2
 awslocal sqs create-queue --queue-name deployments-from-portal --region eu-west-2
+```
+
+### Start cdp-portal-stubs
+
+Run in watch (dev) mode:
+
+> Note with watch mode your refresh tokens will not work. You will have to sign out and in again to get a valid token
+
+```bash
+npm run dev
+```
+
+Run:
+
+```bash
+npm start
 ```
 
 ### Start cdp-portal-backend
@@ -139,22 +158,6 @@ Override using `npm` scripts
 
 ```bash
 AZURE_CLIENT_SECRET=test_value GITHUB_BASE_URL=http://localhost:3939  OIDC_WELL_KNOWN_CONFIGURATION_URL=http://localhost:3939/63983fc2-cfff-45bb-8ec2-959e21062b9a/v2.0/.well-known/openid-configuration AZURE_TENANT_ID=63983fc2-cfff-45bb-8ec2-959e21062b9a APP_BASE_URL=http://localhost:3000 npm run dev
-```
-
-### Start cdp-portal-stubs
-
-Run in watch (dev) mode:
-
-> Note with watch mode your refresh tokens will not work. You will have to sign out and in again to get a valid token
-
-```bash
-npm run dev
-```
-
-Run:
-
-```bash
-npm start
 ```
 
 ## Test Data
