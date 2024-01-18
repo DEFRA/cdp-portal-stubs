@@ -59,6 +59,20 @@ const node = (service) => {
       nodes: [
         {
           name: service,
+          repositoryTopics: {
+            nodes: [
+              {
+                topic: {
+                  name: 'cdp'
+                }
+              },
+              {
+                topic: {
+                  name: 'service'
+                }
+              }
+            ]
+          },
           description: service,
           primaryLanguage: {
             name: 'JavaScript'
