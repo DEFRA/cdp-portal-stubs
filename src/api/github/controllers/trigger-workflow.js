@@ -30,6 +30,11 @@ const triggerWorkflow = {
       }
     }
 
+    if (workflowFile === 'create_env_test_suite.yml') {
+      request.logger.info(`Adding ${repositoryName} to public services`)
+      publicServices.push(repositoryName)
+    }
+
     return h.response({}).code(200)
   }
 }
