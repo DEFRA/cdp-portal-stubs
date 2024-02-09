@@ -1,4 +1,4 @@
-import { allServices } from '~/src/config/services'
+import { ecrRepos } from '~/src/config/services'
 import * as crypto from 'crypto'
 import { config } from '~/src/config'
 
@@ -19,8 +19,7 @@ const blobController = {
       if (fileBlobs[blobId]) {
         return h.file(fileBlobs[blobId])
       }
-
-      return h.response().code(404)
+      return h.file(fileBlobs.defaultlayer)
     }
 
     return h.response(`unsupported accept header ${accept}`).code(400)
@@ -32,12 +31,13 @@ const mockAppLayerHash = `sha256:${crypto
   .update('mock-app-layer.tgz')
   .digest('hex')}`
 const fileBlobs = {
-  [mockAppLayerHash]: 'mock-app-layer.tgz'
+  [mockAppLayerHash]: 'mock-app-layer.tgz',
+  defaultlayer: 'mock-app-layer.tgz'
 }
 
 const configBlobs = () => {
   const configBlobs = {}
-  allServices().forEach((s) => {
+  Object.keys(ecrRepos).forEach((s) => {
     const org = config.get('githubOrg')
 
     const sha256 = crypto.createHash('sha256').update(s).digest('hex')

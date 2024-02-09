@@ -1,5 +1,6 @@
 import { triggerEcrPush } from '~/src/api/admin/controllers/trigger-ecr-push'
 import { oidcSessionController } from '~/src/api/admin/controllers/oidc-session-controller'
+import { dataController } from '~/src/api/admin/controllers/data-controller'
 
 const adminStub = {
   plugin: {
@@ -15,6 +16,11 @@ const adminStub = {
           method: 'GET',
           path: '/_admin/oidc/sessions',
           ...oidcSessionController
+        },
+        {
+          method: 'GET',
+          path: '/_admin/data',
+          ...dataController
         }
       ])
     }
