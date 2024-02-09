@@ -1,5 +1,9 @@
 import { triggerCreateRepoWorkflow } from '~/src/api/github/events/trigger-create-repo-workflow'
-import { protectedServices, publicServices } from '~/src/config/services'
+import {
+  githubRepos,
+  topicsService,
+  topicsTestSuite
+} from '~/src/config/services'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -18,21 +22,13 @@ const triggerWorkflow = {
     await triggerCreateRepoWorkflow(request.sqs, repositoryName)
 
     if (workflowFile === 'create_microservice.yml') {
-      const serviceTypeTemplate = inputs.serviceTypeTemplate
-
-      // Update the list of services
-      if (serviceTypeTemplate?.includes('frontend')) {
-        request.logger.info(`Adding ${repositoryName} to public services`)
-        publicServices.push(repositoryName)
-      } else {
-        protectedServices.push(repositoryName)
-        request.logger.info(`Adding ${repositoryName} to protected services`)
-      }
+      request.logger.info(`Adding service ${repositoryName} to github repos`)
+      githubRepos.push({ name: repositoryName, topics: topicsService })
     }
 
     if (workflowFile === 'create_env_test_suite.yml') {
-      request.logger.info(`Adding ${repositoryName} to public services`)
-      publicServices.push(repositoryName)
+      request.logger.info(`Adding test suite ${repositoryName} to github repos`)
+      githubRepos.push({ name: repositoryName, topics: topicsTestSuite })
     }
 
     return h.response({}).code(200)

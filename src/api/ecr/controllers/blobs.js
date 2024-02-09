@@ -1,4 +1,4 @@
-import { allServices } from '~/src/config/services'
+import { ecrRepos } from '~/src/config/services'
 import * as crypto from 'crypto'
 import { config } from '~/src/config'
 
@@ -37,7 +37,7 @@ const fileBlobs = {
 
 const configBlobs = () => {
   const configBlobs = {}
-  allServices().forEach((s) => {
+  Object.keys(ecrRepos).forEach((s) => {
     const org = config.get('githubOrg')
 
     const sha256 = crypto.createHash('sha256').update(s).digest('hex')
