@@ -1,18 +1,22 @@
 // Simulates a new image being pushed to the ECR registry
 import { config } from '~/src/config'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import { ecrRepos } from '~/src/config/services'
+import { ecrRepos } from '~/src/config/mock-data'
 
 const triggerEcrPush = {
   handler: async (request, h) => {
     const repo = request.params.repo
     const tag = request.params.tag
+    const runMode = request.query.runMode ? request.query.runMode : 'service'
 
     if (ecrRepos[repo] === undefined) {
-      ecrRepos[repo] = []
+      ecrRepos[repo] = {
+        runMode,
+        tags: []
+      }
     }
 
-    ecrRepos[repo].push(tag)
+    ecrRepos[repo].tags.push(tag)
 
     const payload = JSON.stringify(generateMessage(repo, tag))
     const msg = {

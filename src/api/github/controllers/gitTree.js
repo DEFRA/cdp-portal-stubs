@@ -1,4 +1,4 @@
-import { tenantServices } from '~/src/config/services'
+import { tenantServices } from '~/src/config/mock-data'
 
 const gitTreeController = {
   handler: async (request, h) => {

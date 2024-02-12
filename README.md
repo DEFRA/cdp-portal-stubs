@@ -41,7 +41,18 @@ Mocks calls to an ECR repository
 - Gets manifest
 - Gets minimal layers
 
-An admin endpoint is provided to simulate a new image being pushed `POST /_admin/trigger-ecr-push/{repo}/{tag}`
+## Default Data Set
+
+See `~/src/config/mock-data.js` for the starting data set. As the stub is used thse records are updated. Note: these are
+NOT currently persistent across restarts.
+
+## Admin Endpoints
+
+`POST /_admin/trigger-ecr-push/{repo}/{tag}?runMode=service` - simulates a docker image being published. runmode can be service or job.
+
+`GET /_admin/oidc/sessions` - dumps the current ODIC sessions
+
+`GET /_admin/data` - dumps the current state of the mock github/ecr/tenant data
 
 ## Setup
 
@@ -122,6 +133,8 @@ export GITHUB_BASE_URL=http://localhost:3939
 export OIDC_WELL_KNOWN_CONFIGURATION_URL=http://localhost:3939/63983fc2-cfff-45bb-8ec2-959e21062b9a/v2.0/.well-known/openid-configuration
 ```
 
+(Note: the OIDC url can be replaced with any value as long as its the same across local services, in this example we've used a random UUID)
+
 Override using `npm` scripts
 
 ```bash
@@ -168,5 +181,5 @@ AZURE_CLIENT_SECRET=test_value GITHUB_BASE_URL=http://localhost:3939  OIDC_WELL_
 
 ## Test Data
 
-The base set of services is held in /config/services.js. Adding or removing services to this list will result in them
+The base set of services is held in /config/mock-data.js. Adding or removing services to this list will result in them
 being returned in the mock API calls.

@@ -1,4 +1,4 @@
-import { githubRepos } from '~/src/config/services'
+import { githubRepos } from '~/src/config/mock-data'
 
 const teams = [
   {
