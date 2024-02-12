@@ -1,9 +1,10 @@
 import { triggerCreateRepoWorkflow } from '~/src/api/github/events/trigger-create-repo-workflow'
 import {
+  ecrRepos,
   githubRepos,
   topicsService,
   topicsTestSuite
-} from '~/src/config/services'
+} from '~/src/config/mock-data'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -24,11 +25,21 @@ const triggerWorkflow = {
     if (workflowFile === 'create_microservice.yml') {
       request.logger.info(`Adding service ${repositoryName} to github repos`)
       githubRepos.push({ name: repositoryName, topics: topicsService })
+
+      // technically this should happen on the TF-svc stage but its easier to
+      // detect the service type+name here
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
+      }
     }
 
     if (workflowFile === 'create_env_test_suite.yml') {
       request.logger.info(`Adding test suite ${repositoryName} to github repos`)
       githubRepos.push({ name: repositoryName, topics: topicsTestSuite })
+
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
+      }
     }
 
     return h.response({}).code(200)

@@ -40,10 +40,22 @@ const githubRepos = [
 ]
 
 const ecrRepos = {
-  'cdp-portal-frontend': ['0.1.0', '0.2.0', '0.3.0'],
-  'cdp-portal-backend': ['0.1.0', '0.2.0', '0.3.0'],
-  'cdp-self-service-ops': ['0.1.0', '0.2.0', '0.3.0'],
-  'cdp-user-service': ['0.1.0', '0.2.0', '0.3.0']
+  'cdp-portal-frontend': {
+    runMode: 'service',
+    tags: ['0.1.0', '0.2.0', '0.3.0']
+  },
+  'cdp-portal-backend': {
+    runMode: 'service',
+    tags: ['0.1.0', '0.2.0', '0.3.0']
+  },
+  'cdp-self-service-ops': {
+    runMode: 'service',
+    tags: ['0.1.0', '0.2.0', '0.3.0']
+  },
+  'cdp-user-service': {
+    runMode: 'service',
+    tags: ['0.1.0', '0.2.0', '0.3.0']
+  }
 }
 
 export { tenantServices, githubRepos, ecrRepos, topicsTestSuite, topicsService }
