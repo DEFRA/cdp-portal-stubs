@@ -51,6 +51,17 @@ const configBlobs = () => {
 }
 
 const generateConfig = (org, service, runMode) => {
+  const labels = {
+    'defra.cdp.git.repo.url': `https://github.com/${org}/${service}`,
+    'defra.cdp.run_mode': runMode
+  }
+
+  if (runMode === 'job') {
+    labels['defra.cdp.testsuite.name'] = service
+  } else {
+    labels['defra.cdp.service.name'] = service
+  }
+
   return {
     architecture: 'amd64',
     config: {
