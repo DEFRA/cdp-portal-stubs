@@ -19,6 +19,7 @@ async function deploymentHandler(sqs, payload) {
   const containerVersion = msg?.container_version
   const zone = msg?.zone
   const awsAccount = environmentMappings[msg?.environment]
+  const instanceCount = msg?.desired_count
 
   const deploymentId = msg?.deployed_by?.deployment_id
   const lamdaId = crypto.randomUUID()
@@ -36,30 +37,32 @@ async function deploymentHandler(sqs, payload) {
 
   await send(sqs, lambdaUpdated, 1)
 
-  // TODO: send multiple pending/success messages
-  const firstUpdate = ecsDeploymentEvent(
-    awsAccount,
-    zone,
-    containerImage,
-    containerVersion,
-    deploymentId,
-    lamdaId,
-    taskId,
-    'PENDING'
-  )
-  await send(sqs, firstUpdate, 3)
+  if (instanceCount > 0) {
+    // TODO: send multiple pending/success messages
+    const firstUpdate = ecsDeploymentEvent(
+      awsAccount,
+      zone,
+      containerImage,
+      containerVersion,
+      deploymentId,
+      lamdaId,
+      taskId,
+      'PENDING'
+    )
+    await send(sqs, firstUpdate, 3)
 
-  const secondUpdate = ecsDeploymentEvent(
-    awsAccount,
-    zone,
-    containerImage,
-    containerVersion,
-    deploymentId,
-    lamdaId,
-    taskId,
-    'RUNNING'
-  )
-  await send(sqs, secondUpdate, 5)
+    const secondUpdate = ecsDeploymentEvent(
+      awsAccount,
+      zone,
+      containerImage,
+      containerVersion,
+      deploymentId,
+      lamdaId,
+      taskId,
+      'RUNNING'
+    )
+    await send(sqs, secondUpdate, 5)
+  }
 }
 
 async function send(sqs, payload, delay = 0) {
