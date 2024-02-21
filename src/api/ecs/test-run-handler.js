@@ -1,69 +1,79 @@
 import { createLogger } from '~/src/helpers/logging/logger'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
 import * as crypto from 'crypto'
-// import { lambdaDeploymentUpdate } from '~/src/api/ecs/payloads/lambda-deployment-update'
 import { environmentMappings } from '~/src/config/environments'
 import { config } from '~/src/config'
-
-import { ecsDeploymentEvent } from '~/src/api/ecs/payloads/ecs-deployment-event'
-import { lambdaDeploymentUpdate } from '~/src/api/ecs/payloads/lambda-deployment-update'
+import { ecsTestRunEvent } from '~/src/api/ecs/payloads/ecs-taskrun-event'
 
 const logger = createLogger()
 
-async function deploymentHandler(sqs, payload) {
+async function testRunHandler(sqs, payload) {
   logger.info(payload.Message)
 
   const msg = JSON.parse(payload.Message)
 
-  const containerImage = msg?.container_image
-  const containerVersion = msg?.container_version
+  const containerImage = msg?.image
+  const containerVersion = msg?.image_version
   const zone = msg?.zone
   const awsAccount = environmentMappings[msg?.environment]
   const instanceCount = msg?.desired_count
-
-  const deploymentId = msg?.deployed_by?.deployment_id
+  logger.info(`Test Run Handler ${containerImage}:${containerVersion}`)
+  const taskArn = `arn:aws:ecs:eu-west-2:000000000000:task/env-ecs-public/${crypto.randomUUID()}`
   const lamdaId = crypto.randomUUID()
   const taskId = Math.floor(Math.random() * 1000000)
 
-  // Lamba update
-  const lambdaUpdated = lambdaDeploymentUpdate(
-    awsAccount,
-    zone,
-    containerImage,
-    deploymentId,
-    lamdaId,
-    taskId
-  )
-
-  await send(sqs, lambdaUpdated, 1)
-
   if (instanceCount > 0) {
-    // TODO: send multiple pending/success messages
-    const firstUpdate = ecsDeploymentEvent(
+    const pending = ecsTestRunEvent(
       awsAccount,
       zone,
       containerImage,
       containerVersion,
-      deploymentId,
+      taskArn,
       lamdaId,
       taskId,
       'PENDING',
       'RUNNING'
     )
-    await send(sqs, firstUpdate, 3)
+    await send(sqs, pending, 1)
 
-    const secondUpdate = ecsDeploymentEvent(
+    const running = ecsTestRunEvent(
       awsAccount,
       zone,
       containerImage,
       containerVersion,
-      deploymentId,
+      taskArn,
       lamdaId,
       taskId,
       'RUNNING',
       'RUNNING'
     )
-    await send(sqs, secondUpdate, 5)
+    await send(sqs, running, 3)
+
+    const stopping = ecsTestRunEvent(
+      awsAccount,
+      zone,
+      containerImage,
+      containerVersion,
+      taskArn,
+      lamdaId,
+      taskId,
+      'RUNNING',
+      'STOPPED'
+    )
+    await send(sqs, stopping, 7)
+
+    const stopped = ecsTestRunEvent(
+      awsAccount,
+      zone,
+      containerImage,
+      containerVersion,
+      taskArn,
+      lamdaId,
+      taskId,
+      'STOPPED',
+      'STOPPED'
+    )
+    await send(sqs, stopped, 9)
   }
 }
 
@@ -80,4 +90,4 @@ async function send(sqs, payload, delay = 0) {
   return await sqs.send(command)
 }
 
-export { deploymentHandler }
+export { testRunHandler }

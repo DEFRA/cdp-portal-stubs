@@ -19,6 +19,12 @@ const tenantServices = [
       zone: 'protected',
       mongo: true,
       redis: false
+    },
+    'cdp-env-test-suite': {
+      zone: 'public',
+      mongo: false,
+      redis: false,
+      test_suite: 'cdp-env-test-suite'
     }
   }
 ]
@@ -36,7 +42,8 @@ const githubRepos = [
   { name: 'cdp-portal-frontend', topics: topicsService },
   { name: 'cdp-portal-backend', topics: topicsService },
   { name: 'cdp-self-service-ops', topics: topicsService },
-  { name: 'cdp-user-service', topics: topicsService }
+  { name: 'cdp-user-service', topics: topicsService },
+  { name: 'cdp-env-test-suite', topics: topicsTestSuite }
 ]
 
 const ecrRepos = {
@@ -55,6 +62,10 @@ const ecrRepos = {
   'cdp-user-service': {
     runMode: 'service',
     tags: ['0.1.0', '0.2.0', '0.3.0']
+  },
+  'cdp-env-test-suite': {
+    runMode: 'job',
+    tags: ['0.1.0']
   }
 }
 
