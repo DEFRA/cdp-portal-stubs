@@ -71,7 +71,8 @@ async function testRunHandler(sqs, payload) {
       lamdaId,
       taskId,
       'STOPPED',
-      'STOPPED'
+      'STOPPED',
+      0
     )
     await send(sqs, stopped, 9)
   }

@@ -2,6 +2,7 @@
 import { config } from '~/src/config'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
 import { ecrRepos } from '~/src/config/mock-data'
+import crypto from 'crypto'
 
 const triggerEcrPush = {
   handler: async (request, h) => {
@@ -35,6 +36,12 @@ const triggerEcrPush = {
 }
 
 const generateMessage = (service, tag) => {
+  const digest =
+    'sha256:' +
+    crypto
+      .createHash('sha256')
+      .update(service + ':' + tag)
+      .digest('hex')
   return {
     version: '0',
     id: '94d2fb77-c8b1-c698-d675-313ae585ae3f',
@@ -47,8 +54,7 @@ const generateMessage = (service, tag) => {
     detail: {
       result: 'SUCCESS',
       'repository-name': service,
-      'image-digest':
-        'sha256:44e6d7b2641f3666a507cc6a582a343d42c27a3d7dbfb64c2e672dab94831562',
+      'image-digest': digest,
       'action-type': 'PUSH',
       'artifact-media-type': 'application/vnd.docker.container.image.v1+json',
       'image-tag': tag,
