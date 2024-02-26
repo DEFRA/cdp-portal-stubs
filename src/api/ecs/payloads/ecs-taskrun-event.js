@@ -7,10 +7,11 @@ function ecsTestRunEvent(
   lambdaId,
   taskId,
   status,
-  desired
+  desired,
+  exitCode
 ) {
   const now = new Date().toISOString()
-  return {
+  const payload = {
     version: '0',
     id: crypto.randomUUID(),
     'detail-type': 'ECS Task State Change',
@@ -133,6 +134,10 @@ function ecsTestRunEvent(
       version: 5
     }
   }
+  if (exitCode != null || exitCode !== undefined) {
+    payload.detail.containers[2].exitCode = exitCode
+  }
+  return payload
 }
 
 export { ecsTestRunEvent }
