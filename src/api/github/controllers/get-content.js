@@ -1,4 +1,3 @@
-import { getTfSvcFile } from '~/src/api/github/content/tfsvc'
 import { getTfSvcInfraFile } from '~/src/api/github/content/tfsvcinfra'
 import { getCdpAppConfigFile } from '~/src/api/github/content/cdp-app-config'
 
@@ -18,8 +17,6 @@ const getContentController = {
 
 const lookupContent = (repo, path) => {
   switch (repo) {
-    case 'cdp-tf-svc':
-      return getTfSvcFile(path)
     case 'cdp-tf-svc-infra':
       return getTfSvcInfraFile(path)
     case 'cdp-app-config':

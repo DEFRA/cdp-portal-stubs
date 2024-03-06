@@ -1,4 +1,4 @@
-import { allServices } from '~/src/config/services'
+import { ecrRepos } from '~/src/config/mock-data'
 import * as crypto from 'crypto'
 import { config } from '~/src/config'
 
@@ -37,16 +37,31 @@ const fileBlobs = {
 
 const configBlobs = () => {
   const configBlobs = {}
-  allServices().forEach((s) => {
+  Object.keys(ecrRepos).forEach((s) => {
     const org = config.get('githubOrg')
 
     const sha256 = crypto.createHash('sha256').update(s).digest('hex')
-    configBlobs[`sha256:${sha256}`] = generateConfig(org, s)
+    configBlobs[`sha256:${sha256}`] = generateConfig(
+      org,
+      s,
+      ecrRepos[s].runMode
+    )
   })
   return configBlobs
 }
 
-const generateConfig = (org, service) => {
+const generateConfig = (org, service, runMode) => {
+  const labels = {
+    'defra.cdp.git.repo.url': `https://github.com/${org}/${service}`,
+    'defra.cdp.run_mode': runMode
+  }
+
+  if (runMode === 'job') {
+    labels['defra.cdp.testsuite.name'] = service
+  } else {
+    labels['defra.cdp.service.name'] = service
+  }
+
   return {
     architecture: 'amd64',
     config: {
@@ -73,7 +88,8 @@ const generateConfig = (org, service) => {
       OnBuild: null,
       Labels: {
         'defra.cdp.git.repo.url': `https://github.com/${org}/${service}`,
-        'defra.cdp.service.name': service
+        'defra.cdp.service.name': service,
+        'defra.cdp.run_mode': runMode
       }
     },
     container:
@@ -106,13 +122,13 @@ const generateConfig = (org, service) => {
       Entrypoint: ['dotnet', 'Defra.Cdp.Deployments.dll'],
       OnBuild: null,
       Labels: {
-        'defra.cdp.git.repo.url':
-          'https://github.com/defra-cdp-sandpit/cdp-deployments',
-        'defra.cdp.service.name': 'cdp-deployments'
+        'defra.cdp.git.repo.url': `https://github.com/${org}/${service}`,
+        'defra.cdp.service.name': service,
+        'defra.cdp.run_mode': runMode
       }
     },
     created: '2023-04-11T13:32:11.321678253Z',
-    docker_version: '20.10.23+azure-2',
+    docker_version: '20.10.23',
     history: [],
     os: 'linux',
     rootfs: {

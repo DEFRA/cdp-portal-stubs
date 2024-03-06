@@ -1,4 +1,4 @@
-import { allServices } from '~/src/config/services'
+import { githubRepos } from '~/src/config/mock-data'
 
 const teams = [
   {
@@ -45,7 +45,7 @@ const teamsAndReposData = () => {
             hasNextPage: false,
             endCursor: 'Y3Vyc29yOnYyOpMCsVdhdGVyIEFic3RyYWN0aW9uzgAlEAg='
           },
-          nodes: allServices().map(node)
+          nodes: githubRepos.map(node)
         }
       }
     }
@@ -58,26 +58,15 @@ const node = (service) => {
     repositories: {
       nodes: [
         {
-          name: service,
+          name: service.name,
           repositoryTopics: {
-            nodes: [
-              {
-                topic: {
-                  name: 'cdp'
-                }
-              },
-              {
-                topic: {
-                  name: 'service'
-                }
-              }
-            ]
+            nodes: service.topics
           },
-          description: service,
+          description: service.name,
           primaryLanguage: {
             name: 'JavaScript'
           },
-          url: `https://localhost:3939/github/${service}`,
+          url: `https://localhost:3939/github/${service.name}`,
           isArchived: false,
           isTemplate: false,
           isPrivate: false,
