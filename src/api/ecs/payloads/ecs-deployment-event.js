@@ -6,7 +6,9 @@ function ecsDeploymentEvent(
   deploymentId,
   lambdaId,
   taskId,
-  status
+  status,
+  desiredStatus,
+  taskArn
 ) {
   const now = new Date().toISOString()
   return {
@@ -143,7 +145,7 @@ function ecsDeploymentEvent(
       ],
       cpu: '1024',
       createdAt: now,
-      desiredStatus: 'RUNNING',
+      desiredStatus,
       enableExecuteCommand: true,
       ephemeralStorage: {
         sizeInGiB: 20
@@ -160,8 +162,7 @@ function ecsDeploymentEvent(
       pullStoppedAt: now,
       startedAt: now,
       startedBy: `ecs-svc/${lambdaId}`,
-      taskArn:
-        'arn:aws:ecs:eu-west-2:000000000000:task/dev-ecs-public/f8bec92bed774ee4b27711702a862de5',
+      taskArn: `arn:aws:ecs:eu-west-2:000000000000:task/dev-ecs-public/${taskArn}`,
       taskDefinitionArn: `arn:aws:ecs:eu-west-2:000000000000:task-definition/${service}:${taskId}`,
       updatedAt: now,
       version: 5

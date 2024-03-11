@@ -37,33 +37,30 @@ async function deploymentHandler(sqs, payload) {
 
   await send(sqs, lambdaUpdated, 1)
 
-  if (instanceCount > 0) {
-    // TODO: send multiple pending/success messages
-    const firstUpdate = ecsDeploymentEvent(
-      awsAccount,
-      zone,
-      containerImage,
-      containerVersion,
-      deploymentId,
-      lamdaId,
-      taskId,
-      'PENDING',
-      'RUNNING'
-    )
-    await send(sqs, firstUpdate, 3)
+  const deploymentFlow = [
+    { status: 'PROVISIONING', delay: 1 },
+    { status: 'PENDING', delay: 2 },
+    { status: 'ACTIVATING', delay: 3 },
+    { status: 'RUNNING', delay: 5 }
+  ]
 
-    const secondUpdate = ecsDeploymentEvent(
-      awsAccount,
-      zone,
-      containerImage,
-      containerVersion,
-      deploymentId,
-      lamdaId,
-      taskId,
-      'RUNNING',
-      'RUNNING'
-    )
-    await send(sqs, secondUpdate, 5)
+  for (let i = 0; i < instanceCount; i++) {
+    const taskArn = crypto.randomUUID()
+    for (let j = 0; j < deploymentFlow.length; j++) {
+      const payload = ecsDeploymentEvent(
+        awsAccount,
+        zone,
+        containerImage,
+        containerVersion,
+        deploymentId,
+        lamdaId,
+        taskId,
+        deploymentFlow[j].status,
+        'RUNNING',
+        taskArn
+      )
+      await send(sqs, payload, deploymentFlow[j].delay)
+    }
   }
 }
 
