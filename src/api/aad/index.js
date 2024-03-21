@@ -15,6 +15,21 @@ const aadStub = {
         },
         {
           method: 'GET',
+          path: '/msgraph/v1.0/groups/{id}',
+          ...msgraphGroups
+        },
+        {
+          method: 'PATCH',
+          path: '/msgraph/v1.0/groups/{id}',
+          ...msgraphGroups
+        },
+        {
+          method: 'POST',
+          path: '/msgraph/v1.0/groups/{id}/members/$ref',
+          ...msgraphMembers
+        },
+        {
+          method: 'GET',
           path: '/msgraph/v1.0/users',
           ...msgraphUsers
         },
@@ -22,11 +37,6 @@ const aadStub = {
           method: 'GET',
           path: '/msgraph/v1.0/users/{id}',
           ...msgraphUser
-        },
-        {
-          method: 'POST',
-          path: '/msgraph/v1.0/groups/{id}/members/$ref',
-          ...msgraphMembers
         }
       ])
     }
