@@ -2,6 +2,7 @@ import { triggerCreateRepoWorkflow } from '~/src/api/github/events/trigger-creat
 import {
   ecrRepos,
   githubRepos,
+  topicsPerfTestSuite,
   topicsService,
   topicsTestSuite
 } from '~/src/config/mock-data'
@@ -36,6 +37,17 @@ const triggerWorkflow = {
     if (workflowFile === 'create_env_test_suite.yml') {
       request.logger.info(`Adding test suite ${repositoryName} to github repos`)
       githubRepos.push({ name: repositoryName, topics: topicsTestSuite })
+
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
+      }
+    }
+
+    if (workflowFile === 'create_perf_test_suite.yml') {
+      request.logger.info(
+        `Adding perf test suite ${repositoryName} to github repos`
+      )
+      githubRepos.push({ name: repositoryName, topics: topicsPerfTestSuite })
 
       if (ecrRepos[repositoryName] === undefined) {
         ecrRepos[repositoryName] = { tags: [], runMode: 'job' }

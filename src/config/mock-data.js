@@ -38,6 +38,12 @@ const topicsTestSuite = [
   { topic: { name: 'tests' } }
 ]
 
+const topicsPerfTestSuite = [
+  { topic: { name: 'cdp' } },
+  { topic: { name: 'tests' } },
+  { topic: { name: 'performance' } }
+]
+
 const githubRepos = [
   { name: 'cdp-portal-frontend', topics: topicsService },
   { name: 'cdp-portal-backend', topics: topicsService },
@@ -69,4 +75,11 @@ const ecrRepos = {
   }
 }
 
-export { tenantServices, githubRepos, ecrRepos, topicsTestSuite, topicsService }
+export {
+  tenantServices,
+  githubRepos,
+  ecrRepos,
+  topicsTestSuite,
+  topicsService,
+  topicsPerfTestSuite
+}
