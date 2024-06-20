@@ -27,4 +27,20 @@ const patchRefsController = {
   }
 }
 
-export { repoCommitsController, postCommitsController, patchRefsController }
+const getRefsController = {
+  handler: async (request, h) => {
+    const ref = {
+      object: {
+        sha: 'aa218f56b14c9653891f9e74264a383fa43fefbd'
+      }
+    }
+    return h.response(ref).code(200)
+  }
+}
+
+export {
+  getRefsController,
+  repoCommitsController,
+  postCommitsController,
+  patchRefsController
+}

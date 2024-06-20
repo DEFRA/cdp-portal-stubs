@@ -3,6 +3,7 @@ import { updateRepo } from '~/src/api/github/controllers/update-repo'
 import { getRepoController } from '~/src/api/github/controllers/get-repo'
 import { gitTreeController } from '~/src/api/github/controllers/gitTree'
 import {
+  getRefsController,
   patchRefsController,
   postCommitsController,
   repoCommitsController
@@ -51,6 +52,11 @@ const githubStub = {
           method: 'POST',
           path: '/graphql',
           ...graphqlController
+        },
+        {
+          method: 'GET',
+          path: '/repos/{org}/{repo}/git/refs/{path}',
+          ...getRefsController
         },
         {
           method: 'PATCH',
