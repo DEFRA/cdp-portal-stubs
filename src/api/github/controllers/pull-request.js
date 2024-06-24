@@ -1,6 +1,7 @@
 import * as crypto from 'crypto'
 import { triggerMergeResponse } from '~/src/api/github/events/trigger-merge-response'
 import { triggerWorkflowComplete } from '~/src/api/github/events/trigger-workflow-complete'
+import { triggerPrOpenResponse } from '~/src/api/github/events/trigger-pr-open-response'
 
 const createPullRequest = {
   handler: async (request, h) => {
@@ -12,6 +13,7 @@ const createPullRequest = {
     request.logger.info(request.payload)
     const number = Math.floor(Math.random() * 9999999)
 
+    await triggerPrOpenResponse(request.sqs, repo, number, nodeId, commitId)
     await triggerMergeResponse(request.sqs, repo, number, nodeId, commitId)
     await triggerWorkflowComplete(request.sqs, repo, commitId)
 
