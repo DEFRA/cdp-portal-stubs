@@ -55,7 +55,7 @@ const githubStub = {
         },
         {
           method: 'GET',
-          path: '/repos/{org}/{repo}/git/refs/{path}',
+          path: '/repos/{org}/{repo}/git/ref/{path}',
           ...getRefsController
         },
         {
