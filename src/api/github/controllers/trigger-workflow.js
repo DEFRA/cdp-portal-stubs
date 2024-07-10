@@ -17,6 +17,9 @@ const triggerWorkflow = {
       case 'cdp-squid-proxy':
         await handleSquidWorkflows(request)
         break
+      case 'cdp-grafana-svc':
+        await handleDashboardWorkflow(request)
+        break
       default:
         return h
           .response({ message: `unknown workflow ${workflowRepo}` })
@@ -114,6 +117,50 @@ const handleSquidWorkflows = async (request) => {
     await triggerWorkflowStatus(
       request.sqs,
       'cdp-squid-proxy',
+      service,
+      'completed',
+      'success',
+      2
+    )
+  }
+}
+
+const handleDashboardWorkflow = async (request) => {
+  const org = request.params.org
+  const workflowRepo = request.params.repo
+  const workflowFile = request.params.workflow
+  const inputs = request.payload.inputs
+  const service = inputs.service
+
+  request.logger.info(
+    `Stubbing triggering of workflow ${org}/${workflowRepo}/${workflowFile} with inputs ${JSON.stringify(
+      inputs
+    )}`
+  )
+
+  if (workflowFile === 'create-dashboards-conf.yml') {
+    request.logger.info(`Adding service ${service} to dashboard config`)
+    await triggerWorkflowStatus(
+      request.sqs,
+      workflowRepo,
+      service,
+      'requested',
+      null,
+      0
+    )
+
+    await triggerWorkflowStatus(
+      request.sqs,
+      workflowRepo,
+      service,
+      'in_progress',
+      null,
+      1
+    )
+
+    await triggerWorkflowStatus(
+      request.sqs,
+      workflowRepo,
       service,
       'completed',
       'success',
