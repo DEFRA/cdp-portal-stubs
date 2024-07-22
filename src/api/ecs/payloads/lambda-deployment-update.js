@@ -20,7 +20,7 @@ function lambdaDeploymentUpdate(
     detail: {
       eventType: 'INFO',
       eventName: 'IN_PROGRESS',
-      deploymentId: `ecs-svc/${lambdaId}`,
+      deploymentId: lambdaId,
       reason: `Deployment arn:aws:ecs:eu-west-2:${awsAccountId}:service/infra-dev-ecs-public/${service} successfully updated`
     },
     deployed_by: 'Test, User',

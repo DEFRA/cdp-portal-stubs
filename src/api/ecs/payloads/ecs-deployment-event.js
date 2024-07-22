@@ -161,7 +161,7 @@ function ecsDeploymentEvent(
       pullStartedAt: now,
       pullStoppedAt: now,
       startedAt: now,
-      startedBy: `ecs-svc/${lambdaId}`,
+      startedBy: lambdaId,
       taskArn: `arn:aws:ecs:eu-west-2:000000000000:task/dev-ecs-public/${taskArn}`,
       taskDefinitionArn: `arn:aws:ecs:eu-west-2:000000000000:task-definition/${service}:${taskId}`,
       updatedAt: now,
