@@ -25,3 +25,13 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm test
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: eu-west-2
+          role-to-assume: arn:aws:iam::094954420758:role/github-cdp-portal-stubs-build-role
+      - run: aws sts get-caller-identity
+        shell: bash
+        working-directory: .
+      - run: aws secretsmanager get-secret-value --secret-id cdp/services/sc-test-1 | jq '.SecretString = "***"'
+        shell: bash
