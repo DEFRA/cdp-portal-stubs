@@ -24,7 +24,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-cdp-portal-stubs-build-role
+          role-to-assume: arn:aws:iam::094954420758:role/github-cdp-portal-stubs-build-role
       - run: aws sts get-caller-identity
         shell: bash
       - run: aws secretsmanager get-secret-value --secret-id cdp/services/sc-test-1 | jq '.SecretString = "***"'
