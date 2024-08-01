@@ -7,6 +7,7 @@ import { config } from '~/src/config'
 
 import { ecsDeploymentEvent } from '~/src/api/ecs/payloads/ecs-deployment-event'
 import { lambdaDeploymentUpdate } from '~/src/api/ecs/payloads/lambda-deployment-update'
+import { ecsDeployStatusChangeEvent } from '~/src/api/ecs/payloads/ecs-deploy-status-change-event'
 
 const logger = createLogger()
 
@@ -22,7 +23,7 @@ async function deploymentHandler(sqs, payload) {
   const instanceCount = msg?.desired_count
 
   const deploymentId = msg?.deployed_by?.deployment_id
-  const lamdaId = crypto.randomUUID()
+  const lamdaId = `ecs-svc/${crypto.randomUUID()}`
   const taskId = Math.floor(Math.random() * 1000000)
 
   // Lamba update
@@ -62,6 +63,15 @@ async function deploymentHandler(sqs, payload) {
       await send(sqs, payload, deploymentFlow[j].delay)
     }
   }
+
+  const deployStatusChangeEvent = ecsDeployStatusChangeEvent(
+    awsAccount,
+    new Date(),
+    lamdaId,
+    'SERVICE_DEPLOYMENT_COMPLETED',
+    `ECS deployment ${lamdaId} completed.`
+  )
+  await send(sqs, deployStatusChangeEvent, 5)
 }
 
 async function send(sqs, payload, delay = 0) {
