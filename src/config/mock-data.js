@@ -3,28 +3,33 @@ const tenantServices = [
     'cdp-portal-frontend': {
       zone: 'public',
       mongo: false,
-      redis: true
+      redis: true,
+      service_code: 'CDP'
     },
     'cdp-portal-backend': {
       zone: 'protected',
       mongo: true,
-      redis: false
+      redis: false,
+      service_code: 'CDP'
     },
     'cdp-self-service-ops': {
       zone: 'protected',
       mongo: true,
-      redis: false
+      redis: false,
+      service_code: 'CDP'
     },
     'cdp-user-service': {
       zone: 'protected',
       mongo: true,
-      redis: false
+      redis: false,
+      service_code: 'CDP'
     },
     'cdp-env-test-suite': {
       zone: 'public',
       mongo: false,
       redis: false,
-      test_suite: 'cdp-env-test-suite'
+      test_suite: 'cdp-env-test-suite',
+      service_code: 'CDP'
     }
   }
 ]

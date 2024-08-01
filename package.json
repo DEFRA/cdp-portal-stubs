@@ -25,7 +25,8 @@
     "server:debug": "nodemon --exec babel-node --inspect ./src",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict ./.server",
-    "setup:husky": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\""
+    "setup:husky": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
+    "pre-commit-hook": "npm test && npm run lint && npm run format:check"
   },
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
