@@ -66,7 +66,7 @@ const node = (service) => {
           primaryLanguage: {
             name: 'JavaScript'
           },
-          url: `https://localhost:3939/github/${service.name}`,
+          url: `https://github.com/DEFRA/${service.name}`,
           isArchived: false,
           isTemplate: false,
           isPrivate: false,

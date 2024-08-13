@@ -1,10 +1,4 @@
-import {
-  ecrRepos,
-  githubRepos,
-  topicsPerfTestSuite,
-  topicsService,
-  topicsTestSuite
-} from '~/src/config/mock-data'
+import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
 
 const triggerWorkflow = {
@@ -15,10 +9,13 @@ const triggerWorkflow = {
         await handleCdpCreateWorkflows(request)
         break
       case 'cdp-squid-proxy':
-        await handleSquidWorkflows(request)
-        break
       case 'cdp-grafana-svc':
-        await handleDashboardWorkflow(request)
+      case 'cdp-app-config':
+      case 'cdp-nginx-upstreams':
+        await handleGenericWorkflows(request)
+        break
+      case 'cdp-tf-svc-infra':
+        await handleServiceCreation(request)
         break
       default:
         return h
@@ -35,6 +32,9 @@ const handleCdpCreateWorkflows = async (request) => {
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
   const repositoryName = inputs.repositoryName
+  const topics = (inputs.additionalGitHubTopics?.split(',') ?? []).map((t) => {
+    return { topic: { name: t } }
+  })
 
   request.logger.info(
     `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${JSON.stringify(
@@ -42,131 +42,97 @@ const handleCdpCreateWorkflows = async (request) => {
     )}`
   )
 
+  githubRepos.push({ name: repositoryName, topics })
+
   await triggerWorkflowStatus(
     request.sqs,
     'cdp-create-workflows',
+    workflowFile,
     repositoryName,
     'completed',
     'success',
     1
   )
-  if (workflowFile === 'create_microservice.yml') {
-    request.logger.info(`Adding service ${repositoryName} to github repos`)
-    githubRepos.push({ name: repositoryName, topics: topicsService })
 
-    // technically this should happen on the TF-svc stage but its easier to
-    // detect the service type+name here
-    if (ecrRepos[repositoryName] === undefined) {
-      ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
-    }
-  }
-
-  if (workflowFile === 'create_env_test_suite.yml') {
-    request.logger.info(`Adding test suite ${repositoryName} to github repos`)
-    githubRepos.push({ name: repositoryName, topics: topicsTestSuite })
-
-    if (ecrRepos[repositoryName] === undefined) {
-      ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
-    }
-  }
-
-  if (workflowFile === 'create_perf_test_suite.yml') {
-    request.logger.info(
-      `Adding perf test suite ${repositoryName} to github repos`
-    )
-    githubRepos.push({ name: repositoryName, topics: topicsPerfTestSuite })
-
-    if (ecrRepos[repositoryName] === undefined) {
-      ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
-    }
+  switch (workflowFile) {
+    case 'create_microservice.yml':
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
+      }
+      break
+    case 'create_env_test_suite.yml':
+    case 'create_perf_test_suite.yml':
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
+      }
+      break
   }
 }
 
-const handleSquidWorkflows = async (request) => {
+const handleServiceCreation = async (request) => {
+  /**
+   * @type {{service:string, type:string, zone:string, mongo_enabled: boolean, redis_enabled: boolean, service_code:string, test_suite: string|null }}
+   */
+  const inputs = request.payload.inputs
+  // simulate creating the terraform changes erc
+  tenantServices[0][inputs.service] = {
+    zone: inputs.zone,
+    mongo: inputs.mongo_enabled,
+    redis: inputs.redis_enabled,
+    service_code: inputs.service_code
+  }
+
+  await handleGenericWorkflows(request, 3)
+}
+
+const handleGenericWorkflows = async (request, baseDelay = 0) => {
   const org = request.params.org
+  const repo = request.params.repo
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
-  const service = inputs.service
+  const service = inputs?.service || inputs?.repositoryName
 
   request.logger.info(
-    `Stubbing triggering of workflow ${org}/cdp-squid-proxy/${workflowFile} with inputs ${JSON.stringify(
+    `Stubbing triggering of workflow ${org}/${repo}/.github/workflows/${workflowFile} with inputs ${JSON.stringify(
       inputs
     )}`
   )
 
-  if (workflowFile === 'create_service.yml') {
-    request.logger.info(`Adding service ${service} to squid config`)
-    await triggerWorkflowStatus(
-      request.sqs,
-      'cdp-squid-proxy',
-      service,
-      'requested',
-      null,
-      0
-    )
+  // Future stubbing
+  // If we need to support different workflows on the same repo (i.e. create-s3-bucket.yml) we can
+  // check the workflow file: e.g. `if (workflowFile === 'create-service.yml') {}`
 
-    await triggerWorkflowStatus(
-      request.sqs,
-      'cdp-squid-proxy',
-      service,
-      'in_progress',
-      null,
-      1
-    )
+  request.logger.info(`Adding service ${service} to ${repo}`)
 
-    await triggerWorkflowStatus(
-      request.sqs,
-      'cdp-squid-proxy',
-      service,
-      'completed',
-      'success',
-      2
-    )
-  }
-}
-
-const handleDashboardWorkflow = async (request) => {
-  const org = request.params.org
-  const workflowRepo = request.params.repo
-  const workflowFile = request.params.workflow
-  const inputs = request.payload.inputs
-  const service = inputs.service
-
-  request.logger.info(
-    `Stubbing triggering of workflow ${org}/${workflowRepo}/${workflowFile} with inputs ${JSON.stringify(
-      inputs
-    )}`
+  await triggerWorkflowStatus(
+    request.sqs,
+    repo,
+    workflowFile,
+    service,
+    'requested',
+    null,
+    0
   )
 
-  if (workflowFile === 'create-dashboards-conf.yml') {
-    request.logger.info(`Adding service ${service} to dashboard config`)
-    await triggerWorkflowStatus(
-      request.sqs,
-      workflowRepo,
-      service,
-      'requested',
-      null,
-      0
-    )
+  await triggerWorkflowStatus(
+    request.sqs,
+    repo,
+    workflowFile,
+    service,
+    'in_progress',
+    null,
+    baseDelay + 1
+  )
 
-    await triggerWorkflowStatus(
-      request.sqs,
-      workflowRepo,
-      service,
-      'in_progress',
-      null,
-      1
-    )
-
-    await triggerWorkflowStatus(
-      request.sqs,
-      workflowRepo,
-      service,
-      'completed',
-      'success',
-      2
-    )
-  }
+  await triggerWorkflowStatus(
+    request.sqs,
+    repo,
+    workflowFile,
+    service,
+    'completed',
+    'success',
+    baseDelay + 2
+  )
 }
 
 export { triggerWorkflow }
