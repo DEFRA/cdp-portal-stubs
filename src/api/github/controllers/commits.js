@@ -5,6 +5,17 @@ const postCommitsController = {
   }
 }
 
+const getCommitController = {
+  handler: async (request, h) => {
+    const commit = {
+      tree: {
+        sha: request.params.commitSha
+      }
+    }
+    return h.response(commit).code(200)
+  }
+}
+
 const repoCommitsController = {
   handler: async (request, h) => {
     const commits = [
@@ -41,6 +52,7 @@ const getRefsController = {
 export {
   getRefsController,
   repoCommitsController,
+  getCommitController,
   postCommitsController,
   patchRefsController
 }
