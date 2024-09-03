@@ -82,7 +82,16 @@ const handleServiceCreation = async (request) => {
     service_code: inputs.service_code
   }
 
-  await handleGenericWorkflows(request, 3)
+  await handleGenericWorkflows(request, 1)
+  await triggerWorkflowStatus(
+    request.sqs,
+    'cdp-tf-svc-infra',
+    '.github/workflows/manual.yml',
+    'Manual Apply',
+    'completed',
+    'success',
+    4
+  )
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
