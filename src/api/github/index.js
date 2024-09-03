@@ -3,6 +3,7 @@ import { updateRepo } from '~/src/api/github/controllers/update-repo'
 import { getRepoController } from '~/src/api/github/controllers/get-repo'
 import { gitTreeController } from '~/src/api/github/controllers/gitTree'
 import {
+  getCommitController,
   getRefsController,
   patchRefsController,
   postCommitsController,
@@ -12,6 +13,7 @@ import { graphqlController } from '~/src/api/github/controllers/graphql'
 import { createPullRequest } from '~/src/api/github/controllers/pull-request'
 import { triggerWorkflow } from '~/src/api/github/controllers/trigger-workflow'
 import { accessTokenController } from '~/src/api/github/controllers/access-token'
+import { postCreateBlobController } from '~/src/api/github/controllers/blobs'
 
 const githubStub = {
   plugin: {
@@ -39,9 +41,19 @@ const githubStub = {
           ...repoCommitsController
         },
         {
+          method: 'GET',
+          path: '/repos/{org}/{repo}/git/commits/{commitSha}',
+          ...getCommitController
+        },
+        {
           method: 'POST',
           path: '/repos/{org}/{repo}/git/commits',
           ...postCommitsController
+        },
+        {
+          method: 'POST',
+          path: '/repos/{org}/{repo}/git/blobs',
+          ...postCreateBlobController
         },
         {
           method: 'POST',
