@@ -157,6 +157,23 @@ const config = convict({
     format: String,
     default: 'http://127.0.0.1:4566/000000000000/run-test-from-portal',
     env: 'SQS_TEST_RUNS_FROM_PORTAL'
+  },
+  lambda: {
+    secretsUpdates: {
+      queue: {
+        doc: 'A queue that normally receives messages from self service and responded by a lambda',
+        format: String,
+        default:
+          'http://a127.0.0.1:4566/000000000000/secret_management_updates',
+        env: 'SQS_SECRET_UPDATES'
+      },
+      delay: {
+        doc: 'A delay before processing secrets  elf service and responded by a lambda',
+        format: Number,
+        default: '2000',
+        env: 'SQS_SECRET_UPDATES_DELAY'
+      }
+    }
   }
 })
 
