@@ -13,25 +13,26 @@ async function secretsUpdatesHandler(sqs, payload) {
     logger.info('No secret message payload found')
     return
   }
-  const { name, environment, action } = payload.Message
+  const { environment, action } = payload.Message
+  const service = payload.Message.name
   const secretKey = payload.Message.secret_key
   const secretValue = payload.Message.secret_value
 
   if (secretValue === 'BLOWUP') {
-    logger.info(`Exception, BLOWUP received for ${name} in ${environment}`)
+    logger.info(`Exception, BLOWUP received for ${service} in ${environment}`)
     addSecret({
       sqs,
       environment,
       addSecret: false,
-      name,
+      service,
       secretKey,
       exception: 'Something went wrong, on purpose'
     })
     return
   }
   if (action === 'add_secret') {
-    logger.info(`Adding secret [${secretKey}] for ${name} in ${environment}`)
-    addSecret({ sqs, environment, addSecret: true, name, secretKey })
+    logger.info(`Adding secret [${secretKey}] for ${service} in ${environment}`)
+    addSecret({ sqs, environment, addSecret: true, service, secretKey })
   }
 }
 
@@ -39,18 +40,19 @@ async function addSecret({
   sqs,
   environment,
   addSecret,
-  secret,
+  service,
   secretKey,
   exception
 }) {
   const payload = {
     source: 'cdp-secret-manager-lambda',
     statusCode: 200,
+    action: 'add_secret',
     body: {
       environment,
       add_secret: addSecret,
-      secret,
-      secretKey,
+      secret: `cdp/services/${service}`,
+      secret_key: secretKey,
       exception
     }
   }
