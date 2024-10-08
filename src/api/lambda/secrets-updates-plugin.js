@@ -1,13 +1,13 @@
-import { secretUpdatesListener } from '~/src/api/lambda/secrets-updates-listener'
+import { secretsUpdatesListener } from '~/src/api/lambda/secrets-updates-listener'
 
-const secretUpdatesPlugin = {
+const secretsUpdatesPlugin = {
   plugin: {
     name: 'secretUpdatesPlugin',
     version: '1.0.0',
     register: function (server) {
-      secretUpdatesListener(server)
+      secretsUpdatesListener(server)
     }
   }
 }
 
-export { secretUpdatesPlugin }
+export { secretsUpdatesPlugin }

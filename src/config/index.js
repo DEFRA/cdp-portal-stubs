@@ -160,17 +160,23 @@ const config = convict({
   },
   lambda: {
     secretsUpdates: {
-      queue: {
-        doc: 'A queue that normally receives messages from self service and responded by a lambda',
+      queueIn: {
+        doc: 'A queue that normally receives messages from self service ops',
         format: String,
         default:
-          'http://a127.0.0.1:4566/000000000000/secret_management_updates',
+          'http://127.0.0.1:4566/000000000000/secret_management_updates_lambda',
+        env: 'SQS_SECRET_UPDATES_LAMBDA'
+      },
+      queueOut: {
+        doc: 'A queue that normally sends messages to cdp portal backend',
+        format: String,
+        default: 'http://127.0.0.1:4566/000000000000/secret_management_updates',
         env: 'SQS_SECRET_UPDATES'
       },
       delay: {
-        doc: 'A delay before processing secrets  elf service and responded by a lambda',
+        doc: 'A delay before processing secrets and respond by a lambda',
         format: Number,
-        default: '2000',
+        default: '3',
         env: 'SQS_SECRET_UPDATES_DELAY'
       }
     }

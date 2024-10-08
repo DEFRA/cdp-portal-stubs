@@ -9,7 +9,7 @@ import { mongoPlugin } from '~/src/helpers/mongodb'
 import { failAction } from '~/src/helpers/fail-action'
 import { sqsPlugin } from '~/src/helpers/sqs'
 import { deploymentEventsPlugin } from '~/src/api/ecs/deployment-events-plugin'
-import { secretUpdatesPlugin } from '~/src/api/lambdas/secret-updates-plugin'
+import { secretsUpdatesPlugin } from '~/src/api/lambda/secrets-updates-plugin'
 
 async function createServer() {
   const server = hapi.server({
@@ -40,7 +40,7 @@ async function createServer() {
 
   await server.register(sqsPlugin)
   await server.register(deploymentEventsPlugin)
-  await server.register(secretUpdatesPlugin)
+  await server.register(secretsUpdatesPlugin)
 
   return server
 }

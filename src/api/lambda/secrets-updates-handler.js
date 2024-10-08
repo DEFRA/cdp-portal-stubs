@@ -5,33 +5,57 @@ import { config } from '~/src/config'
 
 const logger = createLogger()
 const secretsUpdatedDelay = config.get('lambda.secretsUpdates.delay')
-const secretsUpdatedQueue = config.get('lambda.secretsUpdates.queue')
+const secretsOutgoing = config.get('lambda.secretsUpdates.queueOut')
 
-async function secretUpdatesHandler(sqs, payload) {
-  logger.info(payload.Message, 'Secrets update received')
-  const msg = JSON.parse(payload.Message)
-  const name = msg?.name
-  const environment = msg?.environment
-  const action = msg?.action
-  //   const description = msg?.description
-  const secretKey = msg?.secret_key
-  //   const secretValue = msg?.secret_value
+async function secretsUpdatesHandler(sqs, payload) {
+  logger.info({ payload }, 'Secrets update received')
+  if (!payload?.Message) {
+    logger.info('No secret message payload found')
+    return
+  }
+  const { name, environment, action } = payload.Message
+  const secretKey = payload.Message.secret_key
+  const secretValue = payload.Message.secret_value
 
+  if (secretValue === 'BLOWUP') {
+    logger.info(`Exception, BLOWUP received for ${name} in ${environment}`)
+    addSecret({
+      sqs,
+      environment,
+      addSecret: false,
+      name,
+      secretKey,
+      exception: 'Something went wrong, on purpose'
+    })
+    return
+  }
   if (action === 'add_secret') {
-    logger.info(`Adding secret ${secretKey} for ${name} in ${environment}`)
-    addSecret(sqs, name, secretKey)
+    logger.info(`Adding secret [${secretKey}] for ${name} in ${environment}`)
+    addSecret({ sqs, environment, addSecret: true, name, secretKey })
   }
 }
 
-async function addSecret(sqs, name, secretKey) {
+async function addSecret({
+  sqs,
+  environment,
+  addSecret,
+  secret,
+  secretKey,
+  exception
+}) {
   const payload = {
-    add_secret: true,
-    secret: name,
-    secretKey,
-    exception: ''
+    source: 'cdp-secret-manager-lambda',
+    statusCode: 200,
+    body: {
+      environment,
+      add_secret: addSecret,
+      secret,
+      secretKey,
+      exception
+    }
   }
   const updatedMessage = {
-    QueueUrl: secretsUpdatedQueue,
+    QueueUrl: secretsOutgoing,
     MessageBody: JSON.stringify(payload),
     DelaySeconds: secretsUpdatedDelay,
     MessageAttributes: {},
@@ -41,4 +65,4 @@ async function addSecret(sqs, name, secretKey) {
   return await sqs.send(command)
 }
 
-export { secretUpdatesHandler }
+export { secretsUpdatesHandler }
