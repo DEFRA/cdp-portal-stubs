@@ -198,19 +198,46 @@ being returned in the mock API calls.
 
 Add to pending in portal backend.
 
-`curl -H "Content-Type: application/json" -d '{"environment":"infra-dev", "service": "cdp-portal-frontend","secretKey":"SOME_KEY","action":"add_secret"}'  http://localhost:5094/secrets/register/pending`
+```bash
+curl -H "Content-Type: application/json" -d \
+   '{"environment":"infra-dev", "service": "cdp-portal-frontend","secretKey":"SOME_KEY","action":"add_secret"}' \
+   http://localhost:5094/secrets/register/pending
+```
 
 Add to queue that simulates the lambda consuming it after a slight delay.
 
-`awslocal sqs send-message --queue-url "http://localhost:4566/000000000000/secret_management_updates_lambda" --region eu-west-2 --message-body '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "Some value"}}'`
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates_lambda" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "Some value"}}'
+```
 
 Or add directly to Portal Backend.
 
-`awslocal sqs send-message --queue-url "http://localhost:4566/000000000000/secret_management_updates" --region eu-west-2 --message-body '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "body": {"add_secret": true, "secret": "cdp/services/cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY" }}'`
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "body": {"add_secret": true, "secret": "cdp/services/cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY" }}'
+```
+
+Or publish to topic that fans out to the queue.
+
+```bash
+awslocal sns publish \
+  --topic-arn "arn:aws:sns:eu-west-2:000000000000:secret_management" \
+  --message '{"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "Some value"}'
+```
 
 Add `BLOWUP` as value to simulate the lambda throwing exception.
 
-`awslocal sqs send-message --queue-url "http://localhost:4566/000000000000/secret_management_updates_lambda" --region eu-west-2 --message-body '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "BLOWUP"}}'`
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates_lambda" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",     "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "BLOWUP"}}'
+```
 
 #### Get all secret
 

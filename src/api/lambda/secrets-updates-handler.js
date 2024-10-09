@@ -8,15 +8,16 @@ const secretsUpdatedDelay = config.get('lambda.secretsUpdates.delay')
 const secretsOutgoing = config.get('lambda.secretsUpdates.queueOut')
 
 async function secretsUpdatesHandler(sqs, payload) {
-  logger.info({ payload }, 'Secrets update received')
+  logger.debug({ payload }, 'Secrets update received')
   if (!payload?.Message) {
     logger.info('No secret message payload found')
     return
   }
-  const { environment, action } = payload.Message
-  const service = payload.Message.name
-  const secretKey = payload.Message.secret_key
-  const secretValue = payload.Message.secret_value
+  const message = JSON.parse(payload.Message)
+  const { environment, action } = message
+  const service = message.name
+  const secretKey = message.secret_key
+  const secretValue = message.secret_value
 
   if (secretValue === 'BLOWUP') {
     logger.info(`Exception, BLOWUP received for ${service} in ${environment}`)
@@ -33,6 +34,8 @@ async function secretsUpdatesHandler(sqs, payload) {
   if (action === 'add_secret') {
     logger.info(`Adding secret [${secretKey}] for ${service} in ${environment}`)
     addSecret({ sqs, environment, addSecret: true, service, secretKey })
+  } else {
+    logger.error(`Unknown action [${action}] for ${service} in ${environment}`)
   }
 }
 
