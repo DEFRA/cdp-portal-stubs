@@ -157,6 +157,29 @@ const config = convict({
     format: String,
     default: 'http://127.0.0.1:4566/000000000000/run-test-from-portal',
     env: 'SQS_TEST_RUNS_FROM_PORTAL'
+  },
+  lambda: {
+    secretsUpdates: {
+      queueIn: {
+        doc: 'A queue that normally receives messages from self service ops',
+        format: String,
+        default:
+          'http://127.0.0.1:4566/000000000000/secret_management_updates_lambda',
+        env: 'SQS_SECRET_UPDATES_LAMBDA'
+      },
+      queueOut: {
+        doc: 'A queue that normally sends messages to cdp portal backend',
+        format: String,
+        default: 'http://127.0.0.1:4566/000000000000/secret_management_updates',
+        env: 'SQS_SECRET_UPDATES'
+      },
+      delay: {
+        doc: 'A delay before processing secrets and respond by a lambda',
+        format: Number,
+        default: '3',
+        env: 'SQS_SECRET_UPDATES_DELAY'
+      }
+    }
   }
 })
 
