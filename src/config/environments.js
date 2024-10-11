@@ -5,7 +5,8 @@ const environmentMappings = {
   test: '444444444',
   snd: '555555555',
   management: '666666666',
-  'infra-dev': '777777777'
+  'infra-dev': '777777777',
+  'ext-test': '888888888'
 }
 
 export { environmentMappings }
