@@ -13,10 +13,18 @@ const triggerWorkflowComplete = async (sqs, repoName, mergedSha, delay = 7) => {
       updated_at: new Date().toISOString(),
       head_sha: mergedSha,
       head_branch: 'main',
-      conclusion: 'success'
+      conclusion: 'success',
+      run_number: 1,
+      head_commit: {
+        message: 'commit message',
+        author: {
+          name: 'stub'
+        }
+      }
     },
     repository: {
-      name: repoName
+      name: repoName,
+      html_url: 'http://localhost:3939/#local-stub'
     }
   }
 
