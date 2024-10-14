@@ -33,10 +33,18 @@ const triggerWorkflowStatus = async (
       html_url: 'http://localhost:3939/#local-stub',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      path: `.github/workflows/${workflowFile}`
+      path: `.github/workflows/${workflowFile}`,
+      run_number: 1,
+      head_commit: {
+        message: 'commit message',
+        author: {
+          name: 'stub'
+        }
+      }
     },
     repository: {
-      name: workflowRepo
+      name: workflowRepo,
+      html_url: 'http://localhost:3939/#local-stub'
     },
     workflow: {
       path: `.github/workflows/${workflowFile}`
