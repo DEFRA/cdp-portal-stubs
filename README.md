@@ -86,7 +86,12 @@ awslocal sqs create-queue --queue-name github-events --region eu-west-2
 awslocal sqs create-queue --queue-name deployments-from-portal --region eu-west-2
 awslocal sqs create-queue --queue-name run-test-from-portal
 awslocal sns create-topic --name run-test-topic
-awslocal sns subscribe --topic-arn arn:aws:sns:$AWS_REGION:000000000000:run-test-topic --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:run-test-from-portal
+awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:run-test-topic --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:run-test-from-portal
+awslocal sns create-topic --name secret_management
+awslocal sqs create-queue --queue-name secret_management_updates
+awslocal sqs create-queue --queue-name secret_management_updates_lambda
+awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:secret_management --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:secret_management_updates
+awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:secret_management --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:secret_management_updates_lambda
 ```
 
 ### Setup cdp-portal-stubs
@@ -186,3 +191,56 @@ AZURE_CLIENT_SECRET=test_value GITHUB_BASE_URL=http://localhost:3939  OIDC_WELL_
 
 The base set of services is held in /config/mock-data.js. Adding or removing services to this list will result in them
 being returned in the mock API calls.
+
+### Stub Secrets
+
+#### Add secret
+
+Add to pending in portal backend.
+
+```bash
+curl -H "Content-Type: application/json" -d \
+   '{"environment":"infra-dev", "service": "cdp-portal-frontend","secretKey":"SOME_KEY","action":"add_secret"}' \
+   http://localhost:5094/secrets/register/pending
+```
+
+Add to queue that simulates the lambda consuming it after a slight delay.
+
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates_lambda" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "Some value"}}'
+```
+
+Or add directly to Portal Backend.
+
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "body": {"add_secret": true, "secret": "cdp/services/cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY" }}'
+```
+
+Or publish to topic that fans out to the queue.
+
+```bash
+awslocal sns publish \
+  --topic-arn "arn:aws:sns:eu-west-2:000000000000:secret_management" \
+  --message '{"action": "add_secret", "name": "cdp-portal-frontend",  "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "Some value"}'
+```
+
+Add `BLOWUP` as value to simulate the lambda throwing exception.
+
+```bash
+awslocal sqs send-message --queue-url \
+  "http://localhost:4566/000000000000/secret_management_updates_lambda" \
+  --region eu-west-2 --message-body \
+  '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",     "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "BLOWUP"}}'
+```
+
+#### Get all secret
+
+Updates secret keys in portal backend.
+
+`awslocal sqs send-message --queue-url "http://localhost:4566/000000000000/secret_management_updates" --region eu-west-2 --message-body '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "get_all_secret_keys", "body": {"environment": "infra-dev", "secretKeys": {"/cdp/services/cdp-portal-frontend": {"keys": ["TEST_KEY"],"lastChangedDate":"2024-07-01 10:05:15","createdDate":"2024-07-01 10:05:15"}}}}'`
