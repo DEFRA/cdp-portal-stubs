@@ -34,13 +34,22 @@ const tenantServices = [
   }
 ]
 
-const topicsService = [
+const topicsFrontendService = [
   { topic: { name: 'cdp' } },
-  { topic: { name: 'service' } }
+  { topic: { name: 'service' } },
+  { topic: { name: 'node' } },
+  { topic: { name: 'frontend' } }
+]
+const topicsBackendService = [
+  { topic: { name: 'cdp' } },
+  { topic: { name: 'service' } },
+  { topic: { name: 'node' } },
+  { topic: { name: 'backend' } }
 ]
 const topicsTestSuite = [
   { topic: { name: 'cdp' } },
-  { topic: { name: 'tests' } }
+  { topic: { name: 'environment' } },
+  { topic: { name: 'test' } }
 ]
 
 const topicsPerfTestSuite = [
@@ -50,10 +59,10 @@ const topicsPerfTestSuite = [
 ]
 
 const githubRepos = [
-  { name: 'cdp-portal-frontend', topics: topicsService },
-  { name: 'cdp-portal-backend', topics: topicsService },
-  { name: 'cdp-self-service-ops', topics: topicsService },
-  { name: 'cdp-user-service', topics: topicsService },
+  { name: 'cdp-portal-frontend', topics: topicsFrontendService },
+  { name: 'cdp-portal-backend', topics: topicsBackendService },
+  { name: 'cdp-self-service-ops', topics: topicsBackendService },
+  { name: 'cdp-user-service', topics: topicsBackendService },
   { name: 'cdp-env-test-suite', topics: topicsTestSuite }
 ]
 
@@ -85,6 +94,7 @@ export {
   githubRepos,
   ecrRepos,
   topicsTestSuite,
-  topicsService,
+  topicsFrontendService,
+  topicsBackendService,
   topicsPerfTestSuite
 }
