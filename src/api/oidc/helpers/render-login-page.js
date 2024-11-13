@@ -8,6 +8,7 @@ const userToLink = (user, query) => {
 const renderLoginPage = (url, h) => {
   const queryParams = new URL(url).search
   const page = `
+        <head><title>CDP-Portal-Stubs - Login Stub</title></head>
         <div style="margin: 5%">
         <h1>CDP-Portal-Stubs - Login Stub</h1>
         <pr>Select a user to login as:</pr>
