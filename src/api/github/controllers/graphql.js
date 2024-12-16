@@ -98,6 +98,10 @@ const graphqlController = {
       }
     }
 
+    if (payload.query.includes('createCommitOnBranch')) {
+      return h.response({}).code(200)
+    }
+
     request.logger.error(`unsupported graphql\n${payload.query}`)
     return h.response('Not implemented!').code(500)
   }
