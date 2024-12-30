@@ -158,6 +158,12 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/run-test-from-portal',
     env: 'SQS_TEST_RUNS_FROM_PORTAL'
   },
+  sqsGitHubWorkflowEvents: {
+    doc: 'The queue hooked up to the test suite topic, would normally go to the lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/cdp_workflow_events',
+    env: 'SQS_GITHUB_WORKFLOW_EVENTS'
+  },
   lambda: {
     secretsUpdates: {
       queueIn: {
@@ -180,6 +186,12 @@ const config = convict({
         env: 'SQS_SECRET_UPDATES_DELAY'
       }
     }
+  },
+  sendGitHubWorkflowsOnStartup: {
+    doc: 'Sends github workflow messages when the stubs start',
+    format: Boolean,
+    default: false,
+    env: 'SEND_GITHUB_WORKFLOWS_ON_STARTUP'
   }
 })
 
