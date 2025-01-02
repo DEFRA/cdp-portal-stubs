@@ -1,7 +1,7 @@
 import { triggerEcrPush } from '~/src/api/admin/controllers/trigger-ecr-push'
 import { oidcSessionController } from '~/src/api/admin/controllers/oidc-session-controller'
 import { dataController } from '~/src/api/admin/controllers/data-controller'
-import { triggerWorkflow } from '~/.server/api/github/controllers/trigger-workflow'
+import { triggerWorkflow } from '~/src/api/admin/controllers/trigger-workflow.js'
 
 const adminStub = {
   plugin: {

@@ -3,10 +3,11 @@ import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-
 import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-enabled-vanity-urls'
+import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 
 export const triggerWorkflow = {
   handler: async (request, h) => {
-    const workflow = request.params.worflow
+    const workflow = request.params.workflow
     request.logger(`triggering ${workflow}`)
 
     switch (workflow) {
@@ -19,6 +20,12 @@ export const triggerWorkflow = {
       case 'cdp-tf-waf':
         await triggerShutteredVanityUrls(request.sqs)
         await triggerEnabledVanityUrls(request.sqs)
+        break
+      case 'tenant-services':
+        await triggerTenantServices(request.sqs)
+        break
+      case 'tenant-buckets':
+        await triggerTenantServices(request.sqs)
         break
       case 'terraform-apply':
         await triggerWorkflowStatus(
