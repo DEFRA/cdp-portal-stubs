@@ -10,6 +10,7 @@ import { failAction } from '~/src/helpers/fail-action'
 import { sqsPlugin } from '~/src/helpers/sqs'
 import { deploymentEventsPlugin } from '~/src/api/ecs/deployment-events-plugin'
 import { secretsUpdatesPlugin } from '~/src/api/lambda/secrets-updates-plugin'
+import { workflowsPlugin } from '~/src/api/workflows/workflows'
 
 async function createServer() {
   const server = hapi.server({
@@ -31,16 +32,13 @@ async function createServer() {
   })
 
   await server.register(requestLogger)
-
   await server.register({ plugin: mongoPlugin, options: {} })
-
   await server.register(inert)
-
   await server.register(router, {})
-
   await server.register(sqsPlugin)
   await server.register(deploymentEventsPlugin)
   await server.register(secretsUpdatesPlugin)
+  await server.register(workflowsPlugin)
 
   return server
 }
