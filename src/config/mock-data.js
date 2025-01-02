@@ -1,30 +1,35 @@
 const tenantServices = [
   {
     'cdp-portal-frontend': {
+      name: 'cdp-portal-frontend',
       zone: 'public',
       mongo: false,
       redis: true,
       service_code: 'CDP'
     },
     'cdp-portal-backend': {
+      name: 'cdp-portal-backend',
       zone: 'protected',
       mongo: true,
       redis: false,
       service_code: 'CDP'
     },
     'cdp-self-service-ops': {
+      name: 'cdp-self-service-ops',
       zone: 'protected',
       mongo: true,
       redis: false,
       service_code: 'CDP'
     },
     'cdp-user-service': {
+      name: 'cdp-user-service',
       zone: 'protected',
       mongo: true,
       redis: false,
       service_code: 'CDP'
     },
     'cdp-env-test-suite': {
+      name: 'cdp-env-test-suite',
       zone: 'public',
       mongo: false,
       redis: false,
@@ -89,6 +94,66 @@ const ecrRepos = {
   }
 }
 
+function buckets(environment) {
+  return [
+    {
+      name: `cdp-${environment}-forms-runner-c63f2`,
+      exists: false,
+      services_with_access: ['forms-runner']
+    },
+    {
+      name: `cdp-${environment}-forms-manager-c63f2`,
+      exists: false,
+      services_with_access: ['forms-manager']
+    },
+    {
+      name: `cdp-${environment}-cdp-example-node-frontend-c63f2`,
+      exists: false,
+      services_with_access: ['cdp-example-node-frontend']
+    },
+    {
+      name: `${environment}-nms-frontend-alpha-c63f2`,
+      exists: false,
+      services_with_access: ['nms-backend-alpha', 'nms-frontend-alpha']
+    },
+    {
+      name: `${environment}-epr-cdp-spike-rpd-s3-c63f2`,
+      exists: false,
+      services_with_access: []
+    },
+    {
+      name: `${environment}-forms-submission-api-c63f2`,
+      exists: false,
+      services_with_access: ['forms-submission-api']
+    },
+    {
+      name: `${environment}-eutd-fes-bc-c63f2`,
+      exists: false,
+      services_with_access: ['eutd-mmo-bc']
+    },
+    {
+      name: `${environment}-find-ffa-data-ingester-c63f2`,
+      exists: false,
+      services_with_access: ['find-ffa-data-ingester']
+    },
+    {
+      name: `${environment}-phi-etl-fera-backend-c63f2`,
+      exists: false,
+      services_with_access: ['phi-etl-fera-backend']
+    },
+    {
+      name: `${environment}-btms-backend-c63f2`,
+      exists: false,
+      services_with_access: ['btms-backend']
+    },
+    {
+      name: `${environment}-apha-file-frontend-c63f2`,
+      exists: false,
+      services_with_access: ['apha-file-frontend']
+    }
+  ]
+}
+
 export {
   tenantServices,
   githubRepos,
@@ -96,5 +161,6 @@ export {
   topicsTestSuite,
   topicsFrontendService,
   topicsBackendService,
-  topicsPerfTestSuite
+  topicsPerfTestSuite,
+  buckets
 }

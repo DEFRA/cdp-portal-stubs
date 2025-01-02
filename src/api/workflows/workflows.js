@@ -3,6 +3,8 @@ import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/t
 import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-enabled-vanity-urls'
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 import { config } from '~/src/config'
+import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
+import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
 
 /**
  * Simulates updates from github. Can also be triggered via the /_admin/trigger/{workflow} api
@@ -18,6 +20,8 @@ export const workflowsPlugin = {
         await triggerNginxUpstreams(server.sqs)
         await triggerEnabledVanityUrls(server.sqs)
         await triggerShutteredVanityUrls(server.sqs)
+        await triggerTenantServices(server.sqs)
+        await triggerTenantBuckets(server.sqs)
       }
     }
   }
