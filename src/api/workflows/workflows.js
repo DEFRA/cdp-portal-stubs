@@ -5,6 +5,7 @@ import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigg
 import { config } from '~/src/config'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
+import { populateECR } from '~/src/api/workflows/populate-ecr/populate-ecr'
 
 /**
  * Simulates updates from github. Can also be triggered via the /_admin/trigger/{workflow} api
@@ -22,6 +23,7 @@ export const workflowsPlugin = {
         await triggerShutteredVanityUrls(server.sqs)
         await triggerTenantServices(server.sqs)
         await triggerTenantBuckets(server.sqs)
+        await populateECR(server.sqs)
       }
     }
   }

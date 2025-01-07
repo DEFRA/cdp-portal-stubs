@@ -3,28 +3,26 @@ import { SendMessageBatchCommand } from '@aws-sdk/client-sqs'
 import { workflowEvent } from '~/src/api/workflows/helpers/workflow-event'
 import { environmentMappings } from '~/src/config/environments'
 import { createLogger } from '~/src/helpers/logging/logger'
-import { tenantServices } from '~/src/config/mock-data'
+import { vanityUrls } from '~/src/config/mock-data'
 import crypto from 'node:crypto'
 
 const logger = createLogger()
 
 export async function triggerNginxUpstreams(sqs) {
-  const frontendServices = Object.keys(tenantServices[0])
-    .filter(
-      (name) =>
-        tenantServices[0][name].zone === 'public' &&
-        tenantServices[0][name].test_suite === undefined
-    )
-    .map((name) => {
-      return {
-        name,
-        urls: [{ host: name, domain: 'defra.gov.uk' }]
-      }
-    })
-
   const environments = Object.keys(environmentMappings)
 
   const batch = environments.map((environment) => {
+    const frontendServices = (vanityUrls[environment] ?? []).map((v) => {
+      const splitAt = v.url.indexOf('.')
+      const host = v.url.slice(0, splitAt)
+      const domain = v.url.slice(splitAt + 1)
+
+      return {
+        name: v.service,
+        urls: [{ host, domain }]
+      }
+    })
+
     const payload = JSON.stringify(
       workflowEvent('nginx-vanity-urls', {
         environment,
