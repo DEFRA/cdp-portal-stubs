@@ -154,7 +154,7 @@ function buckets(environment) {
   ]
 }
 
-export const vanityUrls = {
+const vanityUrls = {
   management: [
     {
       service: 'cdp-portal-frontend',
@@ -181,7 +181,44 @@ export const vanityUrls = {
   ]
 }
 
+const appDeployments = {
+  'infra-dev': {
+    public: {
+      'cdp-portal-frontend.json': {
+        deploymentId: 'ead78ce6-f695-4b79-8cfc-d81020f2ef88',
+        deploy: true,
+        service: {
+          name: 'cdp-portal-frontend',
+          image: 'cdp-portal-frontend',
+          version: '0.2.0',
+          configuration: {
+            commitSha: '5d8c8f63b22b2d3ff59aab7a4fcea0dd89204113'
+          },
+          serviceCode: 'CDP'
+        },
+        cluster: {
+          environment: 'infra-dev',
+          zone: 'public'
+        },
+        resources: {
+          instanceCount: 2,
+          cpu: 1024,
+          memory: 2048
+        },
+        metadata: {
+          user: {
+            userId: '90552794-0613-4023-819a-512aa9d40023',
+            displayName: 'admin'
+          },
+          deploymentEnvironment: 'infra-dev'
+        }
+      }
+    }
+  }
+}
+
 export {
+  appDeployments,
   tenantServices,
   githubRepos,
   ecrRepos,
@@ -189,5 +226,6 @@ export {
   topicsFrontendService,
   topicsBackendService,
   topicsPerfTestSuite,
-  buckets
+  buckets,
+  vanityUrls
 }
