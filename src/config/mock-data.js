@@ -154,6 +154,33 @@ function buckets(environment) {
   ]
 }
 
+export const vanityUrls = {
+  management: [
+    {
+      service: 'cdp-portal-frontend',
+      url: 'portal.cdp-int.defra.cloud',
+      shuttered: false,
+      enabled: true
+    }
+  ],
+  'infra-dev': [
+    {
+      service: 'cdp-portal-frontend',
+      url: 'portal-test.cdp-int.defra.cloud',
+      shuttered: true,
+      enabled: true
+    }
+  ],
+  prod: [
+    {
+      service: 'cdp-portal-frontend',
+      url: 'portal.defra.gov',
+      shuttered: false,
+      enabled: false
+    }
+  ]
+}
+
 export {
   tenantServices,
   githubRepos,

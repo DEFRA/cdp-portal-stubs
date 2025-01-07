@@ -4,15 +4,18 @@ import { workflowEvent } from '~/src/api/workflows/helpers/workflow-event'
 import { environmentMappings } from '~/src/config/environments'
 import { createLogger } from '~/src/helpers/logging/logger'
 import crypto from 'node:crypto'
+import { vanityUrls } from '~/src/config/mock-data'
 
 const logger = createLogger()
 
 export async function triggerShutteredVanityUrls(sqs) {
-  const shutteredUrls = []
-
   const environments = Object.keys(environmentMappings)
 
   const batch = environments.map((environment) => {
+    const shutteredUrls = (vanityUrls[environment] ?? [])
+      .filter((v) => v.shuttered)
+      .map((v) => v.url)
+
     const payload = JSON.stringify(
       workflowEvent('shuttered-urls', {
         environment,

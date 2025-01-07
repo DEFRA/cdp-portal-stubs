@@ -8,7 +8,7 @@ import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigg
 export const triggerWorkflow = {
   handler: async (request, h) => {
     const workflow = request.params.workflow
-    request.logger(`triggering ${workflow}`)
+    request.logger.info(`triggering ${workflow}`)
 
     switch (workflow) {
       case 'cdp-app-config':
