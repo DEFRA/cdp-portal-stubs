@@ -12,6 +12,7 @@ const triggerWorkflow = {
       case 'cdp-grafana-svc':
       case 'cdp-app-config':
       case 'cdp-nginx-upstreams':
+      case 'cdp-app-deployments':
         await handleGenericWorkflows(request)
         break
       case 'cdp-tf-svc-infra':
