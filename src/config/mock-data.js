@@ -54,12 +54,14 @@ const topicsBackendService = [
 const topicsTestSuite = [
   { topic: { name: 'cdp' } },
   { topic: { name: 'environment' } },
+  { topic: { name: 'test-suite' } },
   { topic: { name: 'test' } }
 ]
 
 const topicsPerfTestSuite = [
   { topic: { name: 'cdp' } },
   { topic: { name: 'tests' } },
+  { topic: { name: 'test-suite' } },
   { topic: { name: 'performance' } }
 ]
 
