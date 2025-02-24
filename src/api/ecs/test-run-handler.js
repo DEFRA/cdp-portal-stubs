@@ -1,6 +1,6 @@
 import { createLogger } from '~/src/helpers/logging/logger'
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 import { environmentMappings } from '~/src/config/environments'
 import { config } from '~/src/config'
 import { ecsTestRunEvent } from '~/src/api/ecs/payloads/ecs-taskrun-event'
@@ -47,7 +47,7 @@ async function testRunHandler(sqs, payload) {
       'RUNNING',
       'RUNNING'
     )
-    await send(sqs, running, 3)
+    await send(sqs, running, 2)
 
     const stopping = ecsTestRunEvent(
       awsAccount,
@@ -60,7 +60,7 @@ async function testRunHandler(sqs, payload) {
       'RUNNING',
       'STOPPED'
     )
-    await send(sqs, stopping, 7)
+    await send(sqs, stopping, 3)
 
     const stopped = ecsTestRunEvent(
       awsAccount,
@@ -74,7 +74,7 @@ async function testRunHandler(sqs, payload) {
       'STOPPED',
       0
     )
-    await send(sqs, stopped, 9)
+    await send(sqs, stopped, 4)
   }
 }
 
