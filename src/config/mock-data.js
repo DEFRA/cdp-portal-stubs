@@ -1,3 +1,5 @@
+import { teams } from '~/src/api/github/content/teams-and-repos'
+
 const tenantServices = [
   {
     'cdp-portal-frontend': {
@@ -66,11 +68,27 @@ const topicsPerfTestSuite = [
 ]
 
 const githubRepos = [
-  { name: 'cdp-portal-frontend', topics: topicsFrontendService },
-  { name: 'cdp-portal-backend', topics: topicsBackendService },
-  { name: 'cdp-self-service-ops', topics: topicsBackendService },
-  { name: 'cdp-user-service', topics: topicsBackendService },
-  { name: 'cdp-env-test-suite', topics: topicsTestSuite }
+  {
+    name: 'cdp-portal-frontend',
+    topics: topicsFrontendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-portal-backend',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-self-service-ops',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-user-service',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  { name: 'cdp-env-test-suite', topics: topicsTestSuite, team: teams[0].github }
 ]
 
 const ecrRepos = {

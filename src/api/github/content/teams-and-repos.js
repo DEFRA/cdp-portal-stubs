@@ -54,7 +54,7 @@ const teamsAndReposData = () => {
 
 const node = (service) => {
   return {
-    slug: teams[0].github,
+    slug: service.team,
     repositories: {
       nodes: [
         {

@@ -43,7 +43,7 @@ const handleCdpCreateWorkflows = async (request) => {
     )}`
   )
 
-  githubRepos.push({ name: repositoryName, topics })
+  githubRepos.push({ name: repositoryName, topics, team: inputs.team })
 
   await triggerWorkflowStatus(
     request.sqs,
