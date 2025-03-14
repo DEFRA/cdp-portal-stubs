@@ -1,8 +1,9 @@
 import { config } from '~/src/config'
 const oidcBasePath = config.get('oidcBasePath')
+const clientId = config.get('oidcClientId')
 
 const oidcConfig = {
-  clientId: config.get('oidcClientId'),
+  clientId,
   clientSecret: config.get('oidcClientSecret'),
   issuerBase: oidcBasePath,
   authorizationEndpoint: `${oidcBasePath}/authorize`,
@@ -28,7 +29,7 @@ const oidcConfig = {
     'email',
     'groups',
     'profile',
-    'api://63983fc2-cfff-45bb-8ec2-959e21062b9a/cdp.user',
+    `api://${clientId}/cdp.user`,
     'offline_access',
     'user.read'
   ],
