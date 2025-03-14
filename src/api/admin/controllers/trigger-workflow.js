@@ -4,6 +4,7 @@ import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/t
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-enabled-vanity-urls'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
+import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
 
 export const triggerWorkflow = {
   handler: async (request, h) => {
@@ -25,7 +26,7 @@ export const triggerWorkflow = {
         await triggerTenantServices(request.sqs)
         break
       case 'tenant-buckets':
-        await triggerTenantServices(request.sqs)
+        await triggerTenantBuckets(request.sqs)
         break
       case 'terraform-apply':
         await triggerWorkflowStatus(
