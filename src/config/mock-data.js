@@ -1,43 +1,43 @@
-const tenantServices = [
-  {
-    'cdp-portal-frontend': {
-      name: 'cdp-portal-frontend',
-      zone: 'public',
-      mongo: false,
-      redis: true,
-      service_code: 'CDP'
-    },
-    'cdp-portal-backend': {
-      name: 'cdp-portal-backend',
-      zone: 'protected',
-      mongo: true,
-      redis: false,
-      service_code: 'CDP'
-    },
-    'cdp-self-service-ops': {
-      name: 'cdp-self-service-ops',
-      zone: 'protected',
-      mongo: true,
-      redis: false,
-      service_code: 'CDP'
-    },
-    'cdp-user-service': {
-      name: 'cdp-user-service',
-      zone: 'protected',
-      mongo: true,
-      redis: false,
-      service_code: 'CDP'
-    },
-    'cdp-env-test-suite': {
-      name: 'cdp-env-test-suite',
-      zone: 'public',
-      mongo: false,
-      redis: false,
-      test_suite: 'cdp-env-test-suite',
-      service_code: 'CDP'
-    }
+import { teams } from '~/src/api/github/content/teams-and-repos'
+
+const tenantServices = {
+  'cdp-portal-frontend': {
+    name: 'cdp-portal-frontend',
+    zone: 'public',
+    mongo: false,
+    redis: true,
+    service_code: 'CDP'
+  },
+  'cdp-portal-backend': {
+    name: 'cdp-portal-backend',
+    zone: 'protected',
+    mongo: true,
+    redis: false,
+    service_code: 'CDP'
+  },
+  'cdp-self-service-ops': {
+    name: 'cdp-self-service-ops',
+    zone: 'protected',
+    mongo: true,
+    redis: false,
+    service_code: 'CDP'
+  },
+  'cdp-user-service': {
+    name: 'cdp-user-service',
+    zone: 'protected',
+    mongo: true,
+    redis: false,
+    service_code: 'CDP'
+  },
+  'cdp-env-test-suite': {
+    name: 'cdp-env-test-suite',
+    zone: 'public',
+    mongo: false,
+    redis: false,
+    test_suite: 'cdp-env-test-suite',
+    service_code: 'CDP'
   }
-]
+}
 
 const topicsFrontendService = [
   { topic: { name: 'cdp' } },
@@ -66,11 +66,27 @@ const topicsPerfTestSuite = [
 ]
 
 const githubRepos = [
-  { name: 'cdp-portal-frontend', topics: topicsFrontendService },
-  { name: 'cdp-portal-backend', topics: topicsBackendService },
-  { name: 'cdp-self-service-ops', topics: topicsBackendService },
-  { name: 'cdp-user-service', topics: topicsBackendService },
-  { name: 'cdp-env-test-suite', topics: topicsTestSuite }
+  {
+    name: 'cdp-portal-frontend',
+    topics: topicsFrontendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-portal-backend',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-self-service-ops',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  {
+    name: 'cdp-user-service',
+    topics: topicsBackendService,
+    team: teams[0].github
+  },
+  { name: 'cdp-env-test-suite', topics: topicsTestSuite, team: teams[0].github }
 ]
 
 const ecrRepos = {

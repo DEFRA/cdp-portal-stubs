@@ -54,7 +54,7 @@ const teamsAndReposData = () => {
 
 const node = (service) => {
   return {
-    slug: teams[0].github,
+    slug: service.team,
     repositories: {
       nodes: [
         {
@@ -70,7 +70,7 @@ const node = (service) => {
           isArchived: false,
           isTemplate: false,
           isPrivate: false,
-          createdAt: '2016-12-05T11:21:25Z'
+          createdAt: new Date().toISOString()
         }
       ]
     }

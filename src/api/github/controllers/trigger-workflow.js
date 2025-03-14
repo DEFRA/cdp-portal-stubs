@@ -1,5 +1,6 @@
 import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
+import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -43,7 +44,7 @@ const handleCdpCreateWorkflows = async (request) => {
     )}`
   )
 
-  githubRepos.push({ name: repositoryName, topics })
+  githubRepos.push({ name: repositoryName, topics, team: inputs.team })
 
   await triggerWorkflowStatus(
     request.sqs,
@@ -61,7 +62,7 @@ const handleCdpCreateWorkflows = async (request) => {
         ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
       }
       break
-    case 'create_env_test_suite.yml':
+    case 'create_journey_test_suite.yml':
     case 'create_perf_test_suite.yml':
       if (ecrRepos[repositoryName] === undefined) {
         ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
@@ -75,12 +76,14 @@ const handleServiceCreation = async (request) => {
    * @type {{service:string, type:string, zone:string, mongo_enabled: boolean, redis_enabled: boolean, service_code:string, test_suite: string|null }}
    */
   const inputs = request.payload.inputs
-  // simulate creating the terraform changes erc
-  tenantServices[0][inputs.service] = {
+  // simulate creating the terraform changes etc
+  tenantServices[inputs.service] = {
+    name: inputs.service,
     zone: inputs.zone,
-    mongo: inputs.mongo_enabled,
-    redis: inputs.redis_enabled,
-    service_code: inputs.service_code
+    mongo: Boolean(inputs.mongo_enabled),
+    redis: Boolean(inputs.redis_enabled),
+    service_code: inputs.service_code,
+    test_suite: inputs.test_suite
   }
 
   await handleGenericWorkflows(request, 1)
@@ -93,6 +96,7 @@ const handleServiceCreation = async (request) => {
     'success',
     4
   )
+  await triggerTenantServices(request.sqs, 4)
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {

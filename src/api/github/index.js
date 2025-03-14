@@ -1,7 +1,6 @@
 import { getContentController } from '~/src/api/github/controllers/get-content'
 import { updateRepo } from '~/src/api/github/controllers/update-repo'
 import { getRepoController } from '~/src/api/github/controllers/get-repo'
-import { gitTreeController } from '~/src/api/github/controllers/gitTree'
 import {
   getCommitController,
   getRefsController,
@@ -54,11 +53,6 @@ const githubStub = {
           method: 'POST',
           path: '/repos/{org}/{repo}/git/blobs',
           ...postCreateBlobController
-        },
-        {
-          method: 'POST',
-          path: '/repos/{org}/{repo}/git/trees',
-          ...gitTreeController
         },
         {
           method: 'POST',
