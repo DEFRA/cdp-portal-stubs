@@ -11,7 +11,7 @@ function defaultClaims(session, ttl, host) {
     nbf: now, // not before
     sub: session.user.id, // subject (i.e. user)
     amr: ['eid', 'urn:be:fedict:iam:fas:Level500'],
-    azp: '63983fc2-cfff-45bb-8ec2-959e21062b9a', // azure something?
+    azp: oidcConfig.clientId,
     azpacr: 1, // more azure stuff?
     groups: session.user.teams,
     name: session.user.username,

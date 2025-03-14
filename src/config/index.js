@@ -110,16 +110,24 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/ecs-deployments',
     env: 'SQS_ECS_QUEUE'
   },
-  oidcBasePath: {
-    doc: 'the base path all oidc stubs will be served from',
+  get oidcBasePath() {
+    return {
+      doc: 'the base path all oidc stubs will be served from',
+      format: String,
+      default: `/${this.oidcTenantId.default}/v2.0`,
+      env: 'OIDC_BASE_PATH'
+    }
+  },
+  oidcTenantId: {
+    doc: 'Tenant id to use in the oidc stub',
     format: String,
-    default: '/63983fc2-cfff-45bb-8ec2-959e21062b9a/v2.0',
-    env: 'OIDC_BASE_PATH'
+    env: 'OIDC_TENANT_ID',
+    default: '6f504113-6b64-43f2-ade9-242e05780007'
   },
   oidcClientId: {
     doc: 'client id to use in the oidc stub',
     format: String,
-    default: '63983fc2-cfff-45bb-8ec2-959e21062b9a',
+    default: '26372ac9-d8f0-4da9-a17e-938eb3161d8e',
     env: 'OIDC_CLIENT_ID'
   },
   oidcClientSecret: {
