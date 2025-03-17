@@ -61,7 +61,7 @@ const handleCdpCreateWorkflows = async (request) => {
         ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
       }
       break
-    case 'create_env_test_suite.yml':
+    case 'create_journey_test_suite.yml':
     case 'create_perf_test_suite.yml':
       if (ecrRepos[repositoryName] === undefined) {
         ecrRepos[repositoryName] = { tags: [], runMode: 'job' }

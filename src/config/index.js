@@ -198,7 +198,7 @@ const config = convict({
   sendGitHubWorkflowsOnStartup: {
     doc: 'Sends github workflow messages when the stubs start',
     format: Boolean,
-    default: false,
+    default: process.env.NODE_ENV === 'production',
     env: 'SEND_GITHUB_WORKFLOWS_ON_STARTUP'
   }
 })
