@@ -70,7 +70,7 @@ const node = (service) => {
           isArchived: false,
           isTemplate: false,
           isPrivate: false,
-          createdAt: new Date().toISOString()
+          createdAt: service.createdAt
         }
       ]
     }

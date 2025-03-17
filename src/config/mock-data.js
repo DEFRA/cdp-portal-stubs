@@ -69,24 +69,33 @@ const githubRepos = [
   {
     name: 'cdp-portal-frontend',
     topics: topicsFrontendService,
-    team: teams[0].github
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
   },
   {
     name: 'cdp-portal-backend',
     topics: topicsBackendService,
-    team: teams[0].github
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
   },
   {
     name: 'cdp-self-service-ops',
     topics: topicsBackendService,
-    team: teams[0].github
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
   },
   {
     name: 'cdp-user-service',
     topics: topicsBackendService,
-    team: teams[0].github
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
   },
-  { name: 'cdp-env-test-suite', topics: topicsTestSuite, team: teams[0].github }
+  {
+    name: 'cdp-env-test-suite',
+    topics: topicsTestSuite,
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
+  }
 ]
 
 const ecrRepos = {
