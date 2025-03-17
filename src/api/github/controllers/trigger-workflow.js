@@ -1,5 +1,6 @@
 import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
+import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -93,6 +94,8 @@ const handleServiceCreation = async (request) => {
     'success',
     4
   )
+
+  await triggerTenantServices(request.sqs, 4)
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {

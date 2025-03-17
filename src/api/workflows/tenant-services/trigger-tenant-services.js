@@ -8,7 +8,7 @@ import { tenantServices } from '~/src/config/mock-data'
 
 const logger = createLogger()
 
-export async function triggerTenantServices(sqs) {
+export async function triggerTenantServices(sqs, delay = 0) {
   const environments = Object.keys(environmentMappings)
   logger.error(Object.values(tenantServices[0]))
 
@@ -27,7 +27,8 @@ export async function triggerTenantServices(sqs) {
 
   const command = new SendMessageBatchCommand({
     QueueUrl: config.get('sqsGitHubWorkflowEvents'),
-    Entries: batch
+    Entries: batch,
+    DelaySeconds: delay
   })
   const resp = await sqs.send(command)
   logger.info('send tenant-services workflow message', resp)
