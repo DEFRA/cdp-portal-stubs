@@ -1,6 +1,7 @@
 import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
+import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -64,16 +65,24 @@ const handleCdpCreateWorkflows = async (request) => {
   switch (workflowFile) {
     case 'create_microservice.yml':
       if (ecrRepos[repositoryName] === undefined) {
-        ecrRepos[repositoryName] = { tags: [], runMode: 'service' }
+        ecrRepos[repositoryName] = {
+          tags: ['0.1.0', '0.2.0', '0.3.0'],
+          runMode: 'service'
+        }
       }
       break
     case 'create_journey_test_suite.yml':
     case 'create_perf_test_suite.yml':
       if (ecrRepos[repositoryName] === undefined) {
-        ecrRepos[repositoryName] = { tags: [], runMode: 'job' }
+        ecrRepos[repositoryName] = {
+          tags: ['0.1.0', '0.2.0', '0.3.0'],
+          runMode: 'job'
+        }
       }
       break
   }
+
+  await populateEcrRepo(request.sqs, repositoryName)
 }
 
 const handleServiceCreation = async (request) => {
