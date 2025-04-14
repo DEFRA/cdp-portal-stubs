@@ -81,7 +81,7 @@ const handleCdpCreateWorkflows = async (request) => {
     repositoryName,
     'completed',
     'success',
-    1
+    5
   )
 }
 
