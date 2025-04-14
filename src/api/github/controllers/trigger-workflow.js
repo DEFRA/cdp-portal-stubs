@@ -101,7 +101,16 @@ const handleServiceCreation = async (request) => {
     'success',
     4
   )
-  await triggerTenantServices(request.sqs, 4)
+  await triggerTenantServices(request.sqs, 1)
+  await triggerWorkflowStatus(
+    request.sqs,
+    'cdp-tf-svc-infra',
+    '.github/workflows/notify-portal.yml',
+    'Notify Portal',
+    'completed',
+    'success',
+    5
+  )
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
