@@ -8,19 +8,23 @@ const logger = createLogger()
 
 export async function populateECR(sqs) {
   for (const repo of Object.keys(ecrRepos)) {
-    for (const tag of ecrRepos[repo].tags) {
-      const payload = JSON.stringify(generateECRMessage(repo, tag))
-      const msg = {
-        QueueUrl: config.get('sqsEcrQueue'),
-        MessageBody: payload,
-        DelaySeconds: 1, // delay to allow stubs to start before PBE gets messages
-        MessageAttributes: {},
-        MessageSystemAttributes: {}
-      }
-      const command = new SendMessageCommand(msg)
-      const resp = await sqs.send(command)
-      logger.info(resp)
+    await populateEcrRepo(sqs, repo)
+  }
+}
+
+export async function populateEcrRepo(sqs, repo) {
+  for (const tag of ecrRepos[repo].tags) {
+    const payload = JSON.stringify(generateECRMessage(repo, tag))
+    const msg = {
+      QueueUrl: config.get('sqsEcrQueue'),
+      MessageBody: payload,
+      DelaySeconds: 1, // delay to allow stubs to start before PBE gets messages
+      MessageAttributes: {},
+      MessageSystemAttributes: {}
     }
+    const command = new SendMessageCommand(msg)
+    const resp = await sqs.send(command)
+    logger.info(resp)
   }
 }
 
