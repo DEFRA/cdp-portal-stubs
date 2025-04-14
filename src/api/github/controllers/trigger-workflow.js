@@ -52,16 +52,6 @@ const handleCdpCreateWorkflows = async (request) => {
     createdAt: new Date().toISOString()
   })
 
-  await triggerWorkflowStatus(
-    request.sqs,
-    'cdp-create-workflows',
-    workflowFile,
-    repositoryName,
-    'completed',
-    'success',
-    1
-  )
-
   switch (workflowFile) {
     case 'create_microservice.yml':
       if (ecrRepos[repositoryName] === undefined) {
@@ -83,6 +73,16 @@ const handleCdpCreateWorkflows = async (request) => {
   }
 
   await populateEcrRepo(request.sqs, repositoryName)
+
+  await triggerWorkflowStatus(
+    request.sqs,
+    'cdp-create-workflows',
+    workflowFile,
+    repositoryName,
+    'completed',
+    'success',
+    1
+  )
 }
 
 const handleServiceCreation = async (request) => {
