@@ -30,6 +30,7 @@ const mockAppLayerHash = `sha256:${crypto
   .createHash('sha256')
   .update('mock-app-layer.tgz')
   .digest('hex')}`
+
 const fileBlobs = {
   [mockAppLayerHash]: 'mock-app-layer.tgz',
   defaultlayer: 'mock-app-layer.tgz'
@@ -37,14 +38,14 @@ const fileBlobs = {
 
 const configBlobs = () => {
   const configBlobs = {}
-  Object.keys(ecrRepos).forEach((s) => {
+  Object.keys(ecrRepos).forEach((service) => {
     const org = config.get('githubOrg')
 
-    const sha256 = crypto.createHash('sha256').update(s).digest('hex')
+    const sha256 = crypto.createHash('sha256').update(service).digest('hex')
     configBlobs[`sha256:${sha256}`] = generateConfig(
       org,
-      s,
-      ecrRepos[s].runMode
+      service,
+      ecrRepos[service].runMode
     )
   })
   return configBlobs
