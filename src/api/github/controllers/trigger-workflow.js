@@ -82,7 +82,7 @@ const handleCdpCreateWorkflows = async (request) => {
       break
   }
 
-  await populateEcrRepo(request.sqs, repositoryName)
+  await populateEcrRepo(request.sqs, repositoryName, 0)
 }
 
 const handleServiceCreation = async (request) => {
