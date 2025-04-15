@@ -19,7 +19,7 @@ const ecrStub = {
         },
         {
           method: 'GET',
-          path: '/v2/{repo}/blobs/{blobId}',
+          path: '/v2/{repo}/blobs/{blobId*}',
           ...blobController
         }
       ])
