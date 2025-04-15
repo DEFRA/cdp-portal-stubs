@@ -28,6 +28,9 @@ async function createServer() {
     },
     router: {
       stripTrailingSlash: true
+    },
+    debug: {
+      request: ['error', 'uncaught', 'internal']
     }
   })
 
