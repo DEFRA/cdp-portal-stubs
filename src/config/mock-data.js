@@ -34,6 +34,16 @@ const tenantServices = {
     zone: 'public',
     mongo: false,
     redis: false,
+    rds_aurora_postgres: false,
+    test_suite: 'cdp-env-test-suite',
+    service_code: 'CDP'
+  },
+  'cdp-postgres-service': {
+    name: 'cdp-postgres-service',
+    zone: 'protected',
+    mongo: false,
+    redis: false,
+    rds_aurora_postgres: true,
     test_suite: 'cdp-env-test-suite',
     service_code: 'CDP'
   }
