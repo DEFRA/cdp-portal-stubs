@@ -1,12 +1,12 @@
 import { Consumer } from 'sqs-consumer'
-import { testRunHandler } from '~/src/api/ecs/test-run-handler'
+import { migrationHandler } from '~/src/api/ecs/migration-handler'
 
 const { config } = require('~/src/config')
 
-function testRunEventListener(server) {
-  const queueUrl = config.get('sqsTestRunsFromPortal')
+export function migrationEventListener(server) {
+  const queueUrl = config.get('sqsMigrationsFromPortal')
 
-  server.logger.info(`Listening for test runs events on ${queueUrl}`)
+  server.logger.info(`Listening for migration events on ${queueUrl}`)
 
   const sqs = server.sqs
   const listener = Consumer.create({
@@ -19,10 +19,10 @@ function testRunEventListener(server) {
     handleMessage: async (message) => {
       try {
         const payload = JSON.parse(message.Body)
-        await testRunHandler(server.sqs, payload)
+        await migrationHandler(server.sqs, payload)
         return message
       } catch (e) {
-        server.logger.error(e, 'Failed to process test run message')
+        server.logger.error(e, 'failed to process migration event')
         return {}
       }
     },
@@ -45,5 +45,3 @@ function testRunEventListener(server) {
 
   return listener
 }
-
-export { testRunEventListener }
