@@ -41,13 +41,13 @@ export async function migrationHandler(sqs, payload) {
   )
   await send(sqs, inProgress, 2)
 
-  const successful = codebuildStateChange(
+  const succeeded = codebuildStateChange(
     awsAccount,
     service,
     buildId,
-    'SUCCESSFUL'
+    'SUCCEEDED'
   )
-  await send(sqs, successful, 4)
+  await send(sqs, succeeded, 4)
 }
 
 async function send(sqs, payload, delay = 0) {
