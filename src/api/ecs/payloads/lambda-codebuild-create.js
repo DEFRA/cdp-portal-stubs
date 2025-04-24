@@ -4,7 +4,8 @@ export function lambdaCodebuildCreate(
   awsAccountId,
   service,
   cdpMigrationId,
-  buildId
+  buildId,
+  request
 ) {
   return {
     id: crypto.randomUUID(),
@@ -12,7 +13,7 @@ export function lambdaCodebuildCreate(
     source: 'aws.lambda',
     account: awsAccountId,
     region: 'eu-west-2',
-    request: {}, // TODO: echo the original request back
+    request,
     'cdp-migration-id': cdpMigrationId,
     'build-id': buildId
   }

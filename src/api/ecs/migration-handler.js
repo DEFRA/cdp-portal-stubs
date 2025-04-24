@@ -28,7 +28,8 @@ export async function migrationHandler(sqs, payload) {
     awsAccount,
     service,
     cdpMigrationId,
-    buildId
+    buildId,
+    msg
   )
   await send(sqs, created, 1)
 
