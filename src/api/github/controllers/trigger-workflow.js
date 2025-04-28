@@ -35,54 +35,58 @@ const handleCdpCreateWorkflows = async (request) => {
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
   const repositoryName = inputs.repositoryName
-  const topics = (inputs.additionalGitHubTopics?.split(',') ?? []).map((t) => {
-    return { topic: { name: t } }
-  })
-
-  request.logger.info(
-    `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${JSON.stringify(
-      inputs
-    )}`
-  )
-
-  githubRepos.push({
-    name: repositoryName,
-    topics,
-    team: inputs.team,
-    createdAt: new Date().toISOString()
-  })
-
-  switch (workflowFile) {
-    case 'create_microservice.yml':
-      if (ecrRepos[repositoryName] === undefined) {
-        ecrRepos[repositoryName] = {
-          tags: ['0.1.0', '0.2.0', '0.3.0'],
-          runMode: 'service'
-        }
+  if (repositoryName) {
+    const topics = (inputs.additionalGitHubTopics?.split(',') ?? []).map(
+      (t) => {
+        return { topic: { name: t } }
       }
-      break
-    case 'create_journey_test_suite.yml':
-    case 'create_perf_test_suite.yml':
-      if (ecrRepos[repositoryName] === undefined) {
-        ecrRepos[repositoryName] = {
-          tags: ['0.1.0', '0.2.0', '0.3.0'],
-          runMode: 'job'
+    )
+
+    request.logger.info(
+      `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${JSON.stringify(
+        inputs
+      )}`
+    )
+
+    githubRepos.push({
+      name: repositoryName,
+      topics,
+      team: inputs.team,
+      createdAt: new Date().toISOString()
+    })
+
+    switch (workflowFile) {
+      case 'create_microservice.yml':
+        if (ecrRepos[repositoryName] === undefined) {
+          ecrRepos[repositoryName] = {
+            tags: ['0.1.0', '0.2.0', '0.3.0'],
+            runMode: 'service'
+          }
         }
-      }
-      break
+        break
+      case 'create_journey_test_suite.yml':
+      case 'create_perf_test_suite.yml':
+        if (ecrRepos[repositoryName] === undefined) {
+          ecrRepos[repositoryName] = {
+            tags: ['0.1.0', '0.2.0', '0.3.0'],
+            runMode: 'job'
+          }
+        }
+        break
+    }
+
+    await populateEcrRepo(request.sqs, repositoryName, 0)
+
+    await triggerWorkflowStatus(
+      request.sqs,
+      'cdp-create-workflows',
+      workflowFile,
+      repositoryName,
+      'completed',
+      'success',
+      1
+    )
   }
-
-  await populateEcrRepo(request.sqs, repositoryName, 0)
-
-  await triggerWorkflowStatus(
-    request.sqs,
-    'cdp-create-workflows',
-    workflowFile,
-    repositoryName,
-    'completed',
-    'success',
-    1
-  )
 }
 
 const handleServiceCreation = async (request) => {
