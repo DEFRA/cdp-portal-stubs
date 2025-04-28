@@ -14,7 +14,7 @@ export function lambdaCodebuildCreate(
     account: awsAccountId,
     region: 'eu-west-2',
     request,
-    'cdp-migration-id': cdpMigrationId,
-    'build-id': buildId
+    cdpMigrationId,
+    buildId
   }
 }
