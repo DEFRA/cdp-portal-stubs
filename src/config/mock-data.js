@@ -105,6 +105,12 @@ const githubRepos = [
     topics: topicsTestSuite,
     team: teams[0].github,
     createdAt: '2016-12-05T11:21:25Z'
+  },
+  {
+    name: 'cdp-postgres-service',
+    topics: topicsBackendService,
+    team: teams[0].github,
+    createdAt: '2016-12-05T11:21:25Z'
   }
 ]
 
@@ -126,6 +132,10 @@ const ecrRepos = {
     tags: ['0.1.0', '0.2.0', '0.3.0']
   },
   'cdp-env-test-suite': {
+    runMode: 'job',
+    tags: ['0.1.0']
+  },
+  'cdp-postgres-service': {
     runMode: 'job',
     tags: ['0.1.0']
   }
