@@ -6,6 +6,7 @@ import { config } from '~/src/config'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
 import { populateECR } from '~/src/api/workflows/populate-ecr/populate-ecr'
+import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
 
 /**
  * Simulates updates from github. Can also be triggered via the /_admin/trigger/{workflow} api
@@ -18,11 +19,12 @@ export const workflowsPlugin = {
     register: async function (server) {
       if (config.get('sendGitHubWorkflowsOnStartup')) {
         await triggerCdpAppConfig(server.sqs)
-        await triggerNginxUpstreams(server.sqs)
         await triggerEnabledVanityUrls(server.sqs)
+        await triggerNginxUpstreams(server.sqs)
         await triggerShutteredVanityUrls(server.sqs)
-        await triggerTenantServices(server.sqs)
+        await triggerSquidProxy(server.sqs)
         await triggerTenantBuckets(server.sqs)
+        await triggerTenantServices(server.sqs)
         await populateECR(server.sqs)
       }
     }

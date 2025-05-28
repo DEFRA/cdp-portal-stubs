@@ -3,26 +3,20 @@ import {
   workflowEvent
 } from '~/src/api/workflows/helpers/workflow-event'
 import { environmentMappings } from '~/src/config/environments'
-import { vanityUrls } from '~/src/config/mock-data'
+import { tenantServices } from '~/src/config/mock-data'
 import crypto from 'node:crypto'
 
-export async function triggerEnabledVanityUrls(sqs) {
+export async function triggerGrafanaSvc(sqs) {
   const environments = Object.keys(environmentMappings)
+  const eventType = 'grafana-dashboard'
 
-  const eventType = 'enabled-urls'
   const batch = environments.map((environment) => {
-    const enabledUrls = (vanityUrls[environment] ?? [])
-      .filter((v) => v.enabled)
-      .map((v) => {
-        return {
-          service: v.service,
-          url: v.url
-        }
-      })
+    const entities = Object.keys(tenantServices)
+
     const payload = JSON.stringify(
       workflowEvent(eventType, {
         environment,
-        urls: enabledUrls
+        entities
       })
     )
     return {
