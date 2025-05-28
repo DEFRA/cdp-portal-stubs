@@ -1,17 +1,17 @@
-import { config } from '~/src/config'
-import { SendMessageBatchCommand } from '@aws-sdk/client-sqs'
-import { workflowEvent } from '~/src/api/workflows/helpers/workflow-event'
+import {
+  sendWorkflowEventsBatchMessage,
+  workflowEvent
+} from '~/src/api/workflows/helpers/workflow-event'
 import { environmentMappings } from '~/src/config/environments'
-import { createLogger } from '~/src/helpers/logging/logger'
 import crypto from 'node:crypto'
+import { tenantServices } from '~/src/config/mock-data'
 
-const logger = createLogger()
-
-export async function triggerCdpAppConfig(sqs) {
+export async function triggerCdpAppConfig(sqs, delay = 1) {
   const environments = Object.keys(environmentMappings)
-  const batch = environments.map((environment) => {
+  const versionEventType = 'app-config-version'
+  const versionBatch = environments.map((environment) => {
     const payload = JSON.stringify(
-      workflowEvent('app-config-version', {
+      workflowEvent(versionEventType, {
         commitSha: crypto.randomBytes(20).toString('hex'),
         commitTimestamp: new Date().toISOString(),
         environment
@@ -23,11 +23,31 @@ export async function triggerCdpAppConfig(sqs) {
     }
   })
 
-  const command = new SendMessageBatchCommand({
-    QueueUrl: config.get('sqsGitHubWorkflowEvents'),
-    Entries: batch
+  const entitiesEventType = 'app-config'
+  const entitiesBatch = environments.map((environment) => {
+    const payload = JSON.stringify(
+      workflowEvent(entitiesEventType, {
+        commitSha: crypto.randomBytes(20).toString('hex'),
+        commitTimestamp: new Date().toISOString(),
+        environment,
+        entities: Object.keys(tenantServices)
+      })
+    )
+    return {
+      Id: crypto.randomUUID(),
+      MessageBody: payload
+    }
   })
-  const resp = await sqs.send(command)
-
-  logger.info('send cdp-app-config workflow events', resp)
+  await sendWorkflowEventsBatchMessage(
+    versionBatch,
+    versionEventType,
+    sqs,
+    delay
+  )
+  await sendWorkflowEventsBatchMessage(
+    entitiesBatch,
+    entitiesEventType,
+    sqs,
+    delay
+  )
 }

@@ -201,7 +201,7 @@ function buckets(environment) {
   ]
 }
 
-export const vanityUrls = {
+const vanityUrls = {
   management: [
     {
       service: 'cdp-portal-frontend',
@@ -228,6 +228,17 @@ export const vanityUrls = {
   ]
 }
 
+function squidProxy(environment) {
+  return {
+    environment,
+    default_domains: [`cdp.${environment}.defra.cloud`],
+    services: Object.keys(tenantServices).map((service) => ({
+      name: service,
+      allowed_domains: [`${service}.${environment}.defra.cloud`]
+    }))
+  }
+}
+
 export {
   tenantServices,
   githubRepos,
@@ -236,5 +247,7 @@ export {
   topicsFrontendService,
   topicsBackendService,
   topicsPerfTestSuite,
-  buckets
+  buckets,
+  vanityUrls,
+  squidProxy
 }

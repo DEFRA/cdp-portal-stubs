@@ -2,6 +2,10 @@ import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
+import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-cdp-app-config'
+import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
+import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
+import { triggerGrafanaSvc } from '~/src/api/workflows/cdp-grafana-svc/trigger-grafana-svc'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -174,6 +178,21 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
     'success',
     baseDelay + 2
   )
+
+  switch (repo) {
+    case 'cdp-app-config':
+      await triggerCdpAppConfig(request.sqs, baseDelay + 3)
+      break
+    case 'cdp-squid-proxy':
+      await triggerSquidProxy(request.sqs, baseDelay + 3)
+      break
+    case 'cdp-nginx-upstreams':
+      await triggerNginxUpstreams(request.sqs, baseDelay + 3)
+      break
+    case 'cdp-grafana-svc':
+      await triggerGrafanaSvc(request.sqs, baseDelay + 3)
+      break
+  }
 }
 
 export { triggerWorkflow }

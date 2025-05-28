@@ -1,16 +1,15 @@
-import { config } from '~/src/config'
-import { SendMessageBatchCommand } from '@aws-sdk/client-sqs'
-import { workflowEvent } from '~/src/api/workflows/helpers/workflow-event'
+import {
+  sendWorkflowEventsBatchMessage,
+  workflowEvent
+} from '~/src/api/workflows/helpers/workflow-event'
 import { environmentMappings } from '~/src/config/environments'
-import { createLogger } from '~/src/helpers/logging/logger'
-import { vanityUrls } from '~/src/config/mock-data'
+import { tenantServices, vanityUrls } from '~/src/config/mock-data'
 import crypto from 'node:crypto'
-
-const logger = createLogger()
 
 export async function triggerNginxUpstreams(sqs) {
   const environments = Object.keys(environmentMappings)
 
+  const vanityUrlEventType = 'nginx-vanity-urls'
   const batch = environments.map((environment) => {
     const frontendServices = (vanityUrls[environment] ?? []).map((v) => {
       const splitAt = v.url.indexOf('.')
@@ -24,7 +23,7 @@ export async function triggerNginxUpstreams(sqs) {
     })
 
     const payload = JSON.stringify(
-      workflowEvent('nginx-vanity-urls', {
+      workflowEvent(vanityUrlEventType, {
         environment,
         services: frontendServices
       })
@@ -35,10 +34,22 @@ export async function triggerNginxUpstreams(sqs) {
     }
   })
 
-  const command = new SendMessageBatchCommand({
-    QueueUrl: config.get('sqsGitHubWorkflowEvents'),
-    Entries: batch
+  await sendWorkflowEventsBatchMessage(batch, vanityUrlEventType, sqs)
+
+  const upstreamEventType = 'nginx-upstreams'
+  const upstreamsBatch = environments.map((environment) => {
+    const entities = Object.keys(tenantServices)
+    const payload = JSON.stringify(
+      workflowEvent(upstreamEventType, {
+        environment,
+        entities
+      })
+    )
+    return {
+      Id: crypto.randomUUID(),
+      MessageBody: payload
+    }
   })
-  const resp = await sqs.send(command)
-  logger.info('send nginx-vanity-urls workflow messages', resp)
+
+  await sendWorkflowEventsBatchMessage(upstreamsBatch, upstreamEventType, sqs)
 }
