@@ -136,7 +136,7 @@ const ecrRepos = {
     tags: ['0.1.0']
   },
   'cdp-postgres-service': {
-    runMode: 'job',
+    runMode: 'service',
     tags: ['0.1.0']
   }
 }
