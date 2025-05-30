@@ -1,4 +1,5 @@
 import {
+  reposDataForTeam,
   teams,
   teamsAndReposData,
   teamsData
@@ -66,6 +67,15 @@ const graphqlController = {
       request.logger.info('get teams graphql statement')
 
       const data = teamsAndReposData()
+      return h.response(data).code(200)
+    }
+
+    if (payload.query.includes('repositories(first: 100,')) {
+      request.logger.info(
+        `get repos for ${payload.variables.teamSlug} team graphql statement`
+      )
+
+      const data = reposDataForTeam(payload.variables.teamSlug)
       return h.response(data).code(200)
     }
 
