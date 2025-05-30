@@ -45,36 +45,59 @@ const teamsAndReposData = () => {
             hasNextPage: false,
             endCursor: 'Y3Vyc29yOnYyOpMCsVdhdGVyIEFic3RyYWN0aW9uzgAlEAg='
           },
-          nodes: githubRepos.map(node)
+          nodes: githubRepos.map(teamRepositoryNode)
         }
       }
     }
   }
 }
 
-const node = (service) => {
+function reposDataForTeam(teamSlug) {
   return {
-    slug: service.team,
-    repositories: {
-      nodes: [
-        {
-          name: service.name,
-          repositoryTopics: {
-            nodes: service.topics
-          },
-          description: service.name,
-          primaryLanguage: {
-            name: 'JavaScript'
-          },
-          url: `https://github.com/DEFRA/${service.name}`,
-          isArchived: false,
-          isTemplate: false,
-          isPrivate: false,
-          createdAt: service.createdAt
+    data: {
+      organization: {
+        id: 'MDEyOk9yZ2FuaXphdGlvbjU1Mjg4MjI=',
+        team: {
+          repositories: {
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: 'Y3Vyc29yOnYyOpMCsVdhdGVyIEFic3RyYWN0aW9uzgAlEAg='
+            },
+            nodes: githubRepos
+              .filter((repo) => repo.team === teamSlug)
+              .map(repositoryNode)
+          }
         }
-      ]
+      }
     }
   }
 }
 
-export { teamsData, teamsAndReposData, teams }
+const teamRepositoryNode = (service) => {
+  return {
+    slug: service.team,
+    repositories: {
+      nodes: [repositoryNode(service)]
+    }
+  }
+}
+
+const repositoryNode = (service) => {
+  return {
+    name: service.name,
+    repositoryTopics: {
+      nodes: service.topics
+    },
+    description: service.name,
+    primaryLanguage: {
+      name: 'JavaScript'
+    },
+    url: `https://github.com/DEFRA/${service.name}`,
+    isArchived: false,
+    isTemplate: false,
+    isPrivate: false,
+    createdAt: service.createdAt
+  }
+}
+
+export { teamsData, teamsAndReposData, teams, reposDataForTeam }
