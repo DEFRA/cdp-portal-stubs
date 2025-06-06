@@ -18,10 +18,17 @@ export async function sendWorkflowEventsBatchMessage(
   sqs,
   delay = 0
 ) {
+  const entries = batch.map((entry, index) => ({
+    Id: entry.Id || `msg-${index}`,
+    MessageBody: entry.MessageBody,
+    DelaySeconds: entry.DelaySeconds ?? delay,
+    MessageAttributes: entry.MessageAttributes || {}
+  }))
+
   const command = new SendMessageBatchCommand({
     QueueUrl: config.get('sqsGitHubWorkflowEvents'),
     DelaySeconds: delay,
-    Entries: batch
+    Entries: entries
   })
   const resp = await sqs.send(command)
 
