@@ -175,7 +175,8 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
   const repo = request.params.repo
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
-  const service = inputs?.service || inputs?.repositoryName
+  const service =
+    inputs?.service || inputs?.repositoryName || inputs?.serviceName
 
   request.logger.info(
     `Stubbing triggering of workflow ${org}/${repo}/.github/workflows/${workflowFile} with inputs ${JSON.stringify(
