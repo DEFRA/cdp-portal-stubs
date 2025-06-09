@@ -1,4 +1,9 @@
-import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
+import {
+  ecrRepos,
+  githubRepos,
+  tenantServices,
+  vanityUrls
+} from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
@@ -6,6 +11,7 @@ import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-
 import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
 import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
 import { triggerGrafanaSvc } from '~/src/api/workflows/cdp-grafana-svc/trigger-grafana-svc'
+import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -19,6 +25,7 @@ const triggerWorkflow = {
       case 'cdp-app-config':
       case 'cdp-nginx-upstreams':
       case 'cdp-app-deployments':
+      case 'cdp-tf-waf':
         await handleGenericWorkflows(request)
         break
       case 'cdp-tf-svc-infra':
@@ -126,8 +133,41 @@ const handleServiceCreation = async (request) => {
     'Notify Portal',
     'completed',
     'success',
-    5
+    30
   )
+}
+
+function updateVanityUrl(inputs, workflowFile, logger) {
+  const environment = inputs.environment
+  const vanityUrlsForEnv = vanityUrls[environment] ?? []
+  let shuttered
+  if (workflowFile === 'shuttering-add.yml') {
+    shuttered = true
+  } else if (workflowFile === 'shuttering-remove.yml') {
+    shuttered = false
+  } else {
+    logger.warn('Unknown workflow file for vanity URL update:', workflowFile)
+    return
+  }
+
+  const vanityUrl = {
+    service: inputs.serviceName,
+    url: inputs.url,
+    shuttered,
+    enabled: inputs.waf.startsWith('internal')
+  }
+
+  const existingIndex = vanityUrlsForEnv.findIndex(
+    (s) => s.service === vanityUrl.service && s.url === vanityUrl.url
+  )
+
+  if (existingIndex !== -1) {
+    vanityUrlsForEnv[existingIndex] = vanityUrl
+  } else {
+    vanityUrlsForEnv.push(vanityUrl)
+  }
+
+  vanityUrls[environment] = vanityUrlsForEnv
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
@@ -135,7 +175,8 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
   const repo = request.params.repo
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
-  const service = inputs?.service || inputs?.repositoryName
+  const service =
+    inputs?.service || inputs?.repositoryName || inputs?.serviceName
 
   request.logger.info(
     `Stubbing triggering of workflow ${org}/${repo}/.github/workflows/${workflowFile} with inputs ${JSON.stringify(
@@ -191,6 +232,11 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
       break
     case 'cdp-grafana-svc':
       await triggerGrafanaSvc(request.sqs, baseDelay + 3)
+      break
+    case 'cdp-tf-waf':
+      updateVanityUrl(inputs, workflowFile, request.logger)
+      // Long delay to simulate the time taken to update vanity URLs, and allow UI to update
+      await triggerShutteredVanityUrls(request.sqs, baseDelay + 30)
       break
   }
 }
