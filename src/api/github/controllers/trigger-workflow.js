@@ -151,7 +151,7 @@ function updateVanityUrl(inputs, workflowFile, logger) {
   }
 
   const vanityUrl = {
-    service: inputs.serviceName,
+    service: inputs.service,
     url: inputs.url,
     shuttered,
     enabled: inputs.waf.startsWith('internal')
