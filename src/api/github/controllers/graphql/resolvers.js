@@ -69,7 +69,7 @@ export const resolvers = {
     login: (org) => org.login,
     team: (_, { slug }) => ({ slug }),
     teams: (_, { first, after }) => ({
-      nodes: teams.map((t) => ({ slug: t.github, name: t.name })),
+      nodes: teams,
       pageInfo: { hasNextPage: false, endCursor: null }
     }),
     membersWithRole: ({ first = 100, after }) => ({
