@@ -1,14 +1,14 @@
 const githubUsers = [
   {
-    github: 'cdp-foo-0911234',
+    login: 'cdp-foo-0911234',
     name: 'Foo Barr'
   },
   {
-    github: 'cdp-bar-74629590',
+    login: 'cdp-bar-74629590',
     name: 'Bar Barrington'
   },
   {
-    github: 'cdp-test-441241',
+    login: 'cdp-test-441241',
     name: 'Test Testing'
   }
 ]
