@@ -16,6 +16,10 @@ const ecs = {
   'ext-test': {}
 }
 
+function findDeployment(environment, service) {
+  return ecs[environment][service]
+}
+
 async function deploy(deployment) {
   if (deployment.deploy === false) {
     return
@@ -49,4 +53,4 @@ async function deploy(deployment) {
   await sendDeploymentMessages(deployment)
 }
 
-export { deploy }
+export { deploy, findDeployment }

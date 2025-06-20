@@ -8,7 +8,7 @@ LABEL uk.gov.defra.ffc.parent-image=defradigital/node-development:${PARENT_VERSI
 
 ARG PORT
 ARG PORT_DEBUG
-ENV PORT ${PORT}
+ENV PORT=${PORT}
 EXPOSE ${PORT} ${PORT_DEBUG}
 
 COPY --chown=node:node package*.json ./
@@ -36,7 +36,7 @@ COPY --from=development /home/node/.public ./.public/
 RUN npm ci --omit=dev
 
 ARG PORT
-ENV PORT ${PORT}
+ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 CMD [ "node", "./.server" ]
