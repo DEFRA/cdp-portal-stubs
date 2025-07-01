@@ -150,7 +150,7 @@ function ecsDeploymentEvent(
       ephemeralStorage: {
         sizeInGiB: 20
       },
-      group: `service:${service}-${taskId}`,
+      group: `service:${service}`,
       launchType: 'FARGATE',
       lastStatus: status,
       memory: '2048',
