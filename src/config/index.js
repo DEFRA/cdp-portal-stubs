@@ -172,6 +172,19 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/cdp_workflow_events',
     env: 'SQS_GITHUB_WORKFLOW_EVENTS'
   },
+  sqsGrafanaNotification: {
+    doc: 'The queue hooked up to the test suite topic, would normally go to the lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/cdp_grafana_alerts',
+    env: 'SQS_ALERTS_GRAFANA'
+  },
+  sqsGitHubNotification: {
+    doc: 'The queue hooked up to the test suite topic, would normally go to the lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/cdp-notify-github-events',
+    env: 'SQS_ALERTS_GITHUB'
+  },
+
   lambda: {
     secretsUpdates: {
       queueIn: {
@@ -200,6 +213,14 @@ const config = convict({
     format: Boolean,
     default: false,
     env: 'SEND_GITHUB_WORKFLOWS_ON_STARTUP'
+  },
+  slack: {
+    queue: {
+      doc: 'Queue attached to the slack lambda topic',
+      format: String,
+      default: 'http://127.0.0.1:4566/000000000000/stub-slack-messages',
+      env: 'SQS_STUB_SLACK_MESSAGES'
+    }
   }
 })
 

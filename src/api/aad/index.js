@@ -2,6 +2,7 @@ import { msgraphGroups } from '~/src/api/aad/controllers/msgraph-groups'
 import { msgraphUsers } from '~/src/api/aad/controllers/msgraph-users'
 import { msgraphUser } from '~/src/api/aad/controllers/msgraph-user'
 import { msgraphMembers } from '~/src/api/aad/controllers/msgraph-members'
+import { msgraphEmail } from '~/src/api/aad/controllers/msgraph-email'
 
 const aadStub = {
   plugin: {
@@ -37,6 +38,11 @@ const aadStub = {
           method: 'GET',
           path: '/msgraph/v1.0/users/{id}',
           ...msgraphUser
+        },
+        {
+          method: 'POST',
+          path: '/msgraph/v1.0/users/{sender}/sendMail',
+          ...msgraphEmail
         }
       ])
     }
