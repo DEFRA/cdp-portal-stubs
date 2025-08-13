@@ -14,7 +14,7 @@ export async function triggerTenantServices(sqs, delay = 0) {
     const payload = JSON.stringify(
       workflowEvent(eventType, {
         environment,
-        services: Object.values(tenantServices)
+        services: Object.values(tenantServices(environment))
       })
     )
     return {

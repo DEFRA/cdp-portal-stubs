@@ -30,7 +30,7 @@ export async function triggerCdpAppConfig(sqs, delay = 1) {
         commitSha: crypto.randomBytes(20).toString('hex'),
         commitTimestamp: new Date().toISOString(),
         environment,
-        entities: Object.keys(tenantServices)
+        entities: Object.keys(tenantServices(environment))
       })
     )
     return {

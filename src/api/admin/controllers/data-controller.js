@@ -6,7 +6,7 @@ const dataController = {
     const data = {
       github: githubRepos,
       ecr: ecrRepos,
-      tenants: tenantServices,
+      tenants: tenantServices(),
       sessions
     }
 
