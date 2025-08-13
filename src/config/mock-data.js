@@ -1,33 +1,149 @@
 import { teams } from '~/src/api/github/content/teams-and-repos'
 
-const tenantServices = {
+const tenantServices = (environment = 'prod') => ({
   'cdp-portal-frontend': {
     name: 'cdp-portal-frontend',
     zone: 'public',
     mongo: false,
     redis: true,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    testSuite: null,
+    buckets: null,
+    queues: null,
+    s3Buckets: null,
+    sqsQueues: null,
+    snsTopics: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   },
   'cdp-portal-backend': {
     name: 'cdp-portal-backend',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: ['message_notification.fifo', 'message_clearance_request.fifo'],
+    topics: ['decision_notification.fifo', 'error_notification.fifo'],
+    buckets: [`${environment}-cdp-portal-backend-*`],
+    s3_buckets: [
+      {
+        name: `${environment}-cdp-portal-backend-c63f2`,
+        versioning: 'Disabled'
+      },
+      {
+        name: `${environment}-cdp-portal-backend-images-c63f2`,
+        versioning: 'Disabled'
+      }
+    ],
+    sns_topics: [
+      {
+        name: 'decision_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
+      },
+      {
+        name: 'error_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
+      }
+    ],
+    sqs_queues: [
+      {
+        name: 'message_clearance_request',
+        cross_account_allow_list: [],
+        fifo_queue: 'true',
+        content_based_deduplication: false,
+        dlq_max_receive_count: 3,
+        visibility_timeout_seconds: 300,
+        subscriptions: [
+          {
+            queue_name: 'message_clearance_request.fifo',
+            topics: ['error_notification.fifo'],
+            filter_enabled: false,
+            filter_policy: ''
+          }
+        ]
+      },
+      {
+        name: 'message_notification',
+        cross_account_allow_list: [],
+        fifo_queue: 'true',
+        content_based_deduplication: false,
+        dlq_max_receive_count: 3,
+        visibility_timeout_seconds: 300,
+        subscriptions: [
+          {
+            queue_name: 'message_notification.fifo',
+            topics: ['decision_notification.fifo', 'error_notification.fifo'],
+            filter_enabled: false,
+            filter_policy: ''
+          }
+        ]
+      }
+    ],
+    testSuite: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   },
   'cdp-self-service-ops': {
     name: 'cdp-self-service-ops',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    testSuite: null,
+    buckets: null,
+    queues: null,
+    s3Buckets: null,
+    sqsQueues: null,
+    snsTopics: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   },
   'cdp-user-service': {
     name: 'cdp-user-service',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    testSuite: null,
+    buckets: null,
+    queues: null,
+    s3Buckets: null,
+    sqsQueues: null,
+    snsTopics: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   },
   'cdp-env-test-suite': {
     name: 'cdp-env-test-suite',
@@ -36,7 +152,22 @@ const tenantServices = {
     redis: false,
     rds_aurora_postgres: false,
     test_suite: 'cdp-env-test-suite',
-    service_code: 'CDP'
+    service_code: 'CDP',
+    testSuite: null,
+    buckets: null,
+    queues: null,
+    s3Buckets: null,
+    sqsQueues: null,
+    snsTopics: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   },
   'cdp-postgres-service': {
     name: 'cdp-postgres-service',
@@ -45,9 +176,24 @@ const tenantServices = {
     redis: false,
     rds_aurora_postgres: true,
     test_suite: 'cdp-env-test-suite',
-    service_code: 'CDP'
+    service_code: 'CDP',
+    testSuite: null,
+    buckets: null,
+    queues: null,
+    s3Buckets: null,
+    sqsQueues: null,
+    snsTopics: null,
+    apiEnabled: null,
+    apiType: null,
+    teams: [
+      {
+        github: 'cdp-platform',
+        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
+        name: 'Platform'
+      }
+    ]
   }
-}
+})
 
 const topicsFrontendService = [
   { topic: { name: 'cdp' } },
@@ -232,7 +378,7 @@ function squidProxy(environment) {
   return {
     environment,
     default_domains: [`cdp.${environment}.defra.cloud`],
-    services: Object.keys(tenantServices).map((service) => ({
+    services: Object.keys(tenantServices(environment)).map((service) => ({
       name: service,
       allowed_domains: [`${service}.${environment}.defra.cloud`]
     }))
