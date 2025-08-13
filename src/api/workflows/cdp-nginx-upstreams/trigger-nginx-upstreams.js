@@ -38,7 +38,7 @@ export async function triggerNginxUpstreams(sqs) {
 
   const upstreamEventType = 'nginx-upstreams'
   const upstreamsBatch = environments.map((environment) => {
-    const entities = Object.keys(tenantServices(environment))
+    const entities = Object.keys(tenantServices)
     const payload = JSON.stringify(
       workflowEvent(upstreamEventType, {
         environment,

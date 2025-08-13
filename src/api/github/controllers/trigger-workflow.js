@@ -106,7 +106,7 @@ const handleServiceCreation = async (request) => {
    */
   const inputs = request.payload.inputs
   // simulate creating the terraform changes etc
-  tenantServices()[inputs.service] = {
+  tenantServices[inputs.service] = {
     name: inputs.service,
     zone: inputs.zone,
     mongo: Boolean(inputs.mongo_enabled),

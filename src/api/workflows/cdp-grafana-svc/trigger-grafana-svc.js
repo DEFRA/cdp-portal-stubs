@@ -11,7 +11,7 @@ export async function triggerGrafanaSvc(sqs) {
   const eventType = 'grafana-dashboard'
 
   const batch = environments.map((environment) => {
-    const entities = Object.keys(tenantServices(environment))
+    const entities = Object.keys(tenantServices)
 
     const payload = JSON.stringify(
       workflowEvent(eventType, {
