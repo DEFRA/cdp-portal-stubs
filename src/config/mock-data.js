@@ -1,27 +1,18 @@
 import { teams } from '~/src/api/github/content/teams-and-repos'
 
-const tenantServices = (environment = 'prod') => ({
+const tenantServices = {
   'cdp-portal-frontend': {
     name: 'cdp-portal-frontend',
     zone: 'public',
     mongo: false,
     redis: true,
     service_code: 'CDP',
-    testSuite: null,
-    buckets: null,
-    queues: null,
-    s3Buckets: null,
-    sqsQueues: null,
-    snsTopics: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
-    ]
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-portal-backend': {
     name: 'cdp-portal-backend',
@@ -31,14 +22,14 @@ const tenantServices = (environment = 'prod') => ({
     service_code: 'CDP',
     queues: ['message_notification.fifo', 'message_clearance_request.fifo'],
     topics: ['decision_notification.fifo', 'error_notification.fifo'],
-    buckets: [`${environment}-cdp-portal-backend-*`],
+    buckets: ['management-cdp-portal-backend-*'],
     s3_buckets: [
       {
-        name: `${environment}-cdp-portal-backend-c63f2`,
+        name: 'management-cdp-portal-backend-c63f2',
         versioning: 'Disabled'
       },
       {
-        name: `${environment}-cdp-portal-backend-images-c63f2`,
+        name: 'management-cdp-portal-backend-images-c63f2',
         versioning: 'Disabled'
       }
     ],
@@ -89,16 +80,6 @@ const tenantServices = (environment = 'prod') => ({
           }
         ]
       }
-    ],
-    testSuite: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
     ]
   },
   'cdp-self-service-ops': {
@@ -107,21 +88,12 @@ const tenantServices = (environment = 'prod') => ({
     mongo: true,
     redis: false,
     service_code: 'CDP',
-    testSuite: null,
-    buckets: null,
-    queues: null,
-    s3Buckets: null,
-    sqsQueues: null,
-    snsTopics: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
-    ]
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-user-service': {
     name: 'cdp-user-service',
@@ -129,21 +101,12 @@ const tenantServices = (environment = 'prod') => ({
     mongo: true,
     redis: false,
     service_code: 'CDP',
-    testSuite: null,
-    buckets: null,
-    queues: null,
-    s3Buckets: null,
-    sqsQueues: null,
-    snsTopics: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
-    ]
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-env-test-suite': {
     name: 'cdp-env-test-suite',
@@ -153,21 +116,12 @@ const tenantServices = (environment = 'prod') => ({
     rds_aurora_postgres: false,
     test_suite: 'cdp-env-test-suite',
     service_code: 'CDP',
-    testSuite: null,
-    buckets: null,
-    queues: null,
-    s3Buckets: null,
-    sqsQueues: null,
-    snsTopics: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
-    ]
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-postgres-service': {
     name: 'cdp-postgres-service',
@@ -177,23 +131,14 @@ const tenantServices = (environment = 'prod') => ({
     rds_aurora_postgres: true,
     test_suite: 'cdp-env-test-suite',
     service_code: 'CDP',
-    testSuite: null,
-    buckets: null,
-    queues: null,
-    s3Buckets: null,
-    sqsQueues: null,
-    snsTopics: null,
-    apiEnabled: null,
-    apiType: null,
-    teams: [
-      {
-        github: 'cdp-platform',
-        teamId: 'aabe63e7-87ef-4beb-a596-c810631fc474',
-        name: 'Platform'
-      }
-    ]
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   }
-})
+}
 
 const topicsFrontendService = [
   { topic: { name: 'cdp' } },
@@ -378,7 +323,7 @@ function squidProxy(environment) {
   return {
     environment,
     default_domains: [`cdp.${environment}.defra.cloud`],
-    services: Object.keys(tenantServices(environment)).map((service) => ({
+    services: Object.keys(tenantServices).map((service) => ({
       name: service,
       allowed_domains: [`${service}.${environment}.defra.cloud`]
     }))
