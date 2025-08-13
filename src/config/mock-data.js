@@ -6,28 +6,107 @@ const tenantServices = {
     zone: 'public',
     mongo: false,
     redis: true,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-portal-backend': {
     name: 'cdp-portal-backend',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: ['message_notification.fifo', 'message_clearance_request.fifo'],
+    topics: ['decision_notification.fifo', 'error_notification.fifo'],
+    buckets: ['management-cdp-portal-backend-*'],
+    s3_buckets: [
+      {
+        name: 'management-cdp-portal-backend-c63f2',
+        versioning: 'Disabled'
+      },
+      {
+        name: 'management-cdp-portal-backend-images-c63f2',
+        versioning: 'Disabled'
+      }
+    ],
+    sns_topics: [
+      {
+        name: 'decision_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
+      },
+      {
+        name: 'error_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
+      }
+    ],
+    sqs_queues: [
+      {
+        name: 'message_clearance_request',
+        cross_account_allow_list: [],
+        fifo_queue: 'true',
+        content_based_deduplication: false,
+        dlq_max_receive_count: 3,
+        visibility_timeout_seconds: 300,
+        subscriptions: [
+          {
+            queue_name: 'message_clearance_request.fifo',
+            topics: ['error_notification.fifo'],
+            filter_enabled: false,
+            filter_policy: ''
+          }
+        ]
+      },
+      {
+        name: 'message_notification',
+        cross_account_allow_list: [],
+        fifo_queue: 'true',
+        content_based_deduplication: false,
+        dlq_max_receive_count: 3,
+        visibility_timeout_seconds: 300,
+        subscriptions: [
+          {
+            queue_name: 'message_notification.fifo',
+            topics: ['decision_notification.fifo', 'error_notification.fifo'],
+            filter_enabled: false,
+            filter_policy: ''
+          }
+        ]
+      }
+    ]
   },
   'cdp-self-service-ops': {
     name: 'cdp-self-service-ops',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-user-service': {
     name: 'cdp-user-service',
     zone: 'protected',
     mongo: true,
     redis: false,
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-env-test-suite': {
     name: 'cdp-env-test-suite',
@@ -36,7 +115,13 @@ const tenantServices = {
     redis: false,
     rds_aurora_postgres: false,
     test_suite: 'cdp-env-test-suite',
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   },
   'cdp-postgres-service': {
     name: 'cdp-postgres-service',
@@ -45,7 +130,13 @@ const tenantServices = {
     redis: false,
     rds_aurora_postgres: true,
     test_suite: 'cdp-env-test-suite',
-    service_code: 'CDP'
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   }
 }
 
