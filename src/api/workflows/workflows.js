@@ -4,9 +4,9 @@ import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 import { config } from '~/src/config'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
-import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
 import { populateECR } from '~/src/api/workflows/populate-ecr/populate-ecr'
 import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
+import { triggerTenantDatabases } from '~/src/api/workflows/tenant-databases/trigger-tenant-databases'
 
 /**
  * Simulates updates from github. Can also be triggered via the /_admin/trigger/{workflow} api
@@ -23,8 +23,8 @@ export const workflowsPlugin = {
         await triggerNginxUpstreams(server.sqs)
         await triggerShutteredVanityUrls(server.sqs)
         await triggerSquidProxy(server.sqs)
-        await triggerTenantBuckets(server.sqs)
         await triggerTenantServices(server.sqs)
+        await triggerTenantDatabases(server.sqs)
         await populateECR(server.sqs)
       }
     }

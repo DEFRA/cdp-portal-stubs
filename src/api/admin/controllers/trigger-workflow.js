@@ -4,7 +4,7 @@ import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/t
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
 import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-enabled-vanity-urls'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
-import { triggerTenantBuckets } from '~/src/api/workflows/tenant-buckets/trigger-tenant-buckets'
+import { triggerTenantDatabases } from '~/src/api/workflows/tenant-databases/trigger-tenant-databases'
 
 export const triggerWorkflow = {
   handler: async (request, h) => {
@@ -25,9 +25,6 @@ export const triggerWorkflow = {
       case 'tenant-services':
         await triggerTenantServices(request.sqs)
         break
-      case 'tenant-buckets':
-        await triggerTenantBuckets(request.sqs)
-        break
       case 'terraform-apply':
         await triggerWorkflowStatus(
           request.sqs,
@@ -38,6 +35,9 @@ export const triggerWorkflow = {
           'success',
           0
         )
+        break
+      case 'tenant-rds':
+        await triggerTenantDatabases(request.sqs)
         break
       default:
         request.logger.warn(`unsupported workflow: ${workflow}`)

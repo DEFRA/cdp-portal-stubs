@@ -128,7 +128,7 @@ const generateConfig = (org, service, runMode) => {
         'defra.cdp.run_mode': runMode
       }
     },
-    created: '2023-04-11T13:32:11.321678253Z',
+    created: new Date().toISOString(),
     docker_version: '20.10.23',
     history: [],
     os: 'linux',
