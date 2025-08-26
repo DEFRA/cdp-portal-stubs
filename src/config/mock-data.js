@@ -232,66 +232,6 @@ const ecrRepos = {
   }
 }
 
-function buckets(environment) {
-  return [
-    {
-      name: `cdp-${environment}-forms-runner-c63f2`,
-      exists: false,
-      services_with_access: ['forms-runner']
-    },
-    {
-      name: `cdp-${environment}-forms-manager-c63f2`,
-      exists: false,
-      services_with_access: ['forms-manager']
-    },
-    {
-      name: `cdp-${environment}-cdp-example-node-frontend-c63f2`,
-      exists: false,
-      services_with_access: ['cdp-example-node-frontend']
-    },
-    {
-      name: `${environment}-nms-frontend-alpha-c63f2`,
-      exists: false,
-      services_with_access: ['nms-backend-alpha', 'nms-frontend-alpha']
-    },
-    {
-      name: `${environment}-epr-cdp-spike-rpd-s3-c63f2`,
-      exists: false,
-      services_with_access: []
-    },
-    {
-      name: `${environment}-forms-submission-api-c63f2`,
-      exists: false,
-      services_with_access: ['forms-submission-api']
-    },
-    {
-      name: `${environment}-eutd-fes-bc-c63f2`,
-      exists: false,
-      services_with_access: ['eutd-mmo-bc']
-    },
-    {
-      name: `${environment}-find-ffa-data-ingester-c63f2`,
-      exists: false,
-      services_with_access: ['find-ffa-data-ingester']
-    },
-    {
-      name: `${environment}-phi-etl-fera-backend-c63f2`,
-      exists: false,
-      services_with_access: ['phi-etl-fera-backend']
-    },
-    {
-      name: `${environment}-btms-backend-c63f2`,
-      exists: false,
-      services_with_access: ['btms-backend']
-    },
-    {
-      name: `${environment}-apha-file-frontend-c63f2`,
-      exists: false,
-      services_with_access: ['apha-file-frontend']
-    }
-  ]
-}
-
 const vanityUrls = {
   management: [
     {
@@ -330,15 +270,33 @@ function squidProxy(environment) {
   }
 }
 
+function rdsDatabases() {
+  const services = Object.keys(tenantServices).filter(
+    (k) => tenantServices[k]?.rds_aurora_postgres
+  )
+  return services.map((service) => ({
+    service,
+    databaseName: service.replaceAll('-', '_'),
+    endpoint: `${service}.cluster-aabbccdd.eu-west-2.rds.amazonaws.com`,
+    readerEndpoint: `${service}.cluster-ro-aabbccdd.eu-west-2.rds.amazonaws.com`,
+    engine: 'aurora-postgresql',
+    engineVersion: '16.6',
+    port: 5432,
+    earliestRestorableTime: '2025-07-12T07:06:18.191000+00:00',
+    latestRestorableTime: '2025-08-11T15:06:08.796000+00:00',
+    backupRetentionPeriod: 30
+  }))
+}
+
 export {
   tenantServices,
   githubRepos,
   ecrRepos,
+  rdsDatabases,
   topicsTestSuite,
   topicsFrontendService,
   topicsBackendService,
   topicsPerfTestSuite,
-  buckets,
   vanityUrls,
   squidProxy
 }
