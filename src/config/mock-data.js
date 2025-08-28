@@ -137,6 +137,20 @@ const tenantServices = {
     s3_buckets: [],
     sns_topics: [],
     sqs_queues: []
+  },
+  'tenant-backend': {
+    name: 'tenant-backend',
+    zone: 'protected',
+    mongo: true,
+    redis: false,
+    rds_aurora_postgres: false,
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
   }
 }
 
@@ -202,6 +216,12 @@ const githubRepos = [
     topics: topicsBackendService,
     team: teams[0].slug,
     createdAt: '2016-12-05T11:21:25Z'
+  },
+  {
+    name: 'tenant-backend',
+    topics: topicsBackendService,
+    team: teams[4].slug,
+    createdAt: '2024-12-05T11:21:25Z'
   }
 ]
 

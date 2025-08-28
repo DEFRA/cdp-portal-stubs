@@ -14,6 +14,10 @@ const teams = [
   {
     slug: 'cdp-test-3',
     name: 'CDP Test 3 Team'
+  },
+  {
+    slug: 'cdp-tenant-1',
+    name: 'TenantTeam1'
   }
 ]
 
