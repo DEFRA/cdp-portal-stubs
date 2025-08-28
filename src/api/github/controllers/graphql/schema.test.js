@@ -31,7 +31,8 @@ describe('Github Graphql schema', () => {
       { github: 'cdp-platform', name: 'CDP Platform Team' },
       { github: 'cdp-test-1', name: 'CDP Test 1 Team' },
       { github: 'cdp-test-2', name: 'CDP Test 2 Team' },
-      { github: 'cdp-test-3', name: 'CDP Test 3 Team' }
+      { github: 'cdp-test-3', name: 'CDP Test 3 Team' },
+      { github: 'cdp-tenant-1', name: 'TenantTeam1' }
     ])
   })
 
