@@ -13,18 +13,4 @@ const githubUsers = [
   }
 ]
 
-const userData = {
-  data: {
-    organization: {
-      membersWithRole: {
-        nodes: githubUsers,
-        pageInfo: {
-          hasNextPage: false,
-          endCursor: 'Y3Vyc29yOnYyOpHOAAM-Zg=='
-        }
-      }
-    }
-  }
-}
-
-export { githubUsers, userData }
+export { githubUsers }
