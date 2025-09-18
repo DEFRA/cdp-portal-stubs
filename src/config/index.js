@@ -1,8 +1,6 @@
 import convict from 'convict'
 import path from 'path'
 
-import { version } from '~/package.json'
-
 const config = convict({
   env: {
     doc: 'The application environment.',
@@ -15,11 +13,6 @@ const config = convict({
     format: 'port',
     default: 3939,
     env: 'PORT'
-  },
-  version: {
-    doc: 'Api version',
-    format: String,
-    default: version
   },
   serviceName: {
     doc: 'Api Service Name',
@@ -57,22 +50,37 @@ const config = convict({
     default: 'info',
     env: 'LOG_LEVEL'
   },
-  mongoUri: {
-    doc: 'URI for mongodb',
-    format: '*',
-    default: 'mongodb://127.0.0.1:27017/',
-    env: 'MONGO_URI'
-  },
-  mongoDatabase: {
-    doc: 'database for mongodb',
-    format: '*',
-    default: 'cdp-portal-stubs',
-    env: 'MONGO_DATABASE'
-  },
-  mongoCertPath: {
-    doc: 'path for mongodb TLS truststore',
-    format: '*',
-    env: 'MONGO_CERT_PATH'
+  mongo: {
+    mongoUrl: {
+      doc: 'URL for mongodb',
+      format: String,
+      default: 'mongodb://127.0.0.1:27017/?replicaSet=rs0',
+      env: 'MONGO_URI'
+    },
+    databaseName: {
+      doc: 'database for mongodb',
+      format: String,
+      default: 'cdp-portal-stubs',
+      env: 'MONGO_DATABASE'
+    },
+    mongoOptions: {
+      retryWrites: {
+        doc: 'enable mongo write retries',
+        format: Boolean,
+        default: false
+      },
+      readPreference: {
+        doc: 'mongo read preference',
+        format: [
+          'primary',
+          'primaryPreferred',
+          'secondary',
+          'secondaryPreferred',
+          'nearest'
+        ],
+        default: 'secondaryPreferred'
+      }
+    }
   },
   githubOrg: {
     doc: 'github org to mock',
