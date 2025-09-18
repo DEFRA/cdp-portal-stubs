@@ -21,7 +21,7 @@ async function secretsUpdatesHandler(sqs, payload) {
 
   if (secretValue === 'BLOWUP') {
     logger.info(`Exception, BLOWUP received for ${service} in ${environment}`)
-    addSecret({
+    await addSecret({
       sqs,
       environment,
       addSecret: false,
@@ -33,10 +33,32 @@ async function secretsUpdatesHandler(sqs, payload) {
   }
   if (action === 'add_secret') {
     logger.info(`Adding secret [${secretKey}] for ${service} in ${environment}`)
-    addSecret({ sqs, environment, addSecret: true, service, secretKey })
+    await addSecret({ sqs, environment, addSecret: true, service, secretKey })
+  } else if (action === 'remove_secret_by_key') {
+    logger.info(
+      `Removing secret [${secretKey}] for ${service} in ${environment}`
+    )
+    await removeSecretByKey({ sqs, environment, service, secretKey })
   } else {
     logger.error(`Unknown action [${action}] for ${service} in ${environment}`)
   }
+}
+
+async function sendSecretsMessage(action, body, sqs) {
+  const updatedMessage = {
+    QueueUrl: secretsOutgoing,
+    MessageBody: JSON.stringify({
+      source: 'cdp-secret-manager-lambda',
+      statusCode: 200,
+      action,
+      body
+    }),
+    DelaySeconds: secretsUpdatedDelay,
+    MessageAttributes: {},
+    MessageSystemAttributes: {}
+  }
+  const command = new SendMessageCommand(updatedMessage)
+  return await sqs.send(command)
 }
 
 async function addSecret({
@@ -47,27 +69,31 @@ async function addSecret({
   secretKey,
   exception
 }) {
-  const payload = {
-    source: 'cdp-secret-manager-lambda',
-    statusCode: 200,
-    action: 'add_secret',
-    body: {
-      environment,
-      add_secret: addSecret,
-      secret: `cdp/services/${service}`,
-      secret_key: secretKey,
-      exception
-    }
+  const body = {
+    environment,
+    add_secret: addSecret,
+    secret: `cdp/services/${service}`,
+    secret_key: secretKey,
+    exception
   }
-  const updatedMessage = {
-    QueueUrl: secretsOutgoing,
-    MessageBody: JSON.stringify(payload),
-    DelaySeconds: secretsUpdatedDelay,
-    MessageAttributes: {},
-    MessageSystemAttributes: {}
+  return await sendSecretsMessage('add_secret', body, sqs)
+}
+
+async function removeSecretByKey({
+  sqs,
+  environment,
+  service,
+  secretKey,
+  exception
+}) {
+  const body = {
+    environment,
+    remove_secret_by_key: true,
+    secret: `cdp/services/${service}`,
+    secret_key: secretKey,
+    exception
   }
-  const command = new SendMessageCommand(updatedMessage)
-  return await sqs.send(command)
+  return await sendSecretsMessage('remove_secret_by_key', body, sqs)
 }
 
 export { secretsUpdatesHandler }
