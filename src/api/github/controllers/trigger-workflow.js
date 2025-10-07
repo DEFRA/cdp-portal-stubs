@@ -17,6 +17,10 @@ const triggerWorkflow = {
   handler: async (request, h) => {
     const workflowRepo = request.params.repo
     switch (workflowRepo) {
+      case 'cdp-tenant-config':
+        await handleNewCdpCreateWorkflows(request)
+        await handleCdpTenantConfigCreation(request)
+        break
       case 'cdp-create-workflows':
         await handleCdpCreateWorkflows(request)
         break
@@ -98,6 +102,64 @@ const handleCdpCreateWorkflows = async (request) => {
       1
     )
   }
+}
+
+const handleNewCdpCreateWorkflows = async (request) => {
+  const org = request.params.org
+  const workflowFile = request.params.workflow
+  const inputs = request.payload.inputs
+  const repositoryName = inputs.service
+  const tenantConfig = JSON.parse(inputs.config)
+
+  if (repositoryName) {
+    request.logger.info(
+      `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${repositoryName}`
+    )
+
+    githubRepos.push({
+      name: repositoryName,
+      topics: [],
+      team: tenantConfig.team,
+      createdAt: new Date().toISOString()
+    })
+
+    if (ecrRepos[repositoryName] === undefined) {
+      ecrRepos[repositoryName] = {
+        tags: ['0.1.0', '0.2.0', '0.3.0'],
+        runMode: 'job'
+      }
+    }
+
+    await populateEcrRepo(request.sqs, repositoryName, 0)
+  }
+}
+
+const handleCdpTenantConfigCreation = async (request) => {
+  /**
+   * @type {{service:string, config: string, template_repo: string }}
+   */
+  const inputs = request.payload.inputs
+
+  const tenantConfig = JSON.parse(inputs.config)
+
+  request.logger.info(`Create-service workflow ${JSON.stringify(inputs)}`)
+
+  // simulate creating the terraform changes etc
+  tenantServices[inputs.service] = {
+    name: inputs.service,
+    zone: tenantConfig.zone,
+    mongo: tenantConfig.mongo_enabled,
+    redis: tenantConfig.redis_enabled,
+    service_code: tenantConfig.service_code ?? 'UNKNOWN',
+    test_suite: tenantConfig.type === 'TestSuite' ? inputs.service : null
+  }
+
+  await handleNewCdpCreateWorkflows(request)
+  await triggerTenantServices(request.sqs, 1)
+  await triggerCdpAppConfig(request.sqs, 2)
+  await triggerSquidProxy(request.sqs, 3)
+  await triggerNginxUpstreams(request.sqs, 3)
+  await triggerGrafanaSvc(request.sqs, 4)
 }
 
 const handleServiceCreation = async (request) => {
