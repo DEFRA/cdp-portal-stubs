@@ -119,7 +119,7 @@ const handleNewCdpCreateWorkflows = async (request) => {
     githubRepos.push({
       name: repositoryName,
       topics: [],
-      team: tenantConfig.team,
+      team: tenantConfig.github_team,
       createdAt: new Date().toISOString()
     })
 
