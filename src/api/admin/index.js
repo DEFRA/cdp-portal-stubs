@@ -15,6 +15,7 @@ import {
   listSlackMessages,
   resetSlack
 } from '~/src/api/admin/controllers/slack-admin'
+import { monoLambdaPlatformState } from '~/src/api/admin/controllers/mono-lambda-platform-state'
 
 const adminStub = {
   plugin: {
@@ -43,6 +44,11 @@ const adminStub = {
           method: 'GET',
           path: '/_admin/trigger/{workflow}',
           ...triggerWorkflow
+        },
+        {
+          method: 'GET',
+          path: '/_admin/lambda/mono-lambda/state',
+          ...monoLambdaPlatformState
         },
         {
           method: 'GET',

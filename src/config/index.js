@@ -196,6 +196,12 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/cdp-notify-github-events',
     env: 'SQS_ALERTS_GITHUB'
   },
+  sqsLambdaEvents: {
+    doc: 'The queue hooked up to the mono-lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/lambda-events',
+    env: 'SQS_LAMBDA_EVENTS'
+  },
 
   lambda: {
     secretsUpdates: {
