@@ -215,7 +215,7 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
     case 'cdp-tf-waf':
       updateVanityUrl(inputs, workflowFile, request.logger)
       // Long delay to simulate the time taken to update vanity URLs, and allow UI to update
-      await triggerShutteredVanityUrls(request.sqs, baseDelay)
+      await triggerShutteredVanityUrls(request.sqs, baseDelay + 10)
       break
   }
 }
