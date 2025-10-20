@@ -7,6 +7,7 @@ import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigg
 import { populateECR } from '~/src/api/workflows/populate-ecr/populate-ecr'
 import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
 import { triggerTenantDatabases } from '~/src/api/workflows/tenant-databases/trigger-tenant-databases'
+import { sendPlatformStatePayloadForAllEnvs } from '~/src/api/platform-state-lambda/send-platform-state-payload'
 
 /**
  * Simulates updates from github. Can also be triggered via the /_admin/trigger/{workflow} api
@@ -26,6 +27,7 @@ export const workflowsPlugin = {
         await triggerTenantServices(server.sqs)
         await triggerTenantDatabases(server.sqs)
         await populateECR(server.sqs)
+        await sendPlatformStatePayloadForAllEnvs(server.sqs)
       }
     }
   }

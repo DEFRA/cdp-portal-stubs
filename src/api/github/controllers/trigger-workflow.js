@@ -141,6 +141,7 @@ const handleCdpTenantConfigCreation = async (request) => {
 
   // Create the new tenant in the global platform state
   createTenant(inputs.service, tenantConfig)
+  await sendPlatformStatePayloadForAllEnvs(request.sqs)
 
   // simulate creating the terraform changes etc
   tenantServices[inputs.service] = {
@@ -153,13 +154,13 @@ const handleCdpTenantConfigCreation = async (request) => {
   }
 
   await handleNewCdpCreateWorkflows(request)
-  await triggerTenantServices(request.sqs, 1)
   await triggerCdpAppConfig(request.sqs, 2)
+
+  // legacy handlers, remove once portal has moved over to new data see: CORE
+  await triggerTenantServices(request.sqs, 1)
   await triggerSquidProxy(request.sqs, 3)
   await triggerNginxUpstreams(request.sqs, 3)
   await triggerGrafanaSvc(request.sqs, 4)
-
-  await sendPlatformStatePayloadForAllEnvs(request.sqs)
 }
 
 function updateVanityUrl(inputs, workflowFile, logger) {

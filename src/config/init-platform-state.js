@@ -1,9 +1,12 @@
 import { teams } from '~/src/api/github/content/teams-and-repos'
 import {
-  createQueue,
-  createTenant
+  addBucket,
+  addQueue,
+  createTenant,
+  addTopic,
+  addSqlDatabase
 } from '~/src/api/platform-state-lambda/create-tenant'
-import { environmentMappings } from '~/src/config/environments'
+import { environments } from '~/src/config/environments'
 
 const defaultTenants = [
   {
@@ -25,12 +28,36 @@ const defaultTenants = [
     team: teams[0].slug,
     type: 'Microservice',
     subtype: 'Backend',
+    s3_buckets: [
+      {
+        name: 'cdp-portal-backend',
+        versioning: 'Disabled'
+      },
+      {
+        name: 'cdp-portal-backend-images',
+        versioning: 'Disabled'
+      }
+    ],
     sqs_queues: [
       {
         name: 'message_clearance_request',
         fifo_queue: 'true',
         content_based_deduplication: false,
         subscriptions: ['error_notification.fifo']
+      }
+    ],
+    sns_topics: [
+      {
+        name: 'decision_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
+      },
+      {
+        name: 'error_notification',
+        cross_account_allow_list: [],
+        fifo_topic: 'true',
+        content_based_deduplication: false
       }
     ]
   },
@@ -52,7 +79,14 @@ const defaultTenants = [
     service_code: 'CDP',
     team: teams[0].slug,
     type: 'Microservice',
-    subtype: 'Backend'
+    subtype: 'Backend',
+    rds_aurora_postgres: [
+      {
+        instance_count: 1,
+        min_capacity: 0.5,
+        max_capacity: 4.0
+      }
+    ]
   },
   {
     name: 'tenant-backend',
@@ -79,17 +113,29 @@ const defaultTenants = [
 function initPlatformState() {
   for (const config of defaultTenants) {
     createTenant(config.name, config)
-  }
 
-  // TODO: add queues, dbs etc
-  for (const config of defaultTenants) {
-    if (!config.sqs_queues) continue
+    if (config.sqs_queues) {
+      config.sqs_queues.forEach((queue) =>
+        addQueue(config.name, environments, queue)
+      )
+    }
 
-    config.sqs_queues.forEach((queue) => {
-      Object.keys(environmentMappings).forEach((env) => {
-        createQueue(config.name, env, queue)
-      })
-    })
+    if (config.sns_topics) {
+      config.sns_topics.forEach((topic) =>
+        addTopic(config.name, environments, topic)
+      )
+    }
+
+    if (config.s3_buckets) {
+      config.s3_buckets.forEach((bucket) =>
+        // TODO: bucket names are unique per env, for now we just send the management one
+        addBucket(config.name, ['management'], bucket)
+      )
+    }
+
+    if (config.rds_aurora_postgres) {
+      addSqlDatabase(config.name, environments)
+    }
   }
 }
 
