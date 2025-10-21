@@ -12,6 +12,7 @@ import { secretsUpdatesPlugin } from '~/src/api/lambda/secrets-updates-plugin'
 import { workflowsPlugin } from '~/src/api/workflows/workflows'
 import { slackPlugin } from '~/src/api/slack/slack-plugin'
 import { mongoDb } from '~/src/helpers/mongodb'
+import { initPlatformState } from '~/src/config/init-platform-state'
 
 async function createServer() {
   const server = hapi.server({
@@ -34,6 +35,8 @@ async function createServer() {
       request: ['error', 'uncaught', 'internal']
     }
   })
+
+  initPlatformState()
 
   await server.register(requestLogger)
   await server.register({

@@ -8,4 +8,6 @@ const environmentMappings = {
   'ext-test': '888888888'
 }
 
-export { environmentMappings }
+const environments = Object.keys(environmentMappings)
+
+export { environmentMappings, environments }

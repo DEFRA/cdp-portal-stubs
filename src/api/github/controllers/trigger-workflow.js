@@ -12,6 +12,8 @@ import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-c
 import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
 import { triggerGrafanaSvc } from '~/src/api/workflows/cdp-grafana-svc/trigger-grafana-svc'
 import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
+import { createTenant } from '~/src/api/platform-state-lambda/create-tenant'
+import { sendPlatformStatePayloadForAllEnvs } from '~/src/api/platform-state-lambda/send-platform-state-payload'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -24,16 +26,9 @@ const triggerWorkflow = {
       case 'cdp-create-workflows':
         await handleCdpCreateWorkflows(request)
         break
-      case 'cdp-squid-proxy':
-      case 'cdp-grafana-svc':
-      case 'cdp-app-config':
-      case 'cdp-nginx-upstreams':
       case 'cdp-app-deployments':
       case 'cdp-tf-waf':
         await handleGenericWorkflows(request)
-        break
-      case 'cdp-tf-svc-infra':
-        await handleServiceCreation(request)
         break
       default:
         return h
@@ -144,6 +139,10 @@ const handleCdpTenantConfigCreation = async (request) => {
 
   request.logger.info(`Create-service workflow ${JSON.stringify(inputs)}`)
 
+  // Create the new tenant in the global platform state
+  createTenant(inputs.service, tenantConfig)
+  await sendPlatformStatePayloadForAllEnvs(request.sqs)
+
   // simulate creating the terraform changes etc
   tenantServices[inputs.service] = {
     name: inputs.service,
@@ -155,48 +154,13 @@ const handleCdpTenantConfigCreation = async (request) => {
   }
 
   await handleNewCdpCreateWorkflows(request)
-  await triggerTenantServices(request.sqs, 1)
   await triggerCdpAppConfig(request.sqs, 2)
+
+  // legacy handlers, remove once portal has moved over to new data see: CORE
+  await triggerTenantServices(request.sqs, 1)
   await triggerSquidProxy(request.sqs, 3)
   await triggerNginxUpstreams(request.sqs, 3)
   await triggerGrafanaSvc(request.sqs, 4)
-}
-
-const handleServiceCreation = async (request) => {
-  /**
-   * @type {{service:string, type:string, zone:string, mongo_enabled: boolean, redis_enabled: boolean, service_code:string, test_suite: string|null }}
-   */
-  const inputs = request.payload.inputs
-  // simulate creating the terraform changes etc
-  tenantServices[inputs.service] = {
-    name: inputs.service,
-    zone: inputs.zone,
-    mongo: Boolean(inputs.mongo_enabled),
-    redis: Boolean(inputs.redis_enabled),
-    service_code: inputs.service_code,
-    test_suite: inputs.test_suite
-  }
-
-  await handleGenericWorkflows(request, 1)
-  await triggerWorkflowStatus(
-    request.sqs,
-    'cdp-tf-svc-infra',
-    '.github/workflows/manual.yml',
-    'Manual Apply',
-    'completed',
-    'success',
-    4
-  )
-  await triggerTenantServices(request.sqs, 1)
-  await triggerWorkflowStatus(
-    request.sqs,
-    'cdp-tf-svc-infra',
-    '.github/workflows/notify-portal.yml',
-    'Notify Portal',
-    'completed',
-    'success',
-    30
-  )
 }
 
 function updateVanityUrl(inputs, workflowFile, logger) {
@@ -237,8 +201,6 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
   const repo = request.params.repo
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
-  const service =
-    inputs?.service || inputs?.repositoryName || inputs?.serviceName
 
   request.logger.info(
     `Stubbing triggering of workflow ${org}/${repo}/.github/workflows/${workflowFile} with inputs ${JSON.stringify(
@@ -249,52 +211,7 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
   // Future stubbing
   // If we need to support different workflows on the same repo (i.e. create-s3-bucket.yml) we can
   // check the workflow file: e.g. `if (workflowFile === 'create-service.yml') {}`
-
-  request.logger.info(`Adding service ${service} to ${repo}`)
-
-  await triggerWorkflowStatus(
-    request.sqs,
-    repo,
-    workflowFile,
-    service,
-    'requested',
-    null,
-    0
-  )
-
-  await triggerWorkflowStatus(
-    request.sqs,
-    repo,
-    workflowFile,
-    service,
-    'in_progress',
-    null,
-    baseDelay + 1
-  )
-
-  await triggerWorkflowStatus(
-    request.sqs,
-    repo,
-    workflowFile,
-    service,
-    'completed',
-    'success',
-    baseDelay + 2
-  )
-
   switch (repo) {
-    case 'cdp-app-config':
-      await triggerCdpAppConfig(request.sqs, baseDelay + 3)
-      break
-    case 'cdp-squid-proxy':
-      await triggerSquidProxy(request.sqs, baseDelay + 3)
-      break
-    case 'cdp-nginx-upstreams':
-      await triggerNginxUpstreams(request.sqs, baseDelay + 3)
-      break
-    case 'cdp-grafana-svc':
-      await triggerGrafanaSvc(request.sqs, baseDelay + 3)
-      break
     case 'cdp-tf-waf':
       updateVanityUrl(inputs, workflowFile, request.logger)
       // Long delay to simulate the time taken to update vanity URLs, and allow UI to update

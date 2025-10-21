@@ -7,12 +7,7 @@ const tenantServices = {
     mongo: false,
     redis: true,
     service_code: 'CDP',
-    queues: [],
-    topics: [],
-    buckets: [],
-    s3_buckets: [],
-    sns_topics: [],
-    sqs_queues: []
+    team: teams[0].slug
   },
   'cdp-portal-backend': {
     name: 'cdp-portal-backend',
