@@ -205,6 +205,7 @@ function createTenantState(name, config, env) {
       steps: {
         infra: true,
         logs: true,
+        metrics: true,
         nginx: true,
         squid: true
       }
