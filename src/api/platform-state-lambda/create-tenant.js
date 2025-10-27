@@ -199,6 +199,16 @@ function createTenantState(name, config, env) {
       subtype: config.subtype,
       type: config.type,
       teams: [config.team]
+    },
+    progress: {
+      complete: true,
+      steps: {
+        infra: true,
+        logs: true,
+        metrics: true,
+        nginx: true,
+        squid: true
+      }
     }
   }
 }
