@@ -8,7 +8,7 @@ async function sendPlatformStatePayloadForAllEnvs(sqs) {
   }
 }
 
-async function sendPlatformStatePayload(sqs, environment, delay = 1) {
+function sendPlatformStatePayload(sqs, environment, delay = 1) {
   // payload for environment
   const payload = {
     created: new Date().toISOString(),
@@ -41,7 +41,7 @@ async function sendPlatformStatePayload(sqs, environment, delay = 1) {
     MessageSystemAttributes: {}
   }
 
-  return await sqs.send(new SendMessageCommand(command))
+  return sqs.send(new SendMessageCommand(command))
 }
 
 export { sendPlatformStatePayload, sendPlatformStatePayloadForAllEnvs }
