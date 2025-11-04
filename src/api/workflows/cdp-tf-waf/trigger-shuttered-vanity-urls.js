@@ -1,20 +1,26 @@
+import crypto from 'node:crypto'
+
+import { environmentMappings } from '~/src/config/environments'
+import { platformState } from '~/src/api/platform-state-lambda/platform-state'
 import {
   sendWorkflowEventsBatchMessage,
   workflowEvent
 } from '~/src/api/workflows/helpers/workflow-event'
-import { environmentMappings } from '~/src/config/environments'
-import crypto from 'node:crypto'
-import { vanityUrls } from '~/src/config/mock-data'
 
 export async function triggerShutteredVanityUrls(sqs, delay = 0) {
-  const environments = Object.keys(environmentMappings)
-
   const eventType = 'shuttered-urls'
-  const batch = environments.map((environment) => {
-    const urlsForEnv = vanityUrls[environment] ?? []
-    const shutteredUrls = urlsForEnv
-      .filter((v) => v.shuttered)
-      .map((v) => v.url)
+
+  const batch = Object.keys(environmentMappings).map((environment) => {
+    const shutteredUrls = Object.values(platformState[environment]).flatMap(
+      (data) => {
+        const urls = data.tenant.urls || {}
+
+        return Object.entries(urls)
+          .filter(([, detail]) => detail.shuttered)
+          .map(([url]) => url)
+      }
+    )
+
     const payload = JSON.stringify(
       workflowEvent(eventType, {
         environment,
