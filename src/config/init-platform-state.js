@@ -38,7 +38,7 @@ const defaultEntities = [
         shuttered: false,
         enabled: true,
         type: 'vanity',
-        env: 'management'
+        env: 'prod'
       }
     ]
   },
