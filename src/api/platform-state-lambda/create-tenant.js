@@ -224,7 +224,7 @@ function createTenantState(name, config, env) {
       }
     },
     metadata: {
-      created: '2025-05-12T10:16:00.584Z',
+      created: new Date(),
       name,
       service_code: config.service_code,
       subtype: config.subtype,

@@ -1,4 +1,3 @@
-import { teams } from '~/src/api/github/content/teams-and-repos'
 import {
   addBucket,
   addQueue,
@@ -16,7 +15,7 @@ const defaultEntities = [
     mongo: false,
     redis: true,
     service_code: 'CDP',
-    team: teams[0].slug,
+    team: 'platform',
     type: 'Microservice',
     subtype: 'Frontend',
     urls: [
@@ -49,7 +48,7 @@ const defaultEntities = [
     mongo: true,
     redis: false,
     service_code: 'CDP',
-    team: teams[0].slug,
+    team: 'platform',
     type: 'Microservice',
     subtype: 'Backend',
     s3_buckets: [
@@ -107,7 +106,7 @@ const defaultEntities = [
     mongo: true,
     redis: false,
     service_code: 'CDP',
-    team: teams[0].slug,
+    team: 'platform',
     type: 'Microservice',
     subtype: 'Backend'
   },
@@ -117,7 +116,7 @@ const defaultEntities = [
     mongo: false,
     redis: false,
     service_code: 'CDP',
-    team: teams[0].slug,
+    team: 'platform',
     type: 'Microservice',
     subtype: 'Backend',
     rds_aurora_postgres: [
@@ -134,7 +133,7 @@ const defaultEntities = [
     mongo: true,
     redis: false,
     service_code: 'CDP',
-    team: teams[4].slug,
+    team: 'tenantteam1',
     type: 'Microservice',
     subtype: 'Backend',
     urls: [
@@ -161,6 +160,7 @@ const defaultEntities = [
     redis: false,
     test_suite: 'cdp-env-test-suite',
     service_code: 'CDP',
+    team: 'platform',
     type: 'TestSuite',
     subtype: 'Journey'
   }

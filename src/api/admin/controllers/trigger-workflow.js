@@ -5,6 +5,7 @@ import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigg
 import { triggerEnabledVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-enabled-vanity-urls'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { triggerTenantDatabases } from '~/src/api/workflows/tenant-databases/trigger-tenant-databases'
+import { sendPlatformStatePayloadForAllEnvs } from '~/src/api/platform-state-lambda/send-platform-state-payload'
 
 export const triggerWorkflow = {
   handler: async (request, h) => {
@@ -12,6 +13,9 @@ export const triggerWorkflow = {
     request.logger.info(`triggering ${workflow}`)
 
     switch (workflow) {
+      case 'platform-state':
+        await sendPlatformStatePayloadForAllEnvs(request.sqs)
+        break
       case 'cdp-app-config':
         await triggerCdpAppConfig(request.sqs)
         break
