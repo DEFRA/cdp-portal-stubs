@@ -1,9 +1,4 @@
-import {
-  ecrRepos,
-  githubRepos,
-  tenantServices,
-  vanityUrls
-} from '~/src/config/mock-data'
+import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
 import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
@@ -11,9 +6,14 @@ import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-
 import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
 import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
 import { triggerGrafanaSvc } from '~/src/api/workflows/cdp-grafana-svc/trigger-grafana-svc'
-import { triggerShutteredVanityUrls } from '~/src/api/workflows/cdp-tf-waf/trigger-shuttered-vanity-urls'
-import { createTenant } from '~/src/api/platform-state-lambda/create-tenant'
-import { sendPlatformStatePayloadForAllEnvs } from '~/src/api/platform-state-lambda/send-platform-state-payload'
+import {
+  changeShutterState,
+  createTenant
+} from '~/src/api/platform-state-lambda/create-tenant'
+import {
+  sendPlatformStatePayload,
+  sendPlatformStatePayloadForAllEnvs
+} from '~/src/api/platform-state-lambda/send-platform-state-payload'
 
 const triggerWorkflow = {
   handler: async (request, h) => {
@@ -163,37 +163,32 @@ const handleCdpTenantConfigCreation = async (request) => {
   await triggerGrafanaSvc(request.sqs, 4)
 }
 
-function updateVanityUrl(inputs, workflowFile, logger) {
+/**
+ *
+ * @param {{ service: string, url: string, environment: string }} inputs
+ * @param workflowFile
+ * @param request
+ */
+async function updateVanityUrl(inputs, workflowFile, request) {
   const environment = inputs.environment
-  const vanityUrlsForEnv = vanityUrls[environment] ?? []
+  const service = inputs.service
+  const url = inputs.url
+
   let shuttered
   if (workflowFile === 'shuttering-add.yml') {
     shuttered = true
   } else if (workflowFile === 'shuttering-remove.yml') {
     shuttered = false
   } else {
-    logger.warn('Unknown workflow file for vanity URL update:', workflowFile)
+    request.logger.warn(
+      'Unknown workflow file for vanity URL update:',
+      workflowFile
+    )
     return
   }
 
-  const vanityUrl = {
-    service: inputs.service,
-    url: inputs.url,
-    shuttered,
-    enabled: inputs.waf.startsWith('internal')
-  }
-
-  const existingIndex = vanityUrlsForEnv.findIndex(
-    (s) => s.service === vanityUrl.service && s.url === vanityUrl.url
-  )
-
-  if (existingIndex !== -1) {
-    vanityUrlsForEnv[existingIndex] = vanityUrl
-  } else {
-    vanityUrlsForEnv.push(vanityUrl)
-  }
-
-  vanityUrls[environment] = vanityUrlsForEnv
+  changeShutterState(environment, service, url, shuttered)
+  await sendPlatformStatePayload(request.sqs, environment, 5)
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
@@ -208,14 +203,9 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
     )}`
   )
 
-  // Future stubbing
-  // If we need to support different workflows on the same repo (i.e. create-s3-bucket.yml) we can
-  // check the workflow file: e.g. `if (workflowFile === 'create-service.yml') {}`
   switch (repo) {
     case 'cdp-tf-waf':
-      updateVanityUrl(inputs, workflowFile, request.logger)
-      // Long delay to simulate the time taken to update vanity URLs, and allow UI to update
-      await triggerShutteredVanityUrls(request.sqs, baseDelay + 10)
+      await updateVanityUrl(inputs, workflowFile, request)
       break
   }
 }

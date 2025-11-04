@@ -224,7 +224,7 @@ function createTenantState(name, config, env) {
       }
     },
     metadata: {
-      created: '2025-05-12T10:16:00.584Z',
+      created: new Date(),
       name,
       service_code: config.service_code,
       subtype: config.subtype,
@@ -291,4 +291,33 @@ function createECR(name) {
   }
 }
 
-export { createTenant, addQueue, addUrl, addTopic, addBucket, addSqlDatabase }
+/**
+ *
+ * @param {string} env
+ * @param {string} name
+ * @param {string} url
+ * @param {bool} shutterState
+ */
+function changeShutterState(env, name, url, shutterState) {
+  if (!platformState[env][name]) {
+    throw new Error(`Service not found ${name} in ${env}`)
+  }
+
+  if (platformState[env][name].tenant?.urls[url]) {
+    platformState[env][name].tenant.urls[url].shuttered = shutterState
+  } else {
+    throw new Error(
+      `URL ${url} not found found for ${name} in ${env}, unable to shutter`
+    )
+  }
+}
+
+export {
+  createTenant,
+  addQueue,
+  addUrl,
+  addTopic,
+  addBucket,
+  addSqlDatabase,
+  changeShutterState
+}

@@ -8,7 +8,7 @@ async function sendPlatformStatePayloadForAllEnvs(sqs) {
   }
 }
 
-async function sendPlatformStatePayload(sqs, environment) {
+function sendPlatformStatePayload(sqs, environment, delay = 1) {
   // payload for environment
   const payload = {
     created: new Date().toISOString(),
@@ -36,12 +36,12 @@ async function sendPlatformStatePayload(sqs, environment) {
   const command = {
     QueueUrl: config.get('sqsLambdaEvents'),
     MessageBody: JSON.stringify(message),
-    DelaySeconds: 1,
+    DelaySeconds: delay,
     MessageAttributes: {},
     MessageSystemAttributes: {}
   }
 
-  return await sqs.send(new SendMessageCommand(command))
+  return sqs.send(new SendMessageCommand(command))
 }
 
 export { sendPlatformStatePayload, sendPlatformStatePayloadForAllEnvs }

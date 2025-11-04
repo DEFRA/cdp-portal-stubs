@@ -11,6 +11,7 @@ export async function triggerNginxUpstreams(sqs) {
 
   const vanityUrlEventType = 'nginx-vanity-urls'
   const batch = environments.map((environment) => {
+    // TODO does this need updating to use platform state?
     const frontendServices = (vanityUrls[environment] ?? []).map((v) => {
       const splitAt = v.url.indexOf('.')
       const host = v.url.slice(0, splitAt)

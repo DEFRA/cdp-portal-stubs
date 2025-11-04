@@ -1,24 +1,29 @@
+import crypto from 'node:crypto'
+
+import { environmentMappings } from '~/src/config/environments'
+import { platformState } from '~/src/api/platform-state-lambda/platform-state'
 import {
   sendWorkflowEventsBatchMessage,
   workflowEvent
 } from '~/src/api/workflows/helpers/workflow-event'
-import { environmentMappings } from '~/src/config/environments'
-import { vanityUrls } from '~/src/config/mock-data'
-import crypto from 'node:crypto'
 
 export async function triggerEnabledVanityUrls(sqs) {
-  const environments = Object.keys(environmentMappings)
-
   const eventType = 'enabled-urls'
-  const batch = environments.map((environment) => {
-    const enabledUrls = (vanityUrls[environment] ?? [])
-      .filter((v) => v.enabled)
-      .map((v) => {
-        return {
-          service: v.service,
-          url: v.url
-        }
-      })
+
+  const batch = Object.keys(environmentMappings).map((environment) => {
+    const enabledUrls = Object.entries(platformState[environment]).flatMap(
+      ([serviceName, data]) => {
+        const urls = data.tenant.urls || {}
+
+        return Object.entries(urls)
+          .filter(([, detail]) => detail.enabled)
+          .map(([url]) => ({
+            service: serviceName,
+            url
+          }))
+      }
+    )
+
     const payload = JSON.stringify(
       workflowEvent(eventType, {
         environment,
