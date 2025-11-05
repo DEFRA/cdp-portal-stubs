@@ -187,8 +187,10 @@ async function updateVanityUrl(inputs, workflowFile, request) {
     return
   }
 
-  changeShutterState(environment, service, url, shuttered)
-  await sendPlatformStatePayload(request.sqs, environment, 5)
+  setTimeout(() => {
+    changeShutterState(environment, service, url, shuttered)
+    sendPlatformStatePayload(request.sqs, environment)
+  }, 3000)
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
