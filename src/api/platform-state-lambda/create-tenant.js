@@ -207,7 +207,14 @@ function createTenantState(name, config, env) {
         name,
         url: `https://logs.${env}.defra.cloud/_dashboards/app/dashboards#/view/${name}`
       },
-      metrics: [],
+      metrics: [
+        {
+          url: `https://metrics.${env}.cdp-int.defra.cloud/d/cejsk22u6smpse/${name}`,
+          type: 'service',
+          uid: 'cejsk22u6smpse',
+          version: 6
+        }
+      ],
       alerts: [],
       nginx: config.type === 'Microservice' ? createNginx(name, env) : null,
       squid: {
