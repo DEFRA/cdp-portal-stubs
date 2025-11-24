@@ -16,7 +16,8 @@ const tokenController = {
 
     logger.info(JSON.stringify(request.payload))
     const clientId = request.payload.client_id
-    const clientSecret = request.payload.client_secret
+    const clientSecret =
+      request.payload.client_secret ?? request.payload.client_assertion
     const grantType = request.payload.grant_type
     const code = request.payload.code
     const refreshToken = request.payload.refresh_token
