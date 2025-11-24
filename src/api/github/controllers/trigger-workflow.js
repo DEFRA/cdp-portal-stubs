@@ -181,11 +181,41 @@ const handleCdpTenantConfigCreation = async (request) => {
 async function shutterUrl(request, shutter) {
   const inputs = request.payload.inputs
   const environment = inputs.environment
-  const service = inputs.service_name
+  const service = inputs.service_name ?? inputs.service
   const url = inputs.url
 
   setTimeout(() => {
     changeShutterState(environment, service, url, shutter)
+    sendPlatformStatePayload(request.sqs, environment)
+  }, 3000)
+}
+
+/**
+ *
+ * @param {{ service: string, url: string, environment: string }} inputs
+ * @param workflowFile
+ * @param request
+ */
+async function updateVanityUrl(inputs, workflowFile, request) {
+  const environment = inputs.environment
+  const service = inputs.service
+  const url = inputs.url
+
+  let shuttered
+  if (workflowFile === 'shuttering-add.yml') {
+    shuttered = true
+  } else if (workflowFile === 'shuttering-remove.yml') {
+    shuttered = false
+  } else {
+    request.logger.warn(
+      'Unknown workflow file for vanity URL update:',
+      workflowFile
+    )
+    return
+  }
+
+  setTimeout(() => {
+    changeShutterState(environment, service, url, shuttered)
     sendPlatformStatePayload(request.sqs, environment)
   }, 3000)
 }
@@ -204,9 +234,7 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
 
   switch (repo) {
     case 'cdp-tf-waf':
-      if (workflowFile === 'shuttering-add.yml') await shutterUrl(request, true)
-      if (workflowFile === 'shuttering-remove.yml')
-        await shutterUrl(request, false)
+      await updateVanityUrl(request.inputs, workflowFile, request)
       break
   }
 }
