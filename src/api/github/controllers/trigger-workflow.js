@@ -1,11 +1,7 @@
 import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
 import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
-import { triggerTenantServices } from '~/src/api/workflows/tenant-services/trigger-tenant-services'
 import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
 import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-cdp-app-config'
-import { triggerSquidProxy } from '~/src/api/workflows/cdp-squid-proxy/trigger-cdp-squid-proxy'
-import { triggerNginxUpstreams } from '~/src/api/workflows/cdp-nginx-upstreams/trigger-nginx-upstreams'
-import { triggerGrafanaSvc } from '~/src/api/workflows/cdp-grafana-svc/trigger-grafana-svc'
 import {
   changeShutterState,
   createTenant
@@ -18,10 +14,10 @@ import {
 const triggerWorkflow = {
   handler: async (request, h) => {
     const workflowRepo = request.params.repo
+
     switch (workflowRepo) {
       case 'cdp-tenant-config':
-        await handleNewCdpCreateWorkflows(request)
-        await handleCdpTenantConfigCreation(request)
+        await handleCdpTenantConfigWorkflows(request)
         break
       case 'cdp-create-workflows':
         await handleCdpCreateWorkflows(request)
@@ -37,6 +33,26 @@ const triggerWorkflow = {
     }
 
     return h.response({}).code(200)
+  }
+}
+
+const handleCdpTenantConfigWorkflows = async (request) => {
+  const workflowFile = request.params.workflow
+
+  switch (workflowFile) {
+    case 'create-service.yml':
+      await handleNewCdpCreateWorkflows(request)
+      await handleCdpTenantConfigCreation(request)
+      break
+    case 'create-shuttering.yml':
+      await shutterUrl(request, true)
+      break
+    case 'remove-shuttering.yml':
+      await shutterUrl(request, false)
+      break
+    case 'remove-service.yml':
+      // TODO: stub decommissioning
+      break
   }
 }
 
@@ -155,12 +171,23 @@ const handleCdpTenantConfigCreation = async (request) => {
 
   await handleNewCdpCreateWorkflows(request)
   await triggerCdpAppConfig(request.sqs, 2)
+}
 
-  // legacy handlers, remove once portal has moved over to new data see: CORE
-  await triggerTenantServices(request.sqs, 1)
-  await triggerSquidProxy(request.sqs, 3)
-  await triggerNginxUpstreams(request.sqs, 3)
-  await triggerGrafanaSvc(request.sqs, 4)
+/**
+ *
+ * @params {payload: {inputs: {service_name: string, environment: string, url: string}}} request
+ * @params {boolean} shutter
+ */
+async function shutterUrl(request, shutter) {
+  const inputs = request.payload.inputs
+  const environment = inputs.environment
+  const service = inputs.service_name ?? inputs.service
+  const url = inputs.url
+
+  setTimeout(() => {
+    changeShutterState(environment, service, url, shutter)
+    sendPlatformStatePayload(request.sqs, environment)
+  }, 3000)
 }
 
 /**
@@ -207,7 +234,7 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
 
   switch (repo) {
     case 'cdp-tf-waf':
-      await updateVanityUrl(inputs, workflowFile, request)
+      await updateVanityUrl(request.inputs, workflowFile, request)
       break
   }
 }

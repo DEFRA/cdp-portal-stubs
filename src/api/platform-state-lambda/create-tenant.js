@@ -303,7 +303,7 @@ function createECR(name) {
  * @param {string} env
  * @param {string} name
  * @param {string} url
- * @param {bool} shutterState
+ * @param {boolean} shutterState
  */
 function changeShutterState(env, name, url, shutterState) {
   if (!platformState[env][name]) {
