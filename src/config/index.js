@@ -143,7 +143,7 @@ const config = convict({
     env: 'OIDC_CLIENT_ID'
   },
   oidcClientSecret: {
-    doc: 'the client secret key for the oidc stub',
+    doc: 'the client secret key for the oidc stub (deprecated)',
     format: String,
     default: 'test_value',
     env: 'OIDC_CLIENT_SECRET'
@@ -165,6 +165,12 @@ const config = convict({
     format: Boolean,
     default: false,
     env: 'OIDC_SHOW_LOGIN'
+  },
+  oidcTTL: {
+    doc: 'how long the mock oidc tokens live for (seconds)',
+    format: Number,
+    default: 3600,
+    env: 'OIDC_TTL'
   },
   sqsTestRunsFromPortal: {
     doc: 'The queue hooked up to the test suite topic, would normally go to the lambda',

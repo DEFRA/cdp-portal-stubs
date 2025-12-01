@@ -22,7 +22,6 @@ const authorizeController = {
     const clientId = request.query.client_id
     const responseType = request.query.response_type
     const redirectUri = request.query.redirect_uri
-    const state = request.query.state
     const scope = request.query.scope
     const codeChallengeMethod = request.query.code_challenge_method
 
@@ -68,7 +67,6 @@ const authorizeController = {
 
     const location = new URL(redirectUri)
     location.searchParams.append('code', session.sessionId)
-    location.searchParams.append('state', state)
     return h.redirect(location.toString())
   }
 }

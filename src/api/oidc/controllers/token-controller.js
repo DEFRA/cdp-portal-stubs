@@ -17,6 +17,7 @@ const tokenController = {
     logger.info(JSON.stringify(request.payload))
     const clientId = request.payload.client_id
     const clientSecret = request.payload.client_secret
+    const clientAssertionType = request.payload.client_assertion_type
     const grantType = request.payload.grant_type
     const code = request.payload.code
     const refreshToken = request.payload.refresh_token
@@ -29,10 +30,19 @@ const tokenController = {
       return h.response(`Invalid client id ${clientId}`).code(401)
     }
 
-    // validate secret
-    if (clientSecret !== oidcConfig.clientSecret) {
-      logger.error(`Invalid client secret`)
-      return h.response(`Invalid client secret`).code(401)
+    // Federated credentials send client assertions instead of client secrets
+    if (
+      clientAssertionType ===
+      'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+    ) {
+      logger.info('Federated credential login')
+      // TODO: if we want to handle the invalid token flows we would need to actually check the value here
+    } else {
+      if (clientSecret !== oidcConfig.clientSecret) {
+        logger.info('Legacy OIDC login')
+        logger.error(`Invalid client secret`)
+        return h.response(`Invalid client secret`).code(401)
+      }
     }
 
     // get the session depending on the grant type
