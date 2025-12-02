@@ -67,6 +67,10 @@ const authorizeController = {
 
     const location = new URL(redirectUri)
     location.searchParams.append('code', session.sessionId)
+    if (request.query.state) {
+      location.searchParams.append('state', request.query.state)
+    }
+
     return h.redirect(location.toString())
   }
 }
