@@ -16,7 +16,7 @@ function newSession(scope, nonce, user, challenge, challengeMethod) {
   sessions[id] = {
     sessionId: id,
     scopes: scope.split(' '),
-    oidcNonce: nonce,
+    nonce,
     user,
     granted: false,
     codeChallenge: challenge,

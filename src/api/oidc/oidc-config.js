@@ -51,8 +51,8 @@ const oidcConfig = {
     'aud'
   ],
   codeChallengeMethodsSupported: ['plain', 'S256'],
-  ttl: 3600, // seconds
-  refreshTtl: 3600
+  ttl: config.get('oidcTTL'), // seconds
+  refreshTtl: config.get('oidcTTL')
 }
 
 export { oidcConfig, oidcBasePath }
