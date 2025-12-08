@@ -10,7 +10,7 @@ import {
 } from '~/src/api/github/controllers/commits'
 import { graphqlController } from '~/src/api/github/controllers/graphql'
 import { createPullRequest } from '~/src/api/github/controllers/pull-request'
-import { triggerWorkflow } from '~/src/api/github/controllers/trigger-workflow'
+import { dispatchWorkflow } from '~/src/api/github/controllers/dispatch-workflow'
 import { accessTokenController } from '~/src/api/github/controllers/access-token'
 import { postCreateBlobController } from '~/src/api/github/controllers/blobs'
 
@@ -77,7 +77,7 @@ const githubStub = {
         {
           method: 'POST',
           path: '/repos/{org}/{repo}/actions/workflows/{workflow}/dispatches',
-          ...triggerWorkflow
+          ...dispatchWorkflow
         },
         {
           method: 'POST',
