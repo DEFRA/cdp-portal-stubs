@@ -10,8 +10,16 @@ import {
   sendPlatformStatePayload,
   sendPlatformStatePayloadForAllEnvs
 } from '~/src/api/platform-state-lambda/send-platform-state-payload'
+import Joi from 'joi'
+import {
+  createTeamValidator,
+  removeTeamValidator,
+  updateTeamValidator
+} from '~/src/api/github/controllers/workflow-validators'
+import { teamsAndUsers } from '~/src/config/teams-and-users'
+import { triggerTeams } from '~/src/api/workflows/teams/trigger-teams'
 
-const triggerWorkflow = {
+const dispatchWorkflow = {
   handler: async (request, h) => {
     const workflowRepo = request.params.repo
 
@@ -52,6 +60,15 @@ const handleCdpTenantConfigWorkflows = async (request) => {
       break
     case 'remove-service.yml':
       // TODO: stub decommissioning
+      break
+    case 'create-team.yml':
+      handleCreateTeam(request)
+      break
+    case 'update-team.yml':
+      handleUpdateTeam(request)
+      break
+    case 'remove-team.yml':
+      handleDeleteTeam(request)
       break
   }
 }
@@ -239,4 +256,45 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
   }
 }
 
-export { triggerWorkflow }
+const handleCreateTeam = async (request) => {
+  const inputs = request.payload.inputs
+  request.logger.info(`Create Team ${JSON.stringify(inputs)}`)
+  Joi.assert(inputs, createTeamValidator)
+  if (!teamsAndUsers.teams.some((t) => t.team_id === inputs.team_id)) {
+    teamsAndUsers.teams.push(inputs)
+  }
+
+  await triggerTeams(request)
+}
+
+const handleUpdateTeam = async (request) => {
+  const inputs = request.payload.inputs
+  request.logger.info(`Update Team ${JSON.stringify(inputs)}`)
+  Joi.assert(inputs, updateTeamValidator)
+
+  const idx = teamsAndUsers.teams.findIndex((t) => t.team_id === inputs.team_id)
+
+  if (idx === -1) {
+    throw new Error(`Team ${inputs.team_id} not found`)
+  }
+
+  for (const key of Object.keys(inputs)) {
+    if (key === 'team_id') continue
+    teamsAndUsers.teams[idx][key] = inputs[key]
+  }
+
+  await triggerTeams(request)
+}
+
+const handleDeleteTeam = async (request) => {
+  const inputs = request.payload.inputs
+  request.logger.info(`Delete Team ${JSON.stringify(inputs)}`)
+  Joi.assert(inputs, removeTeamValidator)
+  teamsAndUsers.teams = teamsAndUsers.teams.filter(
+    (t) => t.team_id !== inputs.team_id
+  )
+
+  await triggerTeams(request)
+}
+
+export { dispatchWorkflow }
