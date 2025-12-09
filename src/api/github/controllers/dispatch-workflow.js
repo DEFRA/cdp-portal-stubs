@@ -264,7 +264,7 @@ const handleCreateTeam = async (request) => {
     teamsAndUsers.teams.push(inputs)
   }
 
-  await triggerTeams(request)
+  await triggerTeams(request.sqs)
 }
 
 const handleUpdateTeam = async (request) => {
@@ -283,7 +283,7 @@ const handleUpdateTeam = async (request) => {
     teamsAndUsers.teams[idx][key] = inputs[key]
   }
 
-  await triggerTeams(request)
+  await triggerTeams(request.sqs)
 }
 
 const handleDeleteTeam = async (request) => {
@@ -294,7 +294,7 @@ const handleDeleteTeam = async (request) => {
     (t) => t.team_id !== inputs.team_id
   )
 
-  await triggerTeams(request)
+  await triggerTeams(request.sqs)
 }
 
 export { dispatchWorkflow }
