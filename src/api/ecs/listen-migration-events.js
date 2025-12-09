@@ -18,8 +18,7 @@ export function migrationEventListener(server) {
     shouldDeleteMessages: true,
     handleMessage: async (message) => {
       try {
-        const payload = JSON.parse(message.Body)
-        await migrationHandler(server.sqs, payload)
+        await migrationHandler(server.sqs, message.Body)
         return message
       } catch (e) {
         server.logger.error(e, 'failed to process migration event')
