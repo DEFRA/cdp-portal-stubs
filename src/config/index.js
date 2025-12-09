@@ -227,7 +227,7 @@ const config = convict({
       delay: {
         doc: 'A delay before processing secrets and respond by a lambda',
         format: Number,
-        default: '3',
+        default: '1',
         env: 'SQS_SECRET_UPDATES_DELAY'
       }
     }

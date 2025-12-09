@@ -13,9 +13,16 @@ export const workflowsPlugin = {
     version: '1.0.0',
     register: async function (server) {
       if (config.get('sendGitHubWorkflowsOnStartup')) {
-        await triggerCdpAppConfig(server.sqs)
-        await populateECR(server.sqs)
-        await sendPlatformStatePayloadForAllEnvs(server.sqs)
+        server.ext({
+          type: 'onPostStart',
+          method: async function (server) {
+            return Promise.allSettled([
+              sendPlatformStatePayloadForAllEnvs(server.sqs),
+              populateECR(server.sqs),
+              triggerCdpAppConfig(server.sqs)
+            ])
+          }
+        })
       }
     }
   }

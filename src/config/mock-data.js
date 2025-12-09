@@ -247,72 +247,12 @@ const ecrRepos = {
   }
 }
 
-// @deprecated vanity urls are now managed via platform state
-const vanityUrls = {
-  management: [
-    {
-      service: 'cdp-portal-frontend',
-      url: 'portal.cdp-int.defra.cloud',
-      shuttered: false,
-      enabled: true
-    }
-  ],
-  'infra-dev': [
-    {
-      service: 'cdp-portal-frontend',
-      url: 'portal-test.cdp-int.defra.cloud',
-      shuttered: true,
-      enabled: true
-    }
-  ],
-  prod: [
-    {
-      service: 'cdp-portal-frontend',
-      url: 'portal.defra.gov',
-      shuttered: false,
-      enabled: false
-    }
-  ]
-}
-
-function squidProxy(environment) {
-  return {
-    environment,
-    default_domains: [`cdp.${environment}.defra.cloud`],
-    services: Object.keys(tenantServices).map((service) => ({
-      name: service,
-      allowed_domains: [`${service}.${environment}.defra.cloud`]
-    }))
-  }
-}
-
-function rdsDatabases() {
-  const services = Object.keys(tenantServices).filter(
-    (k) => tenantServices[k]?.rds_aurora_postgres
-  )
-  return services.map((service) => ({
-    service,
-    databaseName: service.replaceAll('-', '_'),
-    endpoint: `${service}.cluster-aabbccdd.eu-west-2.rds.amazonaws.com`,
-    readerEndpoint: `${service}.cluster-ro-aabbccdd.eu-west-2.rds.amazonaws.com`,
-    engine: 'aurora-postgresql',
-    engineVersion: '16.6',
-    port: 5432,
-    earliestRestorableTime: '2025-07-12T07:06:18.191000+00:00',
-    latestRestorableTime: '2025-08-11T15:06:08.796000+00:00',
-    backupRetentionPeriod: 30
-  }))
-}
-
 export {
   tenantServices,
   githubRepos,
   ecrRepos,
-  rdsDatabases,
   topicsTestSuite,
   topicsFrontendService,
   topicsBackendService,
-  topicsPerfTestSuite,
-  vanityUrls,
-  squidProxy
+  topicsPerfTestSuite
 }
