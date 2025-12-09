@@ -3,9 +3,11 @@ import { config } from '~/src/config'
 import { platformState } from '~/src/api/platform-state-lambda/platform-state'
 
 async function sendPlatformStatePayloadForAllEnvs(sqs) {
-  for (const environment of Object.keys(platformState)) {
-    await sendPlatformStatePayload(sqs, environment)
-  }
+  return Promise.all(
+    Object.keys(platformState).map((environment) =>
+      sendPlatformStatePayload(sqs, environment)
+    )
+  )
 }
 
 function sendPlatformStatePayload(sqs, environment, delay = 1) {
