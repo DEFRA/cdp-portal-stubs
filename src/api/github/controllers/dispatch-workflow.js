@@ -62,13 +62,13 @@ const handleCdpTenantConfigWorkflows = async (request) => {
       // TODO: stub decommissioning
       break
     case 'create-team.yml':
-      handleCreateTeam(request)
+      await handleCreateTeam(request)
       break
     case 'update-team.yml':
-      handleUpdateTeam(request)
+      await handleUpdateTeam(request)
       break
     case 'remove-team.yml':
-      handleDeleteTeam(request)
+      await handleDeleteTeam(request)
       break
   }
 }
@@ -251,7 +251,7 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
 
   switch (repo) {
     case 'cdp-tf-waf':
-      await updateVanityUrl(request.inputs, workflowFile, request)
+      await updateVanityUrl(inputs, workflowFile, request)
       break
   }
 }

@@ -5,39 +5,16 @@
 const teamsAndUsers = {
   teams: [
     {
-      team_id: 'cdp-platform',
-      name: 'Platform-Team',
-      description: 'CDP Platform Team',
-      github: 'cdp-platform',
-      service_code: 'CDP'
+      team_id: 'platform',
+      name: 'Platform',
+      description: 'The team that runs the platform',
+      github: 'cdp-platform'
     },
     {
-      team_id: 'cdp-test-1',
-      name: 'Test-1',
-      description: 'CDP Test 1 Team',
-      github: 'cdp-test-1',
-      service_code: 'TSA'
-    },
-    {
-      team_id: 'cdp-test-2',
-      name: 'Test-2',
-      description: 'CDP Test 2 Team',
-      github: 'cdp-test-2',
-      service_code: 'TSB'
-    },
-    {
-      team_id: 'cdp-test-3',
-      name: 'Test-3',
-      description: 'Example CDP Test 3 Team',
-      github: 'cdp-test-3',
-      service_code: 'TSC'
-    },
-    {
-      team_id: 'cdp-tenant-1',
-      name: 'Tenant-1',
-      description: 'CDP Tenant Team 1',
-      github: 'cdp-tenant-1',
-      service_code: 'TNT'
+      team_id: 'tenantteam1',
+      name: 'TenantTeam1',
+      description: 'A test team',
+      github: 'cdp-tenant-1'
     }
   ],
   users: []
