@@ -208,7 +208,12 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/lambda-events',
     env: 'SQS_LAMBDA_EVENTS'
   },
-
+  sqsLambdaEventsDelaySeconds: {
+    doc: 'Platform state events delay seconds',
+    format: Number,
+    default: 30,
+    env: 'SQS_LAMBDA_EVENTS_DELAY_SECONDS'
+  },
   lambda: {
     secretsUpdates: {
       queueIn: {

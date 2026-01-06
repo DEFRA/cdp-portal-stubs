@@ -41,9 +41,14 @@ export const typeDefs = `
   scalar GitObjectID
   scalar Base64String
 
+  type NamedRepository {
+    repo: Repository
+  }
+
   type Query {
     user(login: String!): User
     organization(login: String!): Organization
+    repository(owner: String, name: String!): Repository
   }
 
   type UserConnection {

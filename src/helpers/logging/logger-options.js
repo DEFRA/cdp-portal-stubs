@@ -5,7 +5,14 @@ import { config } from '~/src/config'
 const loggerOptions = {
   enabled: true, // !config.get('isTest'),
   redact: {
-    paths: ['req.headers.authorization', 'req.headers.cookie', 'res.headers'],
+    paths: [
+      'req',
+      'res',
+      'responseTime',
+      'req.headers.authorization',
+      'req.headers.cookie',
+      'res.headers'
+    ],
     remove: true
   },
   level: config.get('logLevel'),

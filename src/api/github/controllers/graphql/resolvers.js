@@ -44,7 +44,26 @@ export const resolvers = {
 
   Query: {
     user: (_, { login }) => ({ login }),
-    organization: (_, { login }) => ({ login })
+    organization: (_, { login }) => ({ login }),
+
+    repository: (_, { name }) => {
+      const repo = githubRepos.find((r) => r.name === name)
+      return (
+        repo && {
+          name: repo.name,
+          description: '',
+          primaryLanguage: { name: 'JavaScript' },
+          url: `https://github.com/DEFRA/${repo.name}`,
+          isArchived: false,
+          isTemplate: false,
+          isPrivate: false,
+          createdAt: repo.createdAt,
+          repositoryTopics: {
+            nodes: repo.topics
+          }
+        }
+      )
+    }
   },
 
   User: {

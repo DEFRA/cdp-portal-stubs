@@ -10,7 +10,11 @@ async function sendPlatformStatePayloadForAllEnvs(sqs) {
   )
 }
 
-function sendPlatformStatePayload(sqs, environment, delay = 1) {
+function sendPlatformStatePayload(
+  sqs,
+  environment,
+  delay = config.get('sqsLambdaEventsDelaySeconds')
+) {
   // payload for environment
   const payload = {
     created: new Date().toISOString(),
