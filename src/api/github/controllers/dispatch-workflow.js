@@ -118,17 +118,19 @@ const handleCdpCreateWorkflows = async (request) => {
         break
     }
 
-    await populateEcrRepo(request.sqs, repositoryName, 0)
+    if (workflowFile !== 'create_repository.yml') {
+      await populateEcrRepo(request.sqs, repositoryName, 0)
 
-    await triggerWorkflowStatus(
-      request.sqs,
-      'cdp-create-workflows',
-      workflowFile,
-      repositoryName,
-      'completed',
-      'success',
-      1
-    )
+      await triggerWorkflowStatus(
+        request.sqs,
+        'cdp-create-workflows',
+        workflowFile,
+        repositoryName,
+        'completed',
+        'success',
+        1
+      )
+    }
   }
 }
 
@@ -151,14 +153,16 @@ const handleNewCdpCreateWorkflows = async (request) => {
       createdAt: new Date().toISOString()
     })
 
-    if (ecrRepos[repositoryName] === undefined) {
-      ecrRepos[repositoryName] = {
-        tags: ['0.1.0', '0.2.0', '0.3.0'],
-        runMode: 'job'
+    if (workflowFile !== 'create_repository.yml') {
+      if (ecrRepos[repositoryName] === undefined) {
+        ecrRepos[repositoryName] = {
+          tags: ['0.1.0', '0.2.0', '0.3.0'],
+          runMode: 'job'
+        }
       }
-    }
 
-    await populateEcrRepo(request.sqs, repositoryName, 0)
+      await populateEcrRepo(request.sqs, repositoryName, 0)
+    }
   }
 }
 
@@ -203,7 +207,7 @@ async function shutterUrl(request, shutter) {
 
   setTimeout(() => {
     changeShutterState(environment, service, url, shutter)
-    sendPlatformStatePayload(request.sqs, environment)
+    sendPlatformStatePayload(request.sqs, environment, 1)
   }, 3000)
 }
 
@@ -233,7 +237,7 @@ async function updateVanityUrl(inputs, workflowFile, request) {
 
   setTimeout(() => {
     changeShutterState(environment, service, url, shuttered)
-    sendPlatformStatePayload(request.sqs, environment)
+    sendPlatformStatePayload(request.sqs, environment, 1)
   }, 3000)
 }
 
