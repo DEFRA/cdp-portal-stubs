@@ -35,7 +35,7 @@ function sendPlatformStatePayload(
     encoding: null,
     compression: null,
     payload_version:
-      '30373081fb1c41bd28d8ad8f22bd26c87bc4714b039361478af40dce08cc6b0d',
+      '6cad79f4e908b3df3ffc71fe58369bd22a5ece2174cbee5c6c73ede079e2689a',
     payload
   }
 
