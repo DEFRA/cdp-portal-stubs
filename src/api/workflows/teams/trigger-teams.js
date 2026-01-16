@@ -5,7 +5,7 @@ import {
 
 import { teamsAndUsers } from '~/src/config/teams-and-users'
 
-export async function triggerTeams(sqs, delay = 1) {
+export async function triggerTeams(sqs, delay = 0) {
   const payload = JSON.stringify(
     workflowEvent('teams', {
       teams: teamsAndUsers.teams
