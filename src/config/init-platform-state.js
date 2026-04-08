@@ -24,21 +24,24 @@ const defaultEntities = [
         shuttered: false,
         enabled: false,
         type: 'vanity',
-        env: 'management'
+        env: 'management',
+        delegated: true
       },
       {
         url: 'portal-test.cdp-int.defra.cloud',
         shuttered: true,
         enabled: false,
         type: 'vanity',
-        env: 'infra-dev'
+        env: 'infra-dev',
+        delegated: true
       },
       {
         url: 'portal.defra.gov.uk',
         shuttered: false,
         enabled: true,
         type: 'vanity',
-        env: 'prod'
+        env: 'prod',
+        delegated: true
       }
     ]
   },
@@ -89,14 +92,16 @@ const defaultEntities = [
         shuttered: false,
         enabled: false,
         type: 'vanity',
-        env: 'ext-test'
+        env: 'ext-test',
+        delegated: true
       },
       {
         url: 'portal-backend.defra.gov.uk',
         shuttered: false,
         enabled: true,
         type: 'vanity',
-        env: 'management'
+        env: 'management',
+        delegated: true
       }
     ]
   },
@@ -142,14 +147,16 @@ const defaultEntities = [
         shuttered: false,
         enabled: false,
         type: 'internal',
-        env: 'ext-test'
+        env: 'ext-test',
+        delegated: true
       },
       {
         url: 'tenant-backend.api.defra.gov.uk',
         shuttered: false,
         enabled: true,
         type: 'vanity',
-        env: 'prod'
+        env: 'prod',
+        delegated: true
       }
     ]
   },

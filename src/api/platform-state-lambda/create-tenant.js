@@ -48,7 +48,8 @@ function addUrl(name, urlConfig) {
     [urlConfig.url]: {
       type: urlConfig.type,
       enabled: urlConfig.enabled,
-      shuttered: urlConfig.shuttered
+      shuttered: urlConfig.shuttered,
+      delegated: true
     }
   }
 

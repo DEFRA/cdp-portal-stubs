@@ -35,7 +35,7 @@ async function sendDeploymentMessages(deploymentFile) {
     context.awsAccount,
     new Date(),
     context.lambdaId,
-    'SERVICE_DEPLOYMENT_COMPLETED',
+    'SERVICE_DEPLOYMENT_FAILED',
     `ECS deployment ${context.lambdaId} completed.`
   )
   await send(deployStatusChangeEvent, 5)
