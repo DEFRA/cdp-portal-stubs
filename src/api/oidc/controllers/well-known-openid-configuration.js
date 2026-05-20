@@ -20,7 +20,7 @@ const generateConfig = (host) => {
     token_endpoint_auth_methods_supported:
       oidcConfig.tokenEndpointAuthMethodsSupported,
     claims_supported: oidcConfig.claimsSupported,
-    code_challenge_methods_supported: oidcConfig.claimsSupported
+    code_challenge_methods_supported: oidcConfig.codeChallengeMethodsSupported
   }
 }
 
