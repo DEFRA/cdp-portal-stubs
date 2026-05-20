@@ -15,7 +15,7 @@ function defaultClaims(session, ttl, host) {
     azpacr: 1, // more azure stuff?
     groups: session.user.teams,
     name: session.user.username,
-    preferred_username: session.user.email,
+    preferred_username: session.user.email ?? session.user.preferred_username,
     oid: session.user.id, // should this be user id or a unique one
     upn: session.user.email,
     uti: 'E_C59uEkm0ZORgAi0cAA', // Token identifier claim, unique, per-token identifier that is case-sensitive
