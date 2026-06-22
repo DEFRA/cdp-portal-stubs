@@ -58,7 +58,7 @@ async function deploy(deployment) {
   if (ecs[environment][service]) {
     const oldDeployment = ecs[environment][service]
     logger.info(
-      `undeploying ${oldDeployment.deploymentId} ${oldDeployment.lambdaId}, ${oldDeployment.service.name}`
+      `undeploying ${oldDeployment.deploymentId} ${oldDeployment.lambdaId}, ${service}`
     )
     await sendUndeployMessages(oldDeployment)
   }
