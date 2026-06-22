@@ -22,8 +22,11 @@ function testRunEventListener(server) {
         await testRunHandler(server.sqs, payload)
         return message
       } catch (e) {
-        server.logger.error(e, 'Failed to process test run message')
-        return {}
+        server.logger.error(
+          e,
+          `Failed to process test run message: ${message.Body}`
+        )
+        return message
       }
     },
     sqs

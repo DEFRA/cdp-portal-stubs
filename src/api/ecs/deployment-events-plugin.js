@@ -1,5 +1,6 @@
 import { testRunEventListener } from '~/src/api/ecs/listen-testrun-events'
 import { migrationEventListener } from '~/src/api/ecs/listen-migration-events'
+import { deploymentEventListener } from '~/src/api/ecs/listen-deployment-events'
 
 const deploymentEventsPlugin = {
   plugin: {
@@ -8,6 +9,7 @@ const deploymentEventsPlugin = {
     register: function (server) {
       testRunEventListener(server)
       migrationEventListener(server)
+      deploymentEventListener(server)
     }
   }
 }
