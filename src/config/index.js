@@ -178,6 +178,12 @@ const config = convict({
     default: 'http://127.0.0.1:4566/000000000000/run-test-from-portal',
     env: 'SQS_TEST_RUNS_FROM_PORTAL'
   },
+  sqsDeploymentsFromPortal: {
+    doc: 'The queue hooked up to the deployment topic, would normally go to the lambda',
+    format: String,
+    default: 'http://127.0.0.1:4566/000000000000/deployments-from-portal',
+    env: 'SQS_DEPLOYMENTS_FROM_PORTAL'
+  },
   sqsMigrationsFromPortal: {
     doc: 'The queue hooked up to the migration suite topic, would normally go to the lambda',
     format: String,
@@ -250,6 +256,12 @@ const config = convict({
       default: 'http://127.0.0.1:4566/000000000000/stub-slack-messages',
       env: 'SQS_STUB_SLACK_MESSAGES'
     }
+  },
+  directDeployments: {
+    doc: 'Enable direct deployments via the lambda for specific environments (comma separated)',
+    format: String,
+    default: '',
+    env: 'DIRECT_DEPLOYMENTS'
   }
 })
 

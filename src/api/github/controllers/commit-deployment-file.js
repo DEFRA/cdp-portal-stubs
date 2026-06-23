@@ -2,6 +2,7 @@ import { createLogger } from '~/src/helpers/logging/logger'
 import { deploy } from '~/src/api/ecs/ecs-simulator'
 import { environmentMappings } from '~/src/config/environments'
 import Joi from 'joi'
+import { config } from '~/src/config'
 
 const logger = createLogger()
 
@@ -24,6 +25,14 @@ async function handleFile(file) {
     const decodedContent = Buffer.from(file.contents, 'base64').toString('utf8')
     const deployment = JSON.parse(decodedContent)
     Joi.assert(deployment, deploymentSchema)
+
+    const allowedEnvs = config.get('directDeployments')
+    if ((allowedEnvs ?? []).includes(deployment?.cluster?.environment)) {
+      logger.info(
+        `skipping github deployment for ${deployment?.cluster?.environment}, disabeld via directDeployments`
+      )
+      return
+    }
 
     await deploy(deployment)
   } catch (error) {

@@ -1,5 +1,4 @@
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import { environmentMappings } from '~/src/config/environments'
 import { config } from '~/src/config'
 
 import { ecsDeploymentEvent } from '~/src/api/ecs/payloads/ecs-deployment-event'
@@ -7,10 +6,12 @@ import { lambdaDeploymentUpdate } from '~/src/api/ecs/payloads/lambda-deployment
 import { ecsDeployStatusChangeEvent } from '~/src/api/ecs/payloads/ecs-deploy-status-change-event'
 import { sqsClient } from '~/src/helpers/sqs'
 
-async function sendDeploymentMessages(deploymentFile) {
-  const context = extractDeploymentContext(deploymentFile)
-
-  // Lambda update
+/**
+ *
+ * @param {{ deploymentId: string, image: string, version: string, taskId: string, lambdaId: string, taskArns: string[], zone: string, awsAccount: string }} context
+ * @return {Promise<void>}
+ */
+async function sendDeploymentMessages(context) {
   const lambdaUpdated = lambdaDeploymentUpdate(
     context.awsAccount,
     context.zone,
@@ -41,34 +42,13 @@ async function sendDeploymentMessages(deploymentFile) {
   await send(deployStatusChangeEvent, 5)
 }
 
-async function sendUndeployMessages(deploymentFile, undeploy = false) {
-  const context = extractDeploymentContext(deploymentFile)
-
+async function sendUndeployMessages(context, undeploy = false) {
   const flow = [
     { status: 'STOPPING', desiredStatus: 'STOPPED', delay: 1 },
     { status: 'STOPPED', desiredStatus: 'STOPPED', delay: 2 }
   ]
 
   await sendDeploymentEvents(context, flow)
-}
-
-function extractDeploymentContext(deploymentFile) {
-  const deploymentId = deploymentFile.deploymentId
-  const { image, version } = deploymentFile.service
-  const { taskId, lambdaId, taskArns } = deploymentFile.ecsData
-  const { environment, zone } = deploymentFile.cluster
-  const awsAccount = environmentMappings[environment]
-
-  return {
-    deploymentId,
-    image,
-    version,
-    taskId,
-    lambdaId,
-    taskArns,
-    zone,
-    awsAccount
-  }
 }
 
 async function sendDeploymentEvents(ctx, flow) {
