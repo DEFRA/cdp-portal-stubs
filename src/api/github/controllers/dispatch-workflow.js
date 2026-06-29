@@ -18,14 +18,19 @@ import {
 } from '~/src/api/github/controllers/workflow-validators'
 import { teamsAndUsers } from '~/src/config/teams-and-users'
 import { triggerTeams } from '~/src/api/workflows/teams/trigger-teams'
+import {
+  sendWorkflowEventsBatchMessage,
+  workflowEvent
+} from '~/src/api/workflows/helpers/workflow-event'
 
 const dispatchWorkflow = {
   handler: async (request, h) => {
     const workflowRepo = request.params.repo
+    let dispatchResponse = {}
 
     switch (workflowRepo) {
       case 'cdp-tenant-config':
-        await handleCdpTenantConfigWorkflows(request)
+        dispatchResponse = await handleCdpTenantConfigWorkflows(request)
         break
       case 'cdp-create-workflows':
         await handleCdpCreateWorkflows(request)
@@ -40,12 +45,18 @@ const dispatchWorkflow = {
           .code(400)
     }
 
-    return h.response({}).code(200)
+    return h.response(dispatchResponse).code(200)
   }
 }
 
 const handleCdpTenantConfigWorkflows = async (request) => {
   const workflowFile = request.params.workflow
+  const workflowRunId = 123456789
+  const workflowResponse = {
+    workflow_run_id: workflowRunId,
+    run_url: `https://api.github.com/repos/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`,
+    html_url: `https://github.com/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`
+  }
 
   switch (workflowFile) {
     case 'create-service.yml':
@@ -70,7 +81,39 @@ const handleCdpTenantConfigWorkflows = async (request) => {
     case 'remove-team.yml':
       await handleDeleteTeam(request)
       break
+    case 'generic-cdp-cli-workflow.yml':
+      await handleGenericCdpCliWorkflow(request, workflowRunId)
+      break
   }
+
+  return workflowResponse
+}
+
+const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
+  const inputs = request.payload.inputs ?? {}
+  const runId = inputs.run_id ?? 'stub-run-id'
+  const branch = inputs.use_branch ?? ''
+
+  if (!branch) return
+
+  const prNumber = 99
+  const prUrl = `https://github.com/DEFRA/cdp-tenant-config/pull/${prNumber}`
+  const event = workflowEvent('resource-request-pr', {
+    runId,
+    workflowRunId: String(workflowRunId),
+    workflowRunUrl: `https://github.com/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`,
+    repository: 'DEFRA/cdp-tenant-config',
+    branch,
+    prUrl,
+    prNumber
+  })
+
+  await sendWorkflowEventsBatchMessage(
+    [{ Id: crypto.randomUUID(), MessageBody: JSON.stringify(event) }],
+    'resource-request-pr',
+    request.sqs,
+    1
+  )
 }
 
 const handleCdpCreateWorkflows = async (request) => {
