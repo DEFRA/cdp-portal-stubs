@@ -251,7 +251,7 @@ const config = convict({
   },
   slack: {
     queue: {
-      doc: 'Queue attached to the slack lambda topic',
+      doc: 'Queue attached to the mono-lambda Slack notification topic',
       format: String,
       default: 'http://127.0.0.1:4566/000000000000/stub-slack-messages',
       env: 'SQS_STUB_SLACK_MESSAGES'

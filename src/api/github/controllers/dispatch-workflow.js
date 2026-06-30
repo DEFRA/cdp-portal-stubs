@@ -51,7 +51,7 @@ const dispatchWorkflow = {
 
 const handleCdpTenantConfigWorkflows = async (request) => {
   const workflowFile = request.params.workflow
-  const workflowRunId = 123456789
+  const workflowRunId = Date.now()
   const workflowResponse = {
     workflow_run_id: workflowRunId,
     run_url: `https://api.github.com/repos/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`,
