@@ -6,7 +6,7 @@ const { config } = require('~/src/config')
 function slackListener(server) {
   const queueUrl = config.get('slack.queue')
 
-  server.logger.info(`Listening for secrets updates events on ${queueUrl}`)
+  server.logger.info(`Listening for Slack notification events on ${queueUrl}`)
 
   const sqs = server.sqs
   const listener = Consumer.create({

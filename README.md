@@ -12,6 +12,7 @@ A set of stubs for mocking calls to Github, Aws and Microsoft OIDC for the cdp-p
     - [Redis](#redis)
     - [Localstack](#localstack)
       - [Create queues](#create-queues)
+      - [Slack notifications via mono-lambda](#slack-notifications-via-mono-lambda)
     - [Start cdp-portal-stubs](#start-cdp-portal-stubs)
     - [start cdp-portal-backend](#start-cdp-portal-backend)
     - [start cdp-self-service-ops](#start-cdp-self-service-ops)
@@ -78,11 +79,14 @@ docker run -d -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack:latest
 
 #### Create queues
 
+Run this whole block after starting LocalStack. It creates the queues and topics used by the local stubbed portal stack.
+
 ```bash
 awslocal sqs create-queue --queue-name ecr-push-deployments --region eu-west-2
 awslocal sqs create-queue --queue-name ecs-deployments --region eu-west-2
 awslocal sqs create-queue --queue-name ecr-push-events --region eu-west-2
 awslocal sqs create-queue --queue-name github-events --region eu-west-2
+awslocal sqs create-queue --queue-name cdp_workflow_events --region eu-west-2
 awslocal sqs create-queue --queue-name run-test-from-portal
 awslocal sns create-topic --name run-test-topic
 awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:run-test-topic --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:run-test-from-portal
@@ -91,6 +95,71 @@ awslocal sqs create-queue --queue-name secret_management_updates
 awslocal sqs create-queue --queue-name secret_management_updates_lambda
 awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:secret_management --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:secret_management_updates
 awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:secret_management --protocol sqs --notification-endpoint  arn:aws:sqs:eu-west-2:000000000000:secret_management_updates_lambda
+awslocal sns create-topic --name mono-lambda-local-trigger-topic.fifo --attributes FifoTopic=true,ContentBasedDeduplication=true --region eu-west-2
+awslocal sqs create-queue --queue-name stub-slack-messages --region eu-west-2
+awslocal sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:mono-lambda-local-trigger-topic.fifo --protocol sqs --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:stub-slack-messages --region eu-west-2
+```
+
+#### Slack notifications via mono-lambda
+
+The `cdp-portal-backend` `Stubbed` launch profile publishes Slack notifications to the local mono-lambda SNS topic:
+
+```bash
+LambdaEvents__TopicArn=arn:aws:sns:eu-west-2:000000000000:mono-lambda-local-trigger-topic.fifo
+TenantResourceRequested__SlackChannel=cdp-localhost-slack
+```
+
+The LocalStack setup above must include these resources:
+
+```bash
+awslocal sns create-topic \
+  --name mono-lambda-local-trigger-topic.fifo \
+  --attributes FifoTopic=true,ContentBasedDeduplication=true \
+  --region eu-west-2
+
+awslocal sqs create-queue \
+  --queue-name stub-slack-messages \
+  --region eu-west-2
+
+awslocal sns subscribe \
+  --topic-arn arn:aws:sns:eu-west-2:000000000000:mono-lambda-local-trigger-topic.fifo \
+  --protocol sqs \
+  --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:stub-slack-messages \
+  --region eu-west-2
+```
+
+`cdp-portal-stubs` listens to `stub-slack-messages` by default:
+
+```bash
+SQS_STUB_SLACK_MESSAGES=http://127.0.0.1:4566/000000000000/stub-slack-messages
+```
+
+To check a resource request triggered a Slack notification, clear any old messages, create the resource in the portal, then list captured Slack notifications:
+
+```bash
+curl -X DELETE http://localhost:3939/_admin/slack
+curl http://localhost:3939/_admin/slack | jq
+```
+
+The backend log should include:
+
+```text
+Publishing Slack notification via mono-lambda for channel "cdp-localhost-slack"
+Triggered MonoLambda event, environment:"management" of type "send_slack_notification" ... status: OK
+```
+
+The captured Slack message should contain:
+
+```json
+{
+  "event_type": "send_slack_notification",
+  "payload": {
+    "team": "platform",
+    "message": {
+      "channel": "cdp-localhost-slack"
+    }
+  }
+}
 ```
 
 ### Setup cdp-portal-stubs
@@ -127,6 +196,13 @@ Run in stubbed mode
 
 ```bash
 dotnet run --project Defra.Cdp.Backend.Api --launch-profile Stubbed
+```
+
+The `Stubbed` launch profile is expected to match the LocalStack setup above. In particular, it sets:
+
+```bash
+LambdaEvents__TopicArn=arn:aws:sns:eu-west-2:000000000000:mono-lambda-local-trigger-topic.fifo
+TenantResourceRequested__SlackChannel=cdp-localhost-slack
 ```
 
 ### Start cdp-self-service-ops

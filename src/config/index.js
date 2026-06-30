@@ -251,7 +251,7 @@ const config = convict({
   },
   slack: {
     queue: {
-      doc: 'Queue attached to the slack lambda topic',
+      doc: 'Queue attached to the mono-lambda Slack notification topic',
       format: String,
       default: 'http://127.0.0.1:4566/000000000000/stub-slack-messages',
       env: 'SQS_STUB_SLACK_MESSAGES'
@@ -262,6 +262,13 @@ const config = convict({
     format: String,
     default: '',
     env: 'DIRECT_DEPLOYMENTS'
+  },
+  workflowRunId: {
+    doc: 'Optional fixed workflow run id for tenant-config workflow dispatch stubs',
+    format: Number,
+    nullable: true,
+    default: null,
+    env: 'WORKFLOW_RUN_ID'
   }
 })
 

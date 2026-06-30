@@ -22,6 +22,7 @@ import {
   sendWorkflowEventsBatchMessage,
   workflowEvent
 } from '~/src/api/workflows/helpers/workflow-event'
+import { config } from '~/src/config'
 
 const dispatchWorkflow = {
   handler: async (request, h) => {
@@ -51,7 +52,7 @@ const dispatchWorkflow = {
 
 const handleCdpTenantConfigWorkflows = async (request) => {
   const workflowFile = request.params.workflow
-  const workflowRunId = 123456789
+  const workflowRunId = config.get('workflowRunId') ?? Date.now()
   const workflowResponse = {
     workflow_run_id: workflowRunId,
     run_url: `https://api.github.com/repos/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`,
