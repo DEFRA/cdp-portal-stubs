@@ -17,22 +17,22 @@ function secretsUpdatesListener(server) {
     visibilityTimeout: 20,
     handleMessage: async (message) => {
       const payload = JSON.parse(message.Body)
-      await secretsUpdatesHandler(server.sqs, payload)
+      await secretsUpdatesHandler(server, payload)
       return message
     },
     sqs
   })
 
   listener.on('error', (error) => {
-    server.logger.error(error.message)
+    server.logger.error(error, 'secretsUpdatesListener')
   })
 
   listener.on('processing_error', (error) => {
-    server.logger.error(error.message)
+    server.logger.error(error, 'processing_error')
   })
 
   listener.on('timeout_error', (error) => {
-    server.logger.error(error.message)
+    server.logger.error('timeout_error', error)
   })
 
   listener.start()
