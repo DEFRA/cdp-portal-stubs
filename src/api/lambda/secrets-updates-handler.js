@@ -7,7 +7,8 @@ const logger = createLogger()
 const secretsUpdatedDelay = config.get('lambda.secretsUpdates.delay')
 const secretsOutgoing = config.get('lambda.secretsUpdates.queueOut')
 
-async function secretsUpdatesHandler(sqs, payload) {
+async function secretsUpdatesHandler(server, payload, attr) {
+  const sqs = server.sqs
   logger.debug({ payload }, 'Secrets update received')
   if (!payload?.Message) {
     logger.info('No secret message payload found')
