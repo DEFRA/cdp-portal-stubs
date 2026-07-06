@@ -221,6 +221,14 @@ const config = convict({
     env: 'SQS_LAMBDA_EVENTS_DELAY_SECONDS'
   },
   lambda: {
+    monolambda: {
+      queueIn: {
+        doc: 'A queue bound to a sns that receives monolambda trigger calls on',
+        format: String,
+        default: 'http://127.0.0.1:4566/000000000000/monolambda',
+        env: 'SQS_MONOLAMBDA'
+      }
+    },
     secretsUpdates: {
       queueIn: {
         doc: 'A queue that normally receives messages from self service ops',

@@ -13,6 +13,7 @@ import { workflowsPlugin } from '~/src/api/workflows/workflows'
 import { slackPlugin } from '~/src/api/slack/slack-plugin'
 import { mongoDb } from '~/src/helpers/mongodb'
 import { initPlatformState } from '~/src/config/init-platform-state'
+import { monolambdaPlugin } from '~/src/api/lambda/monolambda/monolambda-listener'
 
 async function createServer() {
   const server = hapi.server({
@@ -49,6 +50,7 @@ async function createServer() {
   await server.register(deploymentEventsPlugin)
   await server.register(secretsUpdatesPlugin)
   await server.register(slackPlugin)
+  await server.register(monolambdaPlugin)
   await server.register(workflowsPlugin)
 
   return server
