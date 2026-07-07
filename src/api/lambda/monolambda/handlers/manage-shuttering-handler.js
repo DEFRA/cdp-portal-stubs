@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { platformState } from '~/src/api/platform-state-lambda/platform-state'
+import { changeShutterState } from '~/src/api/platform-state-lambda/create-tenant'
 import { sendPlatformStatePayload } from '~/src/api/platform-state-lambda/send-platform-state-payload'
 
 const schema = Joi.object({
@@ -21,19 +21,21 @@ export async function manageShutteringHandler(server, payload, attr = {}) {
     throw new Error('manageShutteringHandler Missing environment attr')
   }
 
-  // update the platform state field(s) and send platform status
-  if (
-    platformState[environment] &&
-    platformState[environment][service] &&
-    platformState[environment][service]?.urls[payload.fqdn]
-  ) {
+  try {
+    changeShutterState(
+      environment,
+      service,
+      payload.fqdn,
+      payload.action === 'shutter'
+    )
     server.logger.info(
       `shuttering ${service} url ${payload.fqdn} in ${environment}`
     )
-    platformState[environment][service].urls[payload.fqdn].shuttered =
-      payload.action === 'shutter'
-  } else {
-    server.logger.warn('Unable to find service for shutter payload:', payload)
+  } catch (err) {
+    server.logger.warn(
+      { err, payload },
+      'Unable to find service for shutter payload'
+    )
   }
 
   // simulate cdp-tenant-config being updated
