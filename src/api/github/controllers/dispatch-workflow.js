@@ -37,6 +37,7 @@ const dispatchWorkflow = {
         await handleCdpCreateWorkflows(request)
         break
       case 'cdp-app-deployments':
+      case 'cdp-grafana-modules':
       case 'cdp-tf-waf':
         await handleGenericWorkflows(request)
         break
