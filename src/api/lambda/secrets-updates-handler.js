@@ -73,7 +73,7 @@ async function addSecret({
   const body = {
     environment,
     add_secret: addSecret,
-    secret: `cdp/services/${service}`,
+    secret: service,
     secret_key: secretKey,
     exception
   }
@@ -90,7 +90,7 @@ async function removeSecretByKey({
   const body = {
     environment,
     remove_secret_by_key: true,
-    secret: `cdp/services/${service}`,
+    secret: service,
     secret_key: secretKey,
     exception
   }
