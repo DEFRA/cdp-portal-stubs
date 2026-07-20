@@ -167,7 +167,7 @@ The captured Slack message should contain:
 `generic-cdp-cli-workflow.yml` dispatches from portal can now simulate failure as well as success.
 
 - Normal resource names follow the happy path and emit `resource-request-pr`.
-- If any generated CDP CLI command contains `BLOWUP` (for example, an S3 bucket name of `BLOWUP`), stubs emit `resource-request-failed` instead.
+- If any generated CDP CLI command contains `blowup` (for example, an S3 bucket name of `blowup`), stubs emit `resource-request-failed` instead.
 
 This allows local end-to-end testing of both paths without changing code between runs.
 
