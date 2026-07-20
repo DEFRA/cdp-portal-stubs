@@ -95,8 +95,28 @@ const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
   const inputs = request.payload.inputs ?? {}
   const runId = inputs.run_id ?? 'stub-run-id'
   const branch = inputs.use_branch ?? ''
+  const commands = parseCommands(inputs.commands)
+  const shouldFail = commands.some((command) =>
+    command.toUpperCase().includes('BLOWUP')
+  )
 
   if (!branch) return
+
+  if (shouldFail) {
+    const event = workflowEvent('resource-request-failed', {
+      runId,
+      workflowRunId: String(workflowRunId),
+      workflowRunUrl: `https://github.com/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`
+    })
+
+    await sendWorkflowEventsBatchMessage(
+      [{ Id: crypto.randomUUID(), MessageBody: JSON.stringify(event) }],
+      'resource-request-failed',
+      request.sqs,
+      1
+    )
+    return
+  }
 
   const prNumber = 99
   const prUrl = `https://github.com/DEFRA/cdp-tenant-config/pull/${prNumber}`
@@ -116,6 +136,19 @@ const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
     request.sqs,
     1
   )
+}
+
+function parseCommands(rawCommands) {
+  if (!rawCommands) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(rawCommands)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
 }
 
 const handleCdpCreateWorkflows = async (request) => {
