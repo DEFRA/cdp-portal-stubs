@@ -2,6 +2,7 @@ import { ecrRepos, githubRepos } from '~/src/config/mock-data'
 import { sessions } from '~/src/api/oidc/helpers/session-store'
 import { platformState } from '~/src/api/platform-state-lambda/platform-state'
 import { teamsAndUsers } from '~/src/config/teams-and-users'
+import { grafanaPlaygrounds } from '~/src/config/grafana-playground-state'
 
 const dataController = {
   handler: async (request, h) => {
@@ -11,7 +12,8 @@ const dataController = {
       platform: platformState,
       teams: teamsAndUsers.teams,
       users: teamsAndUsers.users,
-      sessions
+      sessions,
+      grafanaPlaygrounds
     }
 
     return h.response(data).code(200)
