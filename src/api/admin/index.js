@@ -16,6 +16,7 @@ import {
   resetSlack
 } from '~/src/api/admin/controllers/slack-admin'
 import { monoLambdaPlatformState } from '~/src/api/admin/controllers/mono-lambda-platform-state'
+import { updatePlaygroundDashboard } from '~/src/api/admin/controllers/grafana-controller'
 
 const adminStub = {
   plugin: {
@@ -84,6 +85,11 @@ const adminStub = {
           method: 'POST',
           path: '/_admin/alert/{source}',
           ...triggerAlert
+        },
+        {
+          method: 'POST',
+          path: '/_admin/grafana/playground/dashboard/{service}/{uid}',
+          ...updatePlaygroundDashboard
         }
       ])
     }
