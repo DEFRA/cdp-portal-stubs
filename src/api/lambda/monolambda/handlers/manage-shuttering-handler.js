@@ -6,9 +6,6 @@ const schema = Joi.object({
   action: Joi.string().valid('shutter', 'unshutter').required(),
   fqdn: Joi.string().required(),
   service_name: Joi.string().required(),
-  // Optional: real mono-lambda resolves these from platform state
-  shutter_type: Joi.string().valid('www', 'api'),
-  web_acl_name: Joi.string(),
   dry_run: Joi.boolean().default(false)
 }).unknown(true)
 
