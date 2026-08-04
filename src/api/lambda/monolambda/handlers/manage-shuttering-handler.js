@@ -6,8 +6,6 @@ const schema = Joi.object({
   action: Joi.string().valid('shutter', 'unshutter').required(),
   fqdn: Joi.string().required(),
   service_name: Joi.string().required(),
-  shutter_type: Joi.string().valid('www', 'api').required(),
-  web_acl_name: Joi.string().required(),
   dry_run: Joi.boolean().default(false)
 }).unknown(true)
 
