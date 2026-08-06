@@ -10,23 +10,22 @@ import {
   sendPlatformStatePayload,
   sendPlatformStatePayloadForAllEnvs
 } from '~/src/api/platform-state-lambda/send-platform-state-payload'
-import Joi from 'joi'
-import {
-  createTeamValidator,
-  removeTeamValidator,
-  updateTeamValidator
-} from '~/src/api/github/controllers/workflow-validators'
-import { teamsAndUsers } from '~/src/config/teams-and-users'
-import { triggerTeams } from '~/src/api/workflows/teams/trigger-teams'
+
 import {
   sendWorkflowEventsBatchMessage,
   workflowEvent
 } from '~/src/api/workflows/helpers/workflow-event'
 import { config } from '~/src/config'
 import { grafanaPlaygrounds } from '~/src/config/grafana-playground-state'
-import crypto from 'crypto'
 import { platformState } from '~/src/api/platform-state-lambda/platform-state'
 import { environments } from '~/src/config/environments'
+import {
+  parseCommand,
+  parseCommandArray
+} from '~/src/api/github/controllers/generic-cli/parse-command'
+import { handleTeamCommands } from '~/src/api/github/controllers/generic-cli/team-commands'
+import { handleTenantCommands } from '~/src/api/github/controllers/generic-cli/tenant-commands'
+import crypto from 'crypto'
 
 const dispatchWorkflow = {
   handler: async (request, h) => {
@@ -80,15 +79,6 @@ const handleCdpTenantConfigWorkflows = async (request) => {
     case 'remove-service.yml':
       // TODO: stub decommissioning
       break
-    case 'create-team.yml':
-      await handleCreateTeam(request)
-      break
-    case 'update-team.yml':
-      await handleUpdateTeam(request)
-      break
-    case 'remove-team.yml':
-      await handleDeleteTeam(request)
-      break
     case 'generic-cdp-cli-workflow.yml':
       await handleGenericCdpCliWorkflow(request, workflowRunId)
       break
@@ -101,13 +91,12 @@ const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
   const inputs = request.payload.inputs ?? {}
   const runId = inputs.run_id ?? 'stub-run-id'
   const branch = inputs.use_branch ?? ''
-  const commands = parseCommands(inputs.commands)
+  const commands = parseCommandArray(inputs.commands)
   const shouldFail = commands.some((command) =>
     command.toUpperCase().includes('BLOWUP')
   )
 
-  if (!branch) return
-
+  // Failure simulation
   if (shouldFail) {
     const event = workflowEvent('resource-request-failed', {
       runId,
@@ -124,36 +113,14 @@ const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
     return
   }
 
-  const prNumber = 99
-  const prUrl = `https://github.com/DEFRA/cdp-tenant-config/pull/${prNumber}`
-  const event = workflowEvent('resource-request-pr', {
-    runId,
-    workflowRunId: String(workflowRunId),
-    workflowRunUrl: `https://github.com/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`,
-    repository: 'DEFRA/cdp-tenant-config',
-    branch,
-    prUrl,
-    prNumber
-  })
-
-  await sendWorkflowEventsBatchMessage(
-    [{ Id: crypto.randomUUID(), MessageBody: JSON.stringify(event) }],
-    'resource-request-pr',
-    request.sqs,
-    1
-  )
-}
-
-function parseCommands(rawCommands) {
-  if (!rawCommands) {
-    return []
-  }
-
-  try {
-    const parsed = JSON.parse(rawCommands)
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
+  // Rough mocks of what the commands actually do...
+  const parsedCommands = commands.map(parseCommand)
+  for (const cmd of parsedCommands) {
+    if (cmd.namespace === 'team') {
+      await handleTeamCommands(request, cmd)
+    } else if (cmd.namespace === 'tenant-config') {
+      await handleTenantCommands(request, cmd, workflowRunId, runId, branch)
+    }
   }
 }
 
@@ -403,47 +370,6 @@ const handleGrafanaWorkflows = async (request) => {
       sendPlatformStatePayload(request.sqs, env, 0)
     }
   }
-}
-
-const handleCreateTeam = async (request) => {
-  const inputs = request.payload.inputs
-  request.logger.info(`Create Team ${JSON.stringify(inputs)}`)
-  Joi.assert(inputs, createTeamValidator)
-  if (!teamsAndUsers.teams.some((t) => t.team_id === inputs.team_id)) {
-    teamsAndUsers.teams.push(inputs)
-  }
-
-  await triggerTeams(request.sqs)
-}
-
-const handleUpdateTeam = async (request) => {
-  const inputs = request.payload.inputs
-  request.logger.info(`Update Team ${JSON.stringify(inputs)}`)
-  Joi.assert(inputs, updateTeamValidator)
-
-  const idx = teamsAndUsers.teams.findIndex((t) => t.team_id === inputs.team_id)
-
-  if (idx === -1) {
-    throw new Error(`Team ${inputs.team_id} not found`)
-  }
-
-  for (const key of Object.keys(inputs)) {
-    if (key === 'team_id') continue
-    teamsAndUsers.teams[idx][key] = inputs[key]
-  }
-
-  await triggerTeams(request.sqs)
-}
-
-const handleDeleteTeam = async (request) => {
-  const inputs = request.payload.inputs
-  request.logger.info(`Delete Team ${JSON.stringify(inputs)}`)
-  Joi.assert(inputs, removeTeamValidator)
-  teamsAndUsers.teams = teamsAndUsers.teams.filter(
-    (t) => t.team_id !== inputs.team_id
-  )
-
-  await triggerTeams(request.sqs)
 }
 
 function determinePromotedUid(folderName, slug) {
