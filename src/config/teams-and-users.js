@@ -1,6 +1,6 @@
 /**
  *
- * @type {{ teams: {team_id: string, name: string, description: string, github: string|null, service_code: string|null, slack_channels: { prod: string, non_prod: string, team: string }}[], users: *[] }}
+ * @type {{ teams: {team_id: string, name: string, description: string, github: string|null, service_code: string|null, slack_channels: { prod: string, non_prod: string, team: string }, delivery_group_id: string|null}[], users: *[] }}
  */
 const teamsAndUsers = {
   teams: [
@@ -24,7 +24,8 @@ const teamsAndUsers = {
         team: 'tenantteam1',
         prod: 'tenantteam1-prod-alerts',
         non_prod: 'tenantteam1-non-prod-alerts'
-      }
+      },
+      delivery_group_id: 'delivery-group-id'
     }
   ],
   users: []
