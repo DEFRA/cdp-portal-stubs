@@ -151,6 +151,65 @@ describe('Github Graphql schema', () => {
       createdAt: '2016-12-05T11:21:25Z'
     })
   })
+
+  test('search repositories by topic:cdp', async () => {
+    const query = `query ($searchQuery: String!, $repoCursor: String) {
+      search(query: $searchQuery, type: REPOSITORY, first: 100, after: $repoCursor) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          ... on Repository {
+            name
+            repositoryTopics(first: 30) {
+              nodes {
+                topic {
+                  name
+                }
+              }
+            }
+            description
+            primaryLanguage {
+              name
+            }
+            url
+            isArchived
+            createdAt
+          }
+        }
+      }
+    }`
+
+    const result = await graphql({
+      schema: githubSchema,
+      source: query,
+      variableValues: {
+        searchQuery: 'org:DEFRA topic:cdp',
+        repoCursor: null
+      }
+    })
+
+    expect(result.errors).toBeFalsy()
+    expect(result.data.search.pageInfo.hasNextPage).toBe(false)
+    expect(result.data.search.nodes.length).toEqual(7)
+    expect(result.data.search.nodes[0]).toEqual({
+      name: 'cdp-portal-frontend',
+      repositoryTopics: {
+        nodes: [
+          { topic: { name: 'cdp' } },
+          { topic: { name: 'service' } },
+          { topic: { name: 'node' } },
+          { topic: { name: 'frontend' } }
+        ]
+      },
+      description: '',
+      primaryLanguage: { name: 'JavaScript' },
+      url: 'https://github.com/DEFRA/cdp-portal-frontend',
+      isArchived: false,
+      createdAt: '2016-12-05T11:21:25Z'
+    })
+  })
 })
 
 test('commit a file', async () => {

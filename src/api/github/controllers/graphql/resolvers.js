@@ -2,6 +2,10 @@ import { commitDeploymentFile } from '~/src/api/github/controllers/commit-deploy
 import { githubUsers } from '~/src/api/github/content/user-data'
 import { teams } from '~/src/api/github/content/teams-and-repos'
 import { githubRepos } from '~/src/config/mock-data'
+import {
+  filterReposBySearchQuery,
+  mapGithubRepo
+} from '~/src/api/github/helpers/map-github-repo'
 
 export const resolvers = {
   GitObjectID: {
@@ -27,6 +31,12 @@ export const resolvers = {
     }
   },
 
+  SearchResultItem: {
+    __resolveType() {
+      return 'Repository'
+    }
+  },
+
   Mutation: {
     createCommitOnBranch: (_, args) => {
       const { input } = args
@@ -48,21 +58,25 @@ export const resolvers = {
 
     repository: (_, { name }) => {
       const repo = githubRepos.find((r) => r.name === name)
-      return (
-        repo && {
-          name: repo.name,
-          description: '',
-          primaryLanguage: { name: 'JavaScript' },
-          url: `https://github.com/DEFRA/${repo.name}`,
-          isArchived: false,
-          isTemplate: false,
-          isPrivate: false,
-          createdAt: repo.createdAt,
-          repositoryTopics: {
-            nodes: repo.topics
-          }
+      return repo && mapGithubRepo(repo)
+    },
+
+    search: (_, { query, type }) => {
+      if (type !== 'REPOSITORY') {
+        return {
+          pageInfo: { hasNextPage: false, endCursor: null },
+          nodes: []
         }
+      }
+
+      const repos = filterReposBySearchQuery(githubRepos, query).map(
+        mapGithubRepo
       )
+
+      return {
+        pageInfo: { hasNextPage: false, endCursor: null },
+        nodes: repos
+      }
     }
   },
 
@@ -104,19 +118,7 @@ export const resolvers = {
 
       const repos = githubRepos
         .filter((r) => r.team === team.slug)
-        .map((r) => ({
-          name: r.name,
-          description: '',
-          primaryLanguage: { name: 'JavaScript' },
-          url: `https://github.com/DEFRA/${r.name}`,
-          isArchived: false,
-          isTemplate: false,
-          isPrivate: false,
-          createdAt: r.createdAt,
-          repositoryTopics: {
-            nodes: r.topics
-          }
-        }))
+        .map(mapGithubRepo)
 
       return {
         pageInfo: { hasNextPage, endCursor },
