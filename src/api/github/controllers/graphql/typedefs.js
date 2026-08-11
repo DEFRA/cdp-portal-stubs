@@ -45,10 +45,27 @@ export const typeDefs = `
     repo: Repository
   }
 
+  enum SearchType {
+    REPOSITORY
+  }
+
+  union SearchResultItem = Repository
+
+  type SearchResultItemConnection {
+    pageInfo: PageInfo!
+    nodes: [SearchResultItem]!
+  }
+
   type Query {
     user(login: String!): User
     organization(login: String!): Organization
     repository(owner: String, name: String!): Repository
+    search(
+      query: String!
+      type: SearchType!
+      first: Int!
+      after: String
+    ): SearchResultItemConnection!
   }
 
   type UserConnection {
