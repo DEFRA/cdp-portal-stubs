@@ -52,7 +52,10 @@ function updateTeam(inputs) {
 
   for (const key of Object.keys(inputs)) {
     if (key === 'team_id') continue
-    teamsAndUsers.teams[idx][key] = inputs[key]
+
+    if (inputs[key]) {
+      teamsAndUsers.teams[idx][key] = inputs[key]
+    }
   }
 }
 
@@ -64,16 +67,29 @@ function removeTeam(inputs) {
 }
 
 function inputToTeam(input) {
-  return {
+  const slack = {}
+  if (input.slack_prod) {
+    slack.prod = input.slack_prod
+  }
+  if (input.slack_non_prod) {
+    slack.prod = input.slack_non_prod
+  }
+  if (input.slack_team) {
+    slack.prod = input.slack_team
+  }
+
+  const team = {
     team_id: input.team_id,
     name: input.team_name,
     description: input.description,
     service_code: input.service_code,
-    github: input.github,
-    slack_channels: {
-      prod: input.slack_prod,
-      non_prod: input.slack_non_prod,
-      team: input.slack_team
-    }
+    delivery_group_id: input.delivery_group_id,
+    github: input.github
   }
+  if (slack && slack !== {}) {
+    team.slack_channels = slack
+  }
+  return Object.fromEntries(
+    Object.entries(team).filter(([, value]) => value !== null)
+  )
 }
