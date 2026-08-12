@@ -1,7 +1,6 @@
 import { getContentController } from '~/src/api/github/controllers/get-content'
 import { updateRepo } from '~/src/api/github/controllers/update-repo'
 import { getRepoController } from '~/src/api/github/controllers/get-repo'
-import { getRepoTeamsController } from '~/src/api/github/controllers/get-repo-teams'
 import {
   getCommitController,
   getRefsController,
@@ -34,11 +33,6 @@ const githubStub = {
           method: 'GET',
           path: '/repos/{org}/{repo}',
           ...getRepoController
-        },
-        {
-          method: 'GET',
-          path: '/repos/{org}/{repo}/teams',
-          ...getRepoTeamsController
         },
         {
           method: 'GET',
