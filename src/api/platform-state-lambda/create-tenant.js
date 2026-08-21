@@ -90,7 +90,7 @@ function addQueue(name, envs, config) {
  *
  * @param {string} name
  * @param {string[]} envs
- * @param {{ name: string, fifo_topic: string, content_based_deduplication, subscriptions: string[] }} config
+ * @param {{ name: string, fifo_topic: string, content_based_deduplication, subscribers: { queue_name: string, queue_owner: string }[] }} config
  */
 function addTopic(name, envs, config) {
   for (const env of envs) {
@@ -103,7 +103,8 @@ function addTopic(name, envs, config) {
       arn: `arn:aws:sns:eu-west-2:${environmentMappings[env]}:${config.name}`,
       name: config.name,
       fifo_topic: config.fifo_topic === 'true',
-      content_based_deduplication: config.content_based_deduplication ?? false
+      content_based_deduplication: config.content_based_deduplication ?? false,
+      subscribers: config.subscribers ?? []
     }
 
     platformState[env][name].tenant.sns_topics.push(topic)
