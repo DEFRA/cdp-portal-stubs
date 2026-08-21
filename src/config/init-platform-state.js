@@ -83,7 +83,13 @@ const defaultEntities = [
         name: 'error_notification',
         cross_account_allow_list: [],
         fifo_topic: 'true',
-        content_based_deduplication: false
+        content_based_deduplication: false,
+        subscribers: [
+          {
+            queue_name: 'cdp_self_service_ops_error_notifications',
+            queue_owner: 'cdp-self-service-ops'
+          }
+        ]
       }
     ],
     urls: [
@@ -113,7 +119,15 @@ const defaultEntities = [
     service_code: 'CDP',
     team: 'platform',
     type: 'Microservice',
-    subtype: 'Backend'
+    subtype: 'Backend',
+    sqs_queues: [
+      {
+        name: 'cdp_self_service_ops_error_notifications',
+        fifo_queue: 'false',
+        content_based_deduplication: false,
+        subscriptions: ['error_notification']
+      }
+    ]
   },
   {
     name: 'cdp-postgres-service',
