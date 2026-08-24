@@ -5,6 +5,7 @@ import { adminStub } from '~/src/api/admin'
 import { oidc } from '~/src/api/oidc'
 import { aadStub } from '~/src/api/aad'
 import { pagerDutyStub } from '~/src/api/pagerduty'
+import { secretsStub } from '~/src/api/secrets'
 
 const router = {
   plugin: {
@@ -17,7 +18,8 @@ const router = {
         adminStub,
         oidc,
         aadStub,
-        pagerDutyStub
+        pagerDutyStub,
+        secretsStub
       ])
     }
   }
