@@ -20,11 +20,14 @@ export const getGrafanaPlaygroundsController = {
 
     return h
       .response({
-        request_id: `stub-${service}`,
-        service,
-        dashboards: playground.dashboards ?? [],
-        alerts: playground.alerts ?? [],
-        updated: new Date().toISOString()
+        statusCode: 200,
+        body: {
+          request_id: `stub-${service}`,
+          service,
+          dashboards: playground.dashboards ?? [],
+          alerts: playground.alerts ?? [],
+          updated: new Date().toISOString()
+        }
       })
       .code(200)
   }
