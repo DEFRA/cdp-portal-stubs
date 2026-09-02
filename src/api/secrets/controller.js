@@ -18,14 +18,10 @@ export const addSecretKeyValuePairController = {
     }
   },
   handler: (request, h) => {
-    const { secret_name: secretName, secret_key_pair_name: secretKeyPairName } =
-      request.payload
-
     return h
       .response({
-        action: 'add_secret_key_value_pair',
-        secret_name: secretName,
-        secret_key_pair_name: secretKeyPairName
+        statusCode: 200,
+        body: null
       })
       .code(200)
   }
@@ -38,14 +34,10 @@ export const removeSecretKeyValuePairController = {
     }
   },
   handler: (request, h) => {
-    const { secret_name: secretName, secret_key_pair_name: secretKeyPairName } =
-      request.payload
-
     return h
       .response({
-        action: 'remove_secret_key_value_pair',
-        secret_name: secretName,
-        secret_key_pair_name: secretKeyPairName
+        statusCode: 200,
+        body: null
       })
       .code(200)
   }

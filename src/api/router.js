@@ -6,6 +6,7 @@ import { oidc } from '~/src/api/oidc'
 import { aadStub } from '~/src/api/aad'
 import { pagerDutyStub } from '~/src/api/pagerduty'
 import { secretsStub } from '~/src/api/secrets'
+import { grafanaPlaygroundsStub } from '~/src/api/grafana-playgrounds'
 
 const router = {
   plugin: {
@@ -19,7 +20,8 @@ const router = {
         oidc,
         aadStub,
         pagerDutyStub,
-        secretsStub
+        secretsStub,
+        grafanaPlaygroundsStub
       ])
     }
   }

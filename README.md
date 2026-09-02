@@ -323,14 +323,15 @@ awslocal sqs send-message --queue-url \
   '{"source": "cdp-secret-manager-lambda", "statusCode": 200, "action": "add_secret", "Message": {"action": "add_secret", "name": "cdp-portal-frontend",     "environment": "infra-dev", "secret_key": "SOME_KEY", "secret_value": "BLOWUP"}}'
 ```
 
-#### Sync API Gateway-style secrets endpoints
+#### Sync API Gateway-style endpoints
 
-For the new sync flow used by portal-backend (`manage_secrets`), stubs expose:
+For sync flows used by portal-backend, stubs expose:
 
 - `POST /secrets/add-key-value-pair`
 - `POST /secrets/remove-key-value-pair`
+- `GET /grafana/playgrounds/{service}`
 
-Like the other stubs, these just fake a success response (`{ action, secret_name, secret_key_pair_name }`) rather than persisting anything to a real Secrets Manager.
+Like the other stubs, these fake successful responses rather than calling real downstream systems.
 
 #### Get all secret
 

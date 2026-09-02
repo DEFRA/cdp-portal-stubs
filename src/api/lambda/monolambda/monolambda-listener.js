@@ -1,6 +1,5 @@
 import { config } from '~/src/config'
 import { Consumer } from 'sqs-consumer'
-import { grafanaListPlaygroundsHandler } from '~/src/api/lambda/monolambda/handlers/grafana-list-playgrounds-handler'
 import { manageShutteringHandler } from '~/src/api/lambda/monolambda/handlers/manage-shuttering-handler'
 import { sendSlackNotificationHandler } from '~/src/api/lambda/monolambda/handlers/send-slack-notification-handler'
 import { createGrafanaSnapshotHandler } from '~/src/api/lambda/monolambda/handlers/create-grafana-snapshot-handler'
@@ -29,9 +28,6 @@ function monolambdaListener(server) {
         const payload = message.payload
 
         switch (message.event_type) {
-          case 'grafana_list_playgrounds':
-            await grafanaListPlaygroundsHandler(server, payload, attrs)
-            break
           case 'create_grafana_snapshots':
             await createGrafanaSnapshotHandler(server, payload, attrs)
             break
