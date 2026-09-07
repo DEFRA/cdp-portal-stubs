@@ -10,7 +10,8 @@ function ecsTestRunEvent(
   desired,
   exitCode
 ) {
-  const now = new Date().toISOString()
+  // Ensure the test run is created before the ECS event timestamp so it can be linked.
+  const now = new Date(Date.now() + 3000).toISOString()
   const payload = {
     version: '0',
     id: crypto.randomUUID(),
