@@ -3,7 +3,7 @@ import {
   removeSecretKeyValuePairController
 } from '~/src/api/secrets/controller'
 
-const secretsStub = {
+export const secretsApiGatewayStub = {
   plugin: {
     name: 'secretsStub',
     register: async (server) => {
@@ -22,5 +22,3 @@ const secretsStub = {
     }
   }
 }
-
-export { secretsStub }

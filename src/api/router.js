@@ -5,8 +5,9 @@ import { adminStub } from '~/src/api/admin'
 import { oidc } from '~/src/api/oidc'
 import { aadStub } from '~/src/api/aad'
 import { pagerDutyStub } from '~/src/api/pagerduty'
-import { secretsStub } from '~/src/api/secrets'
-import { grafanaPlaygroundsStub } from '~/src/api/grafana-playgrounds'
+import { secretsApiGatewayStub } from '~/src/api/secrets'
+import { grafanaPlaygroundsApiGatewayStub } from '~/src/api/grafana-playgrounds'
+import { slackApiGatewayStub } from '~/src/api/slack'
 
 const router = {
   plugin: {
@@ -20,8 +21,9 @@ const router = {
         oidc,
         aadStub,
         pagerDutyStub,
-        secretsStub,
-        grafanaPlaygroundsStub
+        secretsApiGatewayStub,
+        grafanaPlaygroundsApiGatewayStub,
+        slackApiGatewayStub
       ])
     }
   }

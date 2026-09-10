@@ -1,4 +1,4 @@
-import { slackHistory } from '~/src/api/slack/slack-history'
+import { slackHistory } from '~/src/api/slack/plugin/slack-history'
 
 const listSlackMessages = {
   handler: async (request, h) => {
