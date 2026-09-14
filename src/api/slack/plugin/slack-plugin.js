@@ -1,4 +1,4 @@
-import { slackListener } from '~/src/api/slack/slack-listener'
+import { slackListener } from '~/src/api/slack/plugin/slack-listener'
 
 const slackPlugin = {
   plugin: {

@@ -1,5 +1,5 @@
 import { Consumer } from 'sqs-consumer'
-import { slackHistory } from '~/src/api/slack/slack-history'
+import { slackHistory } from '~/src/api/slack/plugin/slack-history'
 
 const { config } = require('~/src/config')
 

@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { slackHistory } from '~/src/api/slack/slack-history'
+import { slackHistory } from '~/src/api/slack/plugin/slack-history'
 
 const schema = Joi.object({
   team: Joi.string(),

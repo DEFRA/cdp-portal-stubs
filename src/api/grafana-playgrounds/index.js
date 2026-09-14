@@ -1,6 +1,6 @@
 import { getGrafanaPlaygroundsController } from '~/src/api/grafana-playgrounds/controller'
 
-const grafanaPlaygroundsStub = {
+const grafanaPlaygroundsApiGatewayStub = {
   plugin: {
     name: 'grafanaPlaygroundsStub',
     register: async (server) => {
@@ -15,4 +15,4 @@ const grafanaPlaygroundsStub = {
   }
 }
 
-export { grafanaPlaygroundsStub }
+export { grafanaPlaygroundsApiGatewayStub }
