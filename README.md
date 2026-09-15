@@ -173,8 +173,11 @@ This allows local end-to-end testing of both paths without changing code between
 
 ### Setup cdp-portal-stubs
 
+This service uses Node.js 24 (see `.nvmrc`). Copy `.env.example` to `.env` for local overrides; `npm run dev` and `npm start` load it with `--env-file-if-exists=.env`.
+
 ```bash
 npm install
+cp .env.example .env
 ```
 
 ### Start cdp-portal-stubs
