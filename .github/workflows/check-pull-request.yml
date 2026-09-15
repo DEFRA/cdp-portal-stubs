@@ -16,20 +16,23 @@ jobs:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
-      - run: npm install
-      - run: npm run format:check
-      - run: npm run lint
-      - run: npm test
+      - run: |
+          npm ci
+          npm run format:check
+          npm run lint
+          npm test
+      - name: Security audit
+        run: npm run security-audit
   test:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t defradigital/cdp-portal-stubs:${{github.sha}} .
       - uses: DEFRA/cdp-portal-journey-tests/run-journey-tests@main
         with:
