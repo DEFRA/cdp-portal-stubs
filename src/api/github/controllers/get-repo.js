@@ -6,10 +6,7 @@ const getRepoController = {
     const { org, repo } = request.params
 
     if (githubRepos.some((githubRepo) => repo === githubRepo.name)) {
-      return h
-        .response(generateRepoData(org, repo))
-        .header('x-oauth-scopes', 'TODO')
-        .code(200)
+      return h.response(generateRepoData(org, repo)).code(200)
     }
 
     return h
