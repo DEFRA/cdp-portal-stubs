@@ -12,7 +12,7 @@ const defaultEntities = [
   {
     name: 'cdp-portal-frontend',
     zone: 'public',
-    mongo: false,
+    mongo_enabled: false,
     redis: true,
     service_code: 'CDP',
     team: 'platform',
@@ -48,7 +48,7 @@ const defaultEntities = [
   {
     name: 'cdp-portal-backend',
     zone: 'protected',
-    mongo: true,
+    mongo_enabled: true,
     redis: false,
     service_code: 'CDP',
     team: 'platform',
@@ -114,7 +114,7 @@ const defaultEntities = [
   {
     name: 'cdp-self-service-ops',
     zone: 'protected',
-    mongo: true,
+    mongo_enabled: true,
     redis: false,
     service_code: 'CDP',
     team: 'platform',
@@ -132,7 +132,7 @@ const defaultEntities = [
   {
     name: 'cdp-postgres-service',
     zone: 'protected',
-    mongo: false,
+    mongo_enabled: false,
     redis: false,
     service_code: 'CDP',
     team: 'platform',
@@ -149,7 +149,7 @@ const defaultEntities = [
   {
     name: 'tenant-backend',
     zone: 'protected',
-    mongo: true,
+    mongo_enabled: true,
     redis: false,
     service_code: 'CDP',
     team: 'tenantteam1',
@@ -177,7 +177,7 @@ const defaultEntities = [
   {
     name: 'cdp-env-test-suite',
     zone: 'public',
-    mongo: false,
+    mongo_enabled: false,
     redis: false,
     test_suite: 'cdp-env-test-suite',
     service_code: 'CDP',
