@@ -1,36 +1,23 @@
-import { ecrRepos, githubRepos, tenantServices } from '~/src/config/mock-data'
-import { triggerWorkflowStatus } from '~/src/api/github/events/trigger-workflow-status'
-import { populateEcrRepo } from '~/src/api/workflows/populate-ecr/populate-ecr'
-import { triggerCdpAppConfig } from '~/src/api/workflows/cdp-app-config/trigger-cdp-app-config'
-import {
-  changeShutterState,
-  createTenant
-} from '~/src/api/platform-state-lambda/create-tenant'
-import {
-  sendPlatformStatePayload,
-  sendPlatformStatePayloadForAllEnvs
-} from '~/src/api/platform-state-lambda/send-platform-state-payload'
-
-import {
-  sendWorkflowEventsBatchMessage,
-  workflowEvent
-} from '~/src/api/workflows/helpers/workflow-event'
 import { config } from '~/src/config'
-import { grafanaPlaygrounds } from '~/src/config/grafana-playground-state'
-import { platformState } from '~/src/api/platform-state-lambda/platform-state'
-import { environments } from '~/src/config/environments'
-import {
-  parseCommand,
-  parseCommandArray
-} from '~/src/api/github/controllers/generic-cli/parse-command'
-import { handleTeamCommands } from '~/src/api/github/controllers/generic-cli/team-commands'
-import { handleTenantCommands } from '~/src/api/github/controllers/generic-cli/tenant-commands'
-import crypto from 'crypto'
+import { promoteAlertWorkflow } from '~/src/api/github/controllers/workflows/cdp-grafana-svc/promote-advanced-alert'
+import { promoteDashboardWorkflow } from '~/src/api/github/controllers/workflows/cdp-grafana-svc/promote-custom-dashboard'
+
+import { deploySnow } from '~/src/api/github/controllers/workflows/cdp-deployments-snow/deploy'
+import { createTemplatedRepository } from '~/src/api/github/controllers/workflows/cdp-create-workflows/create-templated-repository'
+import { createRepository } from '~/src/api/github/controllers/workflows/cdp-create-workflows/create-repository'
+import { archiveRepository } from '~/src/api/github/controllers/workflows/cdp-create-workflows/archive-repository'
+import { genericCdpCliWorkflow } from '~/src/api/github/controllers/workflows/cdp-tenant-config/generic-cdp-cli-workflow'
+import { cdpTenantConfigCreation } from '~/src/api/github/controllers/workflows/cdp-tenant-config/create-service'
 
 const dispatchWorkflow = {
   handler: async (request, h) => {
     const workflowRepo = request.params.repo
-    let dispatchResponse = {}
+
+    let dispatchResponse = {
+      workflow_run_id: Date.now(),
+      run_url: `https://api.github.com/repos/DEFRA/${workflowRepo}/actions/runs/1`,
+      html_url: `https://github.com/DEFRA/${workflowRepo}/actions/runs/1`
+    }
 
     switch (workflowRepo) {
       case 'cdp-tenant-config':
@@ -39,7 +26,7 @@ const dispatchWorkflow = {
       case 'cdp-create-workflows':
         await handleCdpCreateWorkflows(request)
         break
-      case 'cdp-grafana-modules':
+      case 'cdp-grafana-svc':
         await handleGrafanaWorkflows(request)
         break
       case 'cdp-deployments-snow':
@@ -70,266 +57,45 @@ const handleCdpTenantConfigWorkflows = async (request) => {
 
   switch (workflowFile) {
     case 'create-service.yml':
-      await handleNewCdpCreateWorkflows(request)
-      await handleCdpTenantConfigCreation(request)
-      break
-    case 'create-shuttering.yml':
-      await shutterUrl(request, true)
-      break
-    case 'remove-shuttering.yml':
-      await shutterUrl(request, false)
+      await cdpTenantConfigCreation(request)
       break
     case 'remove-service.yml':
       // TODO: stub decommissioning
       break
     case 'generic-cdp-cli-workflow.yml':
-      await handleGenericCdpCliWorkflow(request, workflowRunId)
+      await genericCdpCliWorkflow(request, workflowRunId)
       break
   }
 
   return workflowResponse
 }
 
-const handleGenericCdpCliWorkflow = async (request, workflowRunId) => {
-  const inputs = request.payload.inputs ?? {}
-  const runId = inputs.run_id ?? 'stub-run-id'
-  const branch = inputs.use_branch ?? ''
-  const commands = parseCommandArray(inputs.commands)
-  const shouldFail = commands.some((command) =>
-    command.toUpperCase().includes('BLOWUP')
-  )
-
-  // Failure simulation
-  if (shouldFail) {
-    const event = workflowEvent('resource-request-failed', {
-      runId,
-      workflowRunId: String(workflowRunId),
-      workflowRunUrl: `https://github.com/DEFRA/cdp-tenant-config/actions/runs/${workflowRunId}`
-    })
-
-    await sendWorkflowEventsBatchMessage(
-      [{ Id: crypto.randomUUID(), MessageBody: JSON.stringify(event) }],
-      'resource-request-failed',
-      request.sqs,
-      1
-    )
-    return
-  }
-
-  // Rough mocks of what the commands actually do...
-  const parsedCommands = commands.map(parseCommand)
-  for (const cmd of parsedCommands) {
-    if (cmd.namespace === 'team') {
-      await handleTeamCommands(request, cmd)
-    } else if (cmd.namespace === 'tenant-config') {
-      await handleTenantCommands(request, cmd, workflowRunId, runId, branch)
-    }
-  }
-}
-
-const parseJsonInput = (value, fallback = {}) => {
-  if (!value) {
-    return fallback
-  }
-
-  try {
-    return JSON.parse(value)
-  } catch {
-    return fallback
-  }
-}
-
 const handleSnowDeploymentWorkflow = async (request) => {
-  const workflowRunId = config.get('workflowRunId') ?? Date.now()
-  const inputs = request.payload.inputs ?? {}
-  const portalPayload = parseJsonInput(inputs.portal_payload)
-  const extendedPayload = parseJsonInput(inputs.extended_payload)
+  const workflowFile = request.params.workflow
 
-  request.logger.info(
-    `Stubbing triggering of workflow ${
-      request.params.org
-    }/cdp-deployments-snow/${
-      request.params.workflow
-    } with portal payload ${JSON.stringify(
-      portalPayload
-    )} and extended payload ${JSON.stringify(extendedPayload)}`
-  )
-
-  // This is intentionally fake for local development only.
-  // GitHub's real workflow_dispatch endpoint responds 204 with no body.
-  return {
-    workflow_run_id: workflowRunId,
-    run_url: `https://api.github.com/repos/DEFRA/cdp-deployments-snow/actions/runs/${workflowRunId}`,
-    html_url: `https://github.com/DEFRA/cdp-deployments-snow/actions/runs/${workflowRunId}`
+  switch (workflowFile) {
+    case 'infra-dev.yml':
+    case 'deploy.yml':
+      return await deploySnow(request)
+    default:
+      throw Error(`unknown workflow ${workflowFile}`)
   }
 }
 
 const handleCdpCreateWorkflows = async (request) => {
-  const org = request.params.org
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
-  const repositoryName = inputs.repositoryName
-  if (repositoryName) {
-    const topics = (inputs.additionalGitHubTopics?.split(',') ?? []).map(
-      (t) => {
-        return { topic: { name: t } }
-      }
-    )
-
-    request.logger.info(
-      `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${JSON.stringify(
-        inputs
-      )}`
-    )
-
-    githubRepos.push({
-      name: repositoryName,
-      topics,
-      team: inputs.team,
-      createdAt: new Date().toISOString()
-    })
-
-    switch (workflowFile) {
-      case 'create_microservice.yml':
-        if (ecrRepos[repositoryName] === undefined) {
-          ecrRepos[repositoryName] = {
-            tags: ['0.1.0', '0.2.0', '0.3.0'],
-            runMode: 'service'
-          }
-        }
-        break
-      case 'create_journey_test_suite.yml':
-      case 'create_perf_test_suite.yml':
-        if (ecrRepos[repositoryName] === undefined) {
-          ecrRepos[repositoryName] = {
-            tags: ['0.1.0', '0.2.0', '0.3.0'],
-            runMode: 'job'
-          }
-        }
-        break
-    }
-
-    if (workflowFile !== 'create_repository.yml') {
-      await populateEcrRepo(request.sqs, repositoryName, 0)
-
-      await triggerWorkflowStatus(
-        request.sqs,
-        'cdp-create-workflows',
-        workflowFile,
-        repositoryName,
-        'completed',
-        'success',
-        1
-      )
-    }
+  switch (workflowFile) {
+    case 'create_templated_repository.yml':
+      await createTemplatedRepository(request, inputs)
+      break
+    case 'create_repository.yml':
+      await createRepository(request, inputs)
+      break
+    case 'archive_repository.yml':
+      await archiveRepository(request)
+      break
   }
-}
-
-const handleNewCdpCreateWorkflows = async (request) => {
-  const org = request.params.org
-  const workflowFile = request.params.workflow
-  const inputs = request.payload.inputs
-  const repositoryName = inputs.service
-  const tenantConfig = JSON.parse(inputs.config)
-
-  if (repositoryName) {
-    request.logger.info(
-      `Stubbing triggering of workflow ${org}/cdp-create-workflows/${workflowFile} with inputs ${repositoryName}`
-    )
-
-    githubRepos.push({
-      name: repositoryName,
-      topics: [],
-      team: tenantConfig.github_team,
-      createdAt: new Date().toISOString()
-    })
-
-    if (workflowFile !== 'create_repository.yml') {
-      if (ecrRepos[repositoryName] === undefined) {
-        ecrRepos[repositoryName] = {
-          tags: ['0.1.0', '0.2.0', '0.3.0'],
-          runMode: 'job'
-        }
-      }
-
-      await populateEcrRepo(request.sqs, repositoryName, 0)
-    }
-  }
-}
-
-const handleCdpTenantConfigCreation = async (request) => {
-  /**
-   * @type {{service:string, config: string, template_repo: string }}
-   */
-  const inputs = request.payload.inputs
-
-  const tenantConfig = JSON.parse(inputs.config)
-
-  request.logger.info(`Create-service workflow ${JSON.stringify(inputs)}`)
-
-  // Create the new tenant in the global platform state
-  createTenant(inputs.service, tenantConfig)
-  await sendPlatformStatePayloadForAllEnvs(request.sqs)
-
-  // simulate creating the terraform changes etc
-  tenantServices[inputs.service] = {
-    name: inputs.service,
-    zone: tenantConfig.zone,
-    mongo: tenantConfig.mongo_enabled,
-    redis: tenantConfig.redis_enabled,
-    service_code: tenantConfig.service_code ?? 'UNKNOWN',
-    test_suite: tenantConfig.type === 'TestSuite' ? inputs.service : null
-  }
-
-  await handleNewCdpCreateWorkflows(request)
-  await triggerCdpAppConfig(request.sqs, 2)
-}
-
-/**
- *
- * @params {payload: {inputs: {service_name: string, environment: string, url: string}}} request
- * @params {boolean} shutter
- */
-async function shutterUrl(request, shutter) {
-  const inputs = request.payload.inputs
-  const environment = inputs.environment
-  const service = inputs.service_name ?? inputs.service
-  const url = inputs.url
-
-  setTimeout(() => {
-    changeShutterState(environment, service, url, shutter)
-    sendPlatformStatePayload(request.sqs, environment, 1)
-  }, 3000)
-}
-
-/**
- *
- * @param {{ service: string, url: string, environment: string }} inputs
- * @param workflowFile
- * @param request
- */
-async function updateVanityUrl(inputs, workflowFile, request) {
-  const environment = inputs.environment
-  const service = inputs.service
-  const url = inputs.url
-
-  let shuttered
-  if (workflowFile === 'shuttering-add.yml') {
-    shuttered = true
-  } else if (workflowFile === 'shuttering-remove.yml') {
-    shuttered = false
-  } else {
-    request.logger.warn(
-      'Unknown workflow file for vanity URL update:',
-      workflowFile
-    )
-    return
-  }
-
-  setTimeout(() => {
-    changeShutterState(environment, service, url, shuttered)
-    sendPlatformStatePayload(request.sqs, environment, 1)
-  }, 3000)
 }
 
 const handleGenericWorkflows = async (request, baseDelay = 0) => {
@@ -343,86 +109,22 @@ const handleGenericWorkflows = async (request, baseDelay = 0) => {
       inputs
     )}`
   )
-
-  switch (repo) {
-    case 'cdp-tf-waf':
-      await updateVanityUrl(inputs, workflowFile, request)
-      break
-  }
 }
 
 const handleGrafanaWorkflows = async (request) => {
-  const org = request.params.org
-  const repo = request.params.repo
   const workflowFile = request.params.workflow
   const inputs = request.payload.inputs
 
-  request.logger.info(
-    `Stubbing triggering of workflow ${org}/${repo}/.github/workflows/${workflowFile} with inputs ${JSON.stringify(
-      inputs
-    )}`
-  )
-
-  if (
-    inputs.service_name &&
-    grafanaPlaygrounds[inputs.service_name]?.dashboards
-  ) {
-    const playgroundData = grafanaPlaygrounds[inputs.service_name]
-
-    const uid = inputs.dashboard_uid
-
-    const dbIdx = playgroundData.dashboards.findIndex((d) => d.uid === uid)
-    if (dbIdx === -1) {
-      request.logger.error(`unable to find dashboard uid ${uid}`)
-      return
-    }
-
-    playgroundData.dashboards[dbIdx].updated = Date.now()
-    playgroundData.dashboards[dbIdx].promoted = true
-    const db = playgroundData.dashboards[dbIdx]
-
-    const slugParts = db.url.split('/')
-    const slug = slugParts[slugParts.length - 1]
-    const publishedUid = determinePromotedUid(inputs.service_name, slug)
-
-    for (const env of environments) {
-      if (!platformState[env][inputs.service_name]) {
-        continue
-      }
-      const serviceData = platformState[env][inputs.service_name]?.tenant
-
-      const idx = serviceData.metrics.findIndex((m) => m.uid === publishedUid)
-
-      if (idx > 0) {
-        platformState[env][inputs.service_name].tenant.metrics[idx].version += 1
-      } else {
-        platformState[env][inputs.service_name].tenant.metrics.push({
-          url: `https://metrics.${env}.cdp-int.defra.cloud/d/${inputs.service_name}/${publishedUid}`,
-          type: 'custom',
-          uid: publishedUid,
-          scope: '',
-          version: 1
-        })
-      }
-      request.logger.info(
-        `promoted dashboard ${uid} -> ${publishedUid} in ${env}`
-      )
-      sendPlatformStatePayload(request.sqs, env, 0)
-    }
+  switch (workflowFile) {
+    case 'promote-advanced-alert.yml':
+      promoteAlertWorkflow(request, inputs)
+      break
+    case 'promote-custom-dashboard.yml':
+      promoteDashboardWorkflow(request, inputs)
+      break
+    default:
+      request.logger.warn(`unknown workflows ${workflowFile}`)
   }
 }
 
-function determinePromotedUid(folderName, slug) {
-  const parts = slug.split('-')
-  const title = `${folderName} (${parts[parts.length - 1]})`
-  const digest = crypto
-    .createHash('sha1')
-    .update(title)
-    .digest('hex')
-    .slice(0, 8)
-
-  // Leave room for "-<hash>"
-  const maxSlugLen = 40 - digest.length - 1
-  return `${slug.slice(0, maxSlugLen)}-${digest}`
-}
 export { dispatchWorkflow }

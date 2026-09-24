@@ -217,7 +217,28 @@ function createTenantState(name, config, env) {
           version: 6
         }
       ],
-      alerts: [],
+      alerts: [
+        {
+          name: 'Default Alert',
+          uid: 'test-alert-1234',
+          type: 'Default',
+          annotations: {
+            description: 'Default alert',
+            runbook_url: 'http://localhost:9999/runbook'
+          }
+        },
+        {
+          name: 'Custom Alert',
+          uid: 'alert1',
+          type: 'custom',
+          annotations: {
+            description: 'Custom alert',
+            runbook_url: 'http://localhost:9999/runbook2',
+            source_uid: 'alert1',
+            source_version: '2'
+          }
+        }
+      ],
       nginx: config.type === 'Microservice' ? createNginx(name, env) : null,
       squid: {
         ports: [80, 443],
@@ -247,7 +268,8 @@ function createTenantState(name, config, env) {
         logs: true,
         metrics: true,
         nginx: true,
-        squid: true
+        squid: true,
+        dns: true
       }
     }
   }

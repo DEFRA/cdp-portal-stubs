@@ -13,22 +13,25 @@ export const grafanaPlaygrounds = {
     ],
     alerts: [
       {
-        uid: 'afh277iclp62of',
-        name: 'cdp-portal-frontend - 4xx error percentage',
+        uid: 'alert1',
+        name: 'cdp-portal-frontend - custom alert',
         type: 'custom',
         annotations: {
-          summary:
-            'Percentage of client error (HTTP 4xx) responses over total requests for fg-gas-backend, alerting when too many client requests fail.'
-        }
+          summary: 'Custom alert'
+        },
+        version: 1,
+        promoted: false
       },
       {
-        uid: 'ffh279a3uwc8wf',
+        uid: 'alert2',
         name: 'cdp-portal-frontend - 5xx error percentage',
         type: 'custom',
         annotations: {
           summary:
             'Percentage of client error (HTTP 5xx) responses over total requests for fg-gas-backend, alerting when too many client requests fail.'
-        }
+        },
+        version: 3,
+        promoted: false
       }
     ]
   }
