@@ -133,8 +133,8 @@ const tenantServices = {
     sns_topics: [],
     sqs_queues: []
   },
-  'cdp-full-service': {
-    name: 'cdp-full-service',
+  'tenant-full-service': {
+    name: 'tenant-full-service',
     zone: 'protected',
     mongo: true,
     redis: false,
@@ -227,9 +227,9 @@ const githubRepos = [
     createdAt: '2016-12-05T11:21:25Z'
   },
   {
-    name: 'cdp-full-service',
+    name: 'tenant-full-service',
     topics: topicsBackendService,
-    team: teams[0].slug,
+    team: teams[4].slug,
     createdAt: '2016-12-05T11:21:25Z'
   },
   {
@@ -265,7 +265,7 @@ const ecrRepos = {
     runMode: 'service',
     tags: ['0.1.0']
   },
-  'cdp-full-service': {
+  'tenant-full-service': {
     runMode: 'service',
     tags: ['0.1.0']
   }

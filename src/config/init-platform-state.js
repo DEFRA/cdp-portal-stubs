@@ -147,12 +147,12 @@ const defaultEntities = [
     ]
   },
   {
-    name: 'cdp-full-service',
+    name: 'tenant-full-service',
     zone: 'protected',
     mongo_enabled: true,
     redis: false,
     service_code: 'CDP',
-    team: 'platform',
+    team: 'tenantteam1',
     type: 'Microservice',
     subtype: 'Backend',
     rds_aurora_postgres: [
