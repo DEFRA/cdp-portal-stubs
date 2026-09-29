@@ -133,6 +133,20 @@ const tenantServices = {
     sns_topics: [],
     sqs_queues: []
   },
+  'cdp-full-service': {
+    name: 'cdp-full-service',
+    zone: 'protected',
+    mongo: true,
+    redis: false,
+    rds_aurora_postgres: true,
+    service_code: 'CDP',
+    queues: [],
+    topics: [],
+    buckets: [],
+    s3_buckets: [],
+    sns_topics: [],
+    sqs_queues: []
+  },
   'tenant-backend': {
     name: 'tenant-backend',
     zone: 'protected',
@@ -213,6 +227,12 @@ const githubRepos = [
     createdAt: '2016-12-05T11:21:25Z'
   },
   {
+    name: 'cdp-full-service',
+    topics: topicsBackendService,
+    team: teams[0].slug,
+    createdAt: '2016-12-05T11:21:25Z'
+  },
+  {
     name: 'tenant-backend',
     topics: topicsBackendService,
     team: teams[4].slug,
@@ -242,6 +262,10 @@ const ecrRepos = {
     tags: ['0.1.0']
   },
   'cdp-postgres-service': {
+    runMode: 'service',
+    tags: ['0.1.0']
+  },
+  'cdp-full-service': {
     runMode: 'service',
     tags: ['0.1.0']
   }
