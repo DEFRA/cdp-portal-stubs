@@ -192,7 +192,7 @@ describe('Github Graphql schema', () => {
 
     expect(result.errors).toBeFalsy()
     expect(result.data.search.pageInfo.hasNextPage).toBe(false)
-    expect(result.data.search.nodes.length).toEqual(7)
+    expect(result.data.search.nodes.length).toEqual(8)
     expect(result.data.search.nodes[0]).toEqual({
       name: 'cdp-portal-frontend',
       repositoryTopics: {

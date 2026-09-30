@@ -147,6 +147,23 @@ const defaultEntities = [
     ]
   },
   {
+    name: 'tenant-full-service',
+    zone: 'protected',
+    mongo_enabled: true,
+    redis: false,
+    service_code: 'CDP',
+    team: 'tenantteam1',
+    type: 'Microservice',
+    subtype: 'Backend',
+    rds_aurora_postgres: [
+      {
+        instance_count: 1,
+        min_capacity: 0.5,
+        max_capacity: 4.0
+      }
+    ]
+  },
+  {
     name: 'tenant-backend',
     zone: 'protected',
     mongo_enabled: true,
