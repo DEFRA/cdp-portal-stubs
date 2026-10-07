@@ -73,6 +73,11 @@ function addQueue(name, envs, config) {
       arn: `arn:aws:sqs:eu-west-2:${environmentMappings[env]}:${config.name}`,
       name: config.name,
       url: `https://sqs.eu-west-2.amazonaws.com/${environmentMappings[env]}/${config.name}`,
+      deadletter_queue_arn: `arn:aws:sqs:eu-west-2:${environmentMappings[env]}:${
+        config.fifo_queue === 'true'
+          ? `${config.name.replace(/\.fifo$/, '')}-deadletter.fifo`
+          : `${config.name}-deadletter`
+      }`,
       fifo_queue: config.fifo_queue === 'true',
       content_based_deduplication: config.content_based_deduplication ?? false,
       receive_wait_time_seconds: 30,
