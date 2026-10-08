@@ -161,6 +161,14 @@ const defaultEntities = [
         min_capacity: 0.5,
         max_capacity: 4.0
       }
+    ],
+    sqs_queues: [
+      {
+        name: 'tenant_full_service_orders',
+        fifo_queue: 'false',
+        content_based_deduplication: false,
+        subscriptions: []
+      }
     ]
   },
   {
