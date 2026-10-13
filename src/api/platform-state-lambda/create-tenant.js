@@ -198,8 +198,8 @@ function createTenantState(name, config, env) {
       cognito_identity_pool: null,
       bedrock_ai: null,
       tenant_config: {
-        redis: config.redis_enabled,
-        mongo: config.mongo_enabled,
+        redis: Boolean(config.redis_enabled),
+        mongo: Boolean(config.mongo_enabled),
         s3_buckets: [],
         sqs_queues: [],
         sns_topics: [],
